@@ -54,8 +54,25 @@ usables como clases normales (`bg-borravino`, `text-oliva`, `border-oliva/30`…
 | `tinta`     | `#3f4420` | Texto de cuerpo                         |
 
 Tipografía: `font-display` (Playfair Display) para titulares, `font-sans`
-(EB Garamond) para el cuerpo. Dos utilidades propias: `titulo-seccion` y
+(Lora) para el cuerpo a 18px. Dos utilidades propias: `titulo-seccion` y
 `versalitas` / `epigrafe`.
+
+**No usar modificadores de opacidad en texto** (`text-oliva/80` y similares).
+Sobre el papel de marca ninguno llega a 4.5:1, ni siquiera al 90%: `text-oliva/90`
+da 4.30 y el sólido 5.30. La jerarquía se construye con tamaño y peso, no
+bajando el alfa. Para texto sobre foto, el velo tiene que ser lo bastante
+oscuro como para que el peor caso (una foto clara) siga pasando.
+
+### Accesibilidad
+
+Las dos páginas cumplen WCAG AA (4.5:1 en texto chico, 3:1 en grande), con el
+par más ajustado en 5.18. Al tocar colores conviene reverificar: Tailwind 4
+emite los colores como `oklab()`, así que un medidor que asuma RGB da valores
+sin sentido.
+
+La elección de Lora sobre EB Garamond es por x-height: 0.50 contra 0.405, lo
+que a igual tamaño da 23% más de altura aparente. EB Garamond es una garalda
+pensada para imprenta y en pantalla, a 17px, dejaba el ojo medio en 6,9px.
 
 El criterio visual: **la paleta de marca es el marco y el color lo ponen las
 flores.** Los fondos, el header y la tipografía se mantienen sobrios en

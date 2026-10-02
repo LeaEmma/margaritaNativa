@@ -7,10 +7,10 @@
 @import '@fontsource/playfair-display/latin-500.css';
 @import '@fontsource/playfair-display/latin-600.css';
 @import '@fontsource/playfair-display/latin-700.css';
-@import '@fontsource/eb-garamond/latin-400.css';
-@import '@fontsource/eb-garamond/latin-400-italic.css';
-@import '@fontsource/eb-garamond/latin-500.css';
-@import '@fontsource/eb-garamond/latin-600.css';
+@import '@fontsource/lora/latin-400.css';
+@import '@fontsource/lora/latin-400-italic.css';
+@import '@fontsource/lora/latin-500.css';
+@import '@fontsource/lora/latin-600.css';
 
 /* ------------------------------------------------------------------
    Identidad Margarita Nativa
@@ -33,7 +33,10 @@
   --color-tinta: #3f4420;
 
   --font-display: 'Playfair Display', Georgia, serif;
-  --font-sans: 'EB Garamond', Georgia, serif;
+  /* Lora en vez de EB Garamond: x-height 0.50 contra 0.405, es decir 23% más
+     de altura aparente al mismo tamaño. EB Garamond es una garalda de
+     imprenta y a 17px el ojo medio quedaba en 6,9px. */
+  --font-sans: 'Lora', Georgia, serif;
 }
 
 @layer base {
@@ -47,8 +50,8 @@
     background-color: var(--color-papel);
     color: var(--color-tinta);
     font-family: var(--font-sans);
-    font-size: 1.0625rem;
-    line-height: 1.65;
+    font-size: 1.125rem;
+    line-height: 1.6;
   }
 
   ::selection {

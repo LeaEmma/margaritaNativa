@@ -94,7 +94,7 @@ const PREGUNTAS = [
       loading="eager"
       fetchpriority="high"
     />
-    <div class="absolute inset-0 -z-10 bg-borravino/65"></div>
+    <div class="absolute inset-0 -z-10 bg-borravino/75"></div>
 
     <div class="mx-auto max-w-3xl px-5 py-24 text-center">
       <Image src={sello} alt={SITIO.nombre} width={320} height={320} class="mx-auto h-32 w-32 sm:h-40 sm:w-40" loading="eager" />
@@ -137,9 +137,9 @@ const PREGUNTAS = [
               <h2 class="font-display text-xl font-semibold tracking-wide text-borravino uppercase">
                 {rubro.titulo}
               </h2>
-              <p class="mt-2 flex-1 text-oliva/90">{rubro.texto}</p>
+              <p class="mt-2 flex-1 text-oliva">{rubro.texto}</p>
               <p class="mt-4 flex items-baseline gap-2 border-t border-oliva/15 pt-3">
-                <span class="text-sm text-oliva/80">desde</span>
+                <span class="text-sm text-oliva">desde</span>
                 <span class="font-display text-xl font-semibold text-oliva">{precio(rubro.desde)}</span>
               </p>
             </div>
@@ -162,7 +162,7 @@ const PREGUNTAS = [
       widths={[640, 1400]}
       sizes="100vw"
     />
-    <div class="absolute inset-0 -z-10 bg-oliva/88"></div>
+    <div class="absolute inset-0 -z-10 bg-tinta/90"></div>
 
     <div class="mx-auto max-w-4xl px-5">
       <TituloSeccion titulo="Suscripción" epigrafe="Flores frescas, siempre" claro />
@@ -179,10 +179,10 @@ const PREGUNTAS = [
               <h3 class="font-display text-xl font-semibold tracking-[0.1em] text-crema uppercase">
                 {plan.nombre}
               </h3>
-              <p class="mt-2 text-sm text-crema/75">{plan.detalle}</p>
+              <p class="mt-2 text-sm text-crema">{plan.detalle}</p>
               <Ornamento claro class="mx-auto mt-5" />
               <p class="font-display mt-5 text-3xl font-semibold text-crema">{precio(plan.precio)}</p>
-              <p class="mt-1 text-sm text-crema/70">por ramo</p>
+              <p class="mt-1 text-sm text-crema">por ramo</p>
             </div>
           ))
         }
@@ -209,7 +209,7 @@ const PREGUNTAS = [
           <Icono nombre="whatsapp" class="h-5 w-5" />
           Quiero suscribirme
         </Boton>
-        <p class="mt-5 text-crema/75">
+        <p class="mt-5 text-crema/85">
           ¿Preferís algo a medida? Consultanos por opciones y ramos personalizados.
         </p>
       </div>
@@ -311,7 +311,7 @@ const PREGUNTAS = [
         {
           PASOS.map((paso) => (
             <div class="text-center">
-              <p class="font-display text-5xl font-semibold text-borravino/25">{paso.n}</p>
+              <p class="font-display text-5xl font-semibold text-borravino/50">{paso.n}</p>
               <h3 class="font-display mt-3 text-xl font-semibold tracking-wide text-borravino uppercase">
                 {paso.titulo}
               </h3>
@@ -358,7 +358,7 @@ const PREGUNTAS = [
       widths={[640, 1400]}
       sizes="100vw"
     />
-    <div class="absolute inset-0 -z-10 bg-borravino/88"></div>
+    <div class="absolute inset-0 -z-10 bg-borravino/90"></div>
 
     <div class="mx-auto max-w-2xl px-5 text-center">
       <TituloSeccion titulo="Contacto" epigrafe="Escribinos" claro />

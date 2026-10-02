@@ -19,7 +19,7 @@ const { item, sufijo } = Astro.props;
     <h3 class="font-display text-lg font-semibold tracking-wide text-borravino uppercase sm:text-xl">
       {item.nombre}
     </h3>
-    {item.detalle && <p class="mt-1 text-balance text-oliva/90">{item.detalle}</p>}
+    {item.detalle && <p class="mt-1 text-balance text-oliva">{item.detalle}</p>}
   </div>
 
   <span class="hidden min-w-6 flex-1 translate-y-[-0.3em] border-b border-dotted border-oliva/40 sm:block"></span>
@@ -28,10 +28,10 @@ const { item, sufijo } = Astro.props;
     <svg viewBox="0 0 10 14" class="h-3 w-2 self-center fill-oliva-medio" aria-hidden="true">
       <path d="M5 0 9.5 7 5 14 .5 7Z" />
     </svg>
-    {item.desde && <span class="text-sm text-oliva/80">desde</span>}
+    {item.desde && <span class="text-sm text-oliva">desde</span>}
     <span class="font-display text-2xl font-semibold text-oliva sm:text-3xl">
       {formatear(item.precio)}
     </span>
-    {sufijo && <span class="text-sm text-oliva/80">{sufijo}</span>}
+    {sufijo && <span class="text-sm text-oliva">{sufijo}</span>}
   </p>
 </div>
