@@ -1,0 +1,37 @@
+---
+import { precio as formatear, type Item } from '../datos/catalogo';
+
+/**
+ * Fila de precio con guía punteada, como en las tarjetas impresas:
+ * NOMBRE ········· ♦ $25.000
+ */
+interface Props {
+  item: Item;
+  /** Texto chico después del precio, p. ej. "c/u". */
+  sufijo?: string;
+}
+
+const { item, sufijo } = Astro.props;
+---
+
+<div class="flex items-baseline gap-3 py-4 sm:gap-4">
+  <div class="min-w-0 flex-shrink">
+    <h3 class="font-display text-lg font-semibold tracking-wide text-borravino uppercase sm:text-xl">
+      {item.nombre}
+    </h3>
+    {item.detalle && <p class="mt-1 text-balance text-oliva/90">{item.detalle}</p>}
+  </div>
+
+  <span class="hidden min-w-6 flex-1 translate-y-[-0.3em] border-b border-dotted border-oliva/40 sm:block"></span>
+
+  <p class="ml-auto flex shrink-0 items-baseline gap-2 sm:ml-0">
+    <svg viewBox="0 0 10 14" class="h-3 w-2 self-center fill-oliva-medio" aria-hidden="true">
+      <path d="M5 0 9.5 7 5 14 .5 7Z" />
+    </svg>
+    {item.desde && <span class="text-sm text-oliva/80">desde</span>}
+    <span class="font-display text-2xl font-semibold text-oliva sm:text-3xl">
+      {formatear(item.precio)}
+    </span>
+    {sufijo && <span class="text-sm text-oliva/80">{sufijo}</span>}
+  </p>
+</div>

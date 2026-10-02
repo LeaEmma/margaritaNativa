@@ -1,26 +1,107 @@
 @import 'tailwindcss';
 
-/* Identidad de marca — tomada del logo de Margarita Nativa.
-   Se exponen como tokens de Tailwind v4, usables como bg-borravino,
-   text-oliva, border-salvia, etc. */
+/* Tipografía de marca. Playfair Display para titulares (es la serif de alto
+   contraste de las tarjetas impresas de Productos/), EB Garamond para el
+   cuerpo. Subconjunto latino: alcanza para el español. */
+@import '@fontsource/playfair-display/latin-400.css';
+@import '@fontsource/playfair-display/latin-500.css';
+@import '@fontsource/playfair-display/latin-600.css';
+@import '@fontsource/playfair-display/latin-700.css';
+@import '@fontsource/eb-garamond/latin-400.css';
+@import '@fontsource/eb-garamond/latin-400-italic.css';
+@import '@fontsource/eb-garamond/latin-500.css';
+@import '@fontsource/eb-garamond/latin-600.css';
+
+/* ------------------------------------------------------------------
+   Identidad Margarita Nativa
+   Los tres colores base están muestreados del logo definitivo
+   (_resources/Margarita Nativa/Diseño & Marca/Logo/Margaritalogolíneagruesa.png).
+   El resto son derivados para estados, bordes y fondos.
+   ------------------------------------------------------------------ */
 @theme {
-  --color-borravino: #550000;
-  --color-borravino-claro: #7a1a1a;
-  --color-oliva: #636b2f;
-  --color-oliva-oscuro: #494f22;
-  --color-verde-profundo: #274903;
-  --color-salvia: #c1ca93;
-  --color-crema: #fffbee;
+  --color-borravino: #500000;
+  --color-borravino-medio: #6e1a1a;
+  --color-borravino-tenue: #a56a6a;
 
-  --font-display: Georgia, 'Times New Roman', serif;
-  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --color-oliva: #606828;
+  --color-oliva-medio: #7d8640;
+  --color-oliva-tenue: #b3ba8e;
+
+  --color-crema: #f8f0c0;
+  --color-papel: #f2efe2;
+  --color-papel-claro: #faf8ef;
+  --color-tinta: #3f4420;
+
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-sans: 'EB Garamond', Georgia, serif;
 }
 
-html {
-  scroll-behavior: smooth;
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    /* Compensa el header fijo al saltar con anclas */
+    scroll-padding-top: 5.5rem;
+  }
+
+  body {
+    background-color: var(--color-papel);
+    color: var(--color-tinta);
+    font-family: var(--font-sans);
+    font-size: 1.0625rem;
+    line-height: 1.65;
+  }
+
+  ::selection {
+    background-color: var(--color-borravino);
+    color: var(--color-crema);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-borravino);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
 }
 
-body {
-  background-color: var(--color-crema);
-  color: var(--color-oliva-oscuro);
+@utility titulo-seccion {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--color-borravino);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1.1;
+}
+
+/* Versalitas espaciadas: el recurso tipográfico que usan las tarjetas
+   impresas para los subtítulos ("PARA TODAS LAS OCASIONES").
+   `versalitas` no fija color, para poder combinarla con cualquier text-*;
+   `epigrafe` es la versión con el oliva de marca ya aplicado. */
+@utility versalitas {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  font-size: 0.8125rem;
+}
+
+@utility epigrafe {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  font-size: 0.8125rem;
+  color: var(--color-oliva);
 }

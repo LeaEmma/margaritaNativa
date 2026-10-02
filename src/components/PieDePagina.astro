@@ -1,0 +1,58 @@
+---
+import { Image } from 'astro:assets';
+import sello from '../assets/sello-margarita-nativa.png';
+import Ornamento from './Ornamento.astro';
+import { NAVEGACION, SITIO } from '../datos/sitio';
+
+const anio = 2026;
+---
+
+<footer class="mt-24 border-t border-oliva/20 bg-papel-claro">
+  <div class="mx-auto max-w-6xl px-5 py-16 text-center">
+    <Image src={sello} alt={SITIO.nombre} width={160} height={160} class="mx-auto h-24 w-24" />
+
+    <p class="epigrafe mt-6">{SITIO.lema}</p>
+
+    <Ornamento conFiletes class="mt-6" />
+
+    <nav class="mt-8" aria-label="Pie de página">
+      <ul class="flex flex-wrap items-center justify-center gap-x-7 gap-y-3">
+        {
+          NAVEGACION.map((enlace) => (
+            <li>
+              <a href={enlace.href} class="versalitas text-oliva transition-colors hover:text-borravino">
+                {enlace.texto}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <div class="mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-2">
+      <a
+        href={SITIO.instagram}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="text-borravino transition-colors hover:text-borravino-medio"
+      >
+        Instagram {SITIO.instagramUsuario}
+      </a>
+      <a
+        href={SITIO.tiktok}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="text-borravino transition-colors hover:text-borravino-medio"
+      >
+        TikTok {SITIO.tiktokUsuario}
+      </a>
+      <a href={`mailto:${SITIO.email}`} class="text-borravino transition-colors hover:text-borravino-medio">
+        {SITIO.email}
+      </a>
+    </div>
+
+    <p class="mt-10 text-sm text-oliva/70">
+      © {anio} {SITIO.nombre}. Las fotos son ilustrativas: las flores varían según la estación.
+    </p>
+  </div>
+</footer>

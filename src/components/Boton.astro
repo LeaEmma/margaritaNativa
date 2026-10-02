@@ -1,0 +1,31 @@
+---
+interface Props {
+  href: string;
+  /** `relleno` para la acción principal, `contorno` para la secundaria. */
+  variante?: 'relleno' | 'contorno' | 'claro';
+  class?: string;
+}
+
+const { href, variante = 'relleno', class: clase = '' } = Astro.props;
+
+const externo = href.startsWith('http');
+
+const estilos = {
+  relleno: 'bg-borravino text-crema hover:bg-borravino-medio',
+  contorno: 'border border-borravino/40 text-borravino hover:border-borravino hover:bg-borravino/5',
+  claro: 'bg-crema text-borravino hover:bg-white',
+};
+---
+
+<a
+  href={href}
+  target={externo ? '_blank' : undefined}
+  rel={externo ? 'noopener noreferrer' : undefined}
+  class:list={[
+    'versalitas inline-flex items-center justify-center rounded-full px-7 py-3.5 transition-colors',
+    estilos[variante],
+    clase,
+  ]}
+>
+  <slot />
+</a>

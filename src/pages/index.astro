@@ -1,22 +1,416 @@
 ---
+import { Image } from 'astro:assets';
+
 import Layout from '../layouts/Layout.astro';
+import TituloSeccion from '../components/TituloSeccion.astro';
+import FilaPrecio from '../components/FilaPrecio.astro';
+import Tarjeta from '../components/Tarjeta.astro';
+import Boton from '../components/Boton.astro';
+import Ornamento from '../components/Ornamento.astro';
+
+import { RAMOS, SUSCRIPCION, PLANTAS, EXHIBIDOR, CUIDADOS, precio } from '../datos/catalogo';
+import { SITIO, enlaceContacto } from '../datos/sitio';
+
+import sello from '../assets/sello-margarita-nativa.png';
+import orquideaFucsia from '../assets/fotos/orquidea-fucsia.jpg';
+import orquideaBlanca from '../assets/fotos/orquidea-blanca.jpg';
+import ramoDetalle from '../assets/fotos/ramo-detalle.jpg';
+import ramosVariedad from '../assets/fotos/ramos-variedad.jpg';
+import exhibidorBaldes from '../assets/fotos/exhibidor-baldes.jpg';
+import localExhibidor from '../assets/fotos/local-exhibidor.jpg';
+import plantasVerde from '../assets/fotos/plantas-verde.jpg';
+import liriosArreglo from '../assets/fotos/lirios-arreglo.jpg';
+
+const RUBROS = [
+  { titulo: 'Ramos', texto: 'Para un cumpleaños, un gracias o un porque sí.', href: '#ramos', foto: ramoDetalle },
+  { titulo: 'Suscripción', texto: 'Flores frescas en casa, todas las semanas.', href: '#suscripcion', foto: ramosVariedad },
+  { titulo: 'Plantas', texto: 'De interior y de exterior, listas para llevar.', href: '#plantas', foto: plantasVerde },
+  { titulo: 'Locales', texto: 'Exhibidor con reposición para tu negocio.', href: '#exhibidor', foto: localExhibidor },
+];
+
+const PASOS = [
+  { n: '01', titulo: 'Escribinos', texto: 'Contanos para qué es y qué presupuesto tenés en mente. Te ayudamos a elegir.' },
+  { n: '02', titulo: 'Lo armamos', texto: 'Preparamos el ramo a mano con las flores que trajo la semana del mercado.' },
+  { n: '03', titulo: 'Lo entregamos', texto: 'Coordinamos día y horario. Llega envuelto y listo para regalar.' },
+];
+
+const PREGUNTAS = [
+  {
+    p: '¿Qué flores vienen en cada ramo?',
+    r: 'Las de estación. Trabajamos con lo que da la temporada, así que el ramo cambia a lo largo del año. Por eso cada entrega es distinta: esa es la gracia.',
+  },
+  {
+    p: '¿Puedo pedir flores o colores puntuales?',
+    r: 'Sí. El ramo personalizado se arma a medida: nos decís la paleta, la flor o la ocasión y lo preparamos. Arranca en ' + precio(50000) + '.',
+  },
+  {
+    p: '¿Cómo cuido las flores para que duren?',
+    r: 'Cambiá el agua cada dos días, mantené limpio el recipiente y ubicá el ramo lejos del sol directo y de fuentes de calor.',
+  },
+  {
+    p: '¿Y si alguna flor llega en mal estado?',
+    r: 'La reponemos. Si una flor se deteriora antes de tiempo, escribinos y la cambiamos sin cargo.',
+  },
+  {
+    p: 'Tengo un local, ¿cómo funciona el exhibidor?',
+    r: 'Llevamos el exhibidor con seis ramos de estación y después vamos reponiendo. Cuanto más alto el volumen, más baja el precio por ramo. Al terminar el servicio retiramos el exhibidor.',
+  },
+];
 ---
 
-<Layout title="Margarita Nativa">
-  <main class="mx-auto flex min-h-screen max-w-3xl flex-col items-center justify-center px-6 text-center">
-    <img src="/favicon.svg" alt="Margarita Nativa" class="h-28 w-28" />
+<Layout>
+  {/* ---------------------------------------------------------------- Hero */}
+  <section id="inicio" class="relative isolate flex min-h-[78vh] items-center justify-center overflow-hidden">
+    <Image
+      src={orquideaFucsia}
+      alt="Orquídeas fucsias y naranjas en flor"
+      class="absolute inset-0 -z-10 h-full w-full object-cover"
+      widths={[640, 1024, 1600, 2000]}
+      sizes="100vw"
+      loading="eager"
+      fetchpriority="high"
+    />
+    <div class="absolute inset-0 -z-10 bg-borravino/65"></div>
 
-    <h1 class="font-display mt-8 text-5xl tracking-[0.18em] text-oliva uppercase">
-      Margarita Nativa
-    </h1>
-    <div class="mt-4 h-px w-24 bg-borravino/40"></div>
+    <div class="mx-auto max-w-3xl px-5 py-24 text-center">
+      <Image src={sello} alt={SITIO.nombre} width={320} height={320} class="mx-auto h-32 w-32 sm:h-40 sm:w-40" loading="eager" />
 
-    <p class="mt-6 text-lg text-oliva-oscuro/80">
-      El sitio está en construcción.
-    </p>
+      <h1 class="font-display mt-8 text-4xl leading-[1.15] font-semibold text-balance text-crema sm:text-6xl">
+        Flores de estación,<br />armadas a mano
+      </h1>
 
-    <p class="mt-10 text-xs tracking-widest text-oliva/60 uppercase">
-      Próximamente
-    </p>
-  </main>
+      <p class="mx-auto mt-6 max-w-xl text-lg text-balance text-crema/85">
+        Cada semana traemos del mercado lo que da la temporada y lo convertimos en ramos.
+        Nunca son iguales: esa es la idea.
+      </p>
+
+      <div class="mt-10 flex flex-wrap items-center justify-center gap-4">
+        <Boton href="#ramos" variante="claro">Ver los ramos</Boton>
+        <Boton href="#suscripcion" variante="contorno" class="border-crema/50 text-crema hover:border-crema hover:bg-crema/10">
+          Suscribirme
+        </Boton>
+      </div>
+    </div>
+  </section>
+
+  {/* ------------------------------------------------------------- Rubros */}
+  <section class="mx-auto max-w-6xl px-5 py-20">
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      {
+        RUBROS.map((rubro) => (
+          <a
+            href={rubro.href}
+            class="group overflow-hidden rounded-xl border border-oliva/25 bg-papel-claro transition-colors hover:border-borravino/40"
+          >
+            <Image
+              src={rubro.foto}
+              alt=""
+              class="h-44 w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              widths={[400, 800]}
+              sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+            />
+            <div class="p-5">
+              <h2 class="font-display text-xl font-semibold tracking-wide text-borravino uppercase">
+                {rubro.titulo}
+              </h2>
+              <p class="mt-2 text-oliva/90">{rubro.texto}</p>
+            </div>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+
+  {/* -------------------------------------------------------------- Ramos */}
+  <section id="ramos" class="mx-auto max-w-6xl px-5 py-20">
+    <TituloSeccion titulo="Ramos" epigrafe="Para todas las ocasiones" />
+
+    <div class="mt-14 grid items-start gap-10 lg:grid-cols-[1fr_minmax(0,22rem)]">
+      <Tarjeta>
+        <div class="divide-y divide-oliva/20">
+          {RAMOS.map((item) => <FilaPrecio item={item} />)}
+        </div>
+      </Tarjeta>
+
+      <figure class="overflow-hidden rounded-xl border border-oliva/25">
+        <Image
+          src={ramoDetalle}
+          alt="Ramo de alstroemerias rosas y fucsias"
+          class="h-full w-full object-cover"
+          widths={[400, 800, 1200]}
+          sizes="(min-width: 1024px) 22rem, 100vw"
+        />
+      </figure>
+    </div>
+
+    <div class="mt-10 text-center">
+      <Boton href={enlaceContacto('¡Hola! Quiero encargar un ramo.')}>Encargar un ramo</Boton>
+    </div>
+  </section>
+
+  {/* --------------------------------------------------------- Suscripción */}
+  <section id="suscripcion" class="relative isolate overflow-hidden py-24">
+    <Image
+      src={ramosVariedad}
+      alt=""
+      class="absolute inset-0 -z-10 h-full w-full object-cover"
+      widths={[640, 1400]}
+      sizes="100vw"
+    />
+    <div class="absolute inset-0 -z-10 bg-oliva/88"></div>
+
+    <div class="mx-auto max-w-4xl px-5">
+      <TituloSeccion titulo="Suscripción" epigrafe="Flores frescas, siempre" claro />
+
+      <p class="mx-auto mt-8 max-w-2xl text-center text-lg text-balance text-crema/90">
+        Elegís cada cuánto querés recibir tu ramo y nos ocupamos del resto.
+        Todos los ramos son de flores de estación.
+      </p>
+
+      <div class="mt-12 grid gap-5 sm:grid-cols-3">
+        {
+          SUSCRIPCION.map((plan) => (
+            <div class="rounded-xl border border-crema/25 bg-crema/10 p-7 text-center backdrop-blur-[2px]">
+              <h3 class="font-display text-xl font-semibold tracking-[0.1em] text-crema uppercase">
+                {plan.nombre}
+              </h3>
+              <p class="mt-2 text-sm text-crema/75">{plan.detalle}</p>
+              <Ornamento claro class="mx-auto mt-5" />
+              <p class="font-display mt-5 text-3xl font-semibold text-crema">{precio(plan.precio)}</p>
+              <p class="mt-1 text-sm text-crema/70">por ramo</p>
+            </div>
+          ))
+        }
+      </div>
+
+      <div class="mx-auto mt-12 max-w-2xl rounded-xl border border-crema/20 p-7">
+        <h3 class="versalitas text-center text-crema">Mantenimiento y cuidado</h3>
+        <ul class="mt-5 space-y-3">
+          {
+            CUIDADOS.map((texto) => (
+              <li class="flex gap-3 text-crema/85">
+                <svg viewBox="0 0 10 14" class="mt-2 h-3 w-2 shrink-0 fill-crema/60" aria-hidden="true">
+                  <path d="M5 0 9.5 7 5 14 .5 7Z" />
+                </svg>
+                <span>{texto}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div class="mt-12 text-center">
+        <Boton href={enlaceContacto('¡Hola! Me interesa la suscripción de ramos.')} variante="claro">
+          Quiero suscribirme
+        </Boton>
+        <p class="mt-5 text-crema/75">
+          ¿Preferís algo a medida? Consultanos por opciones y ramos personalizados.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  {/* ------------------------------------------------------------ Plantas */}
+  <section id="plantas" class="mx-auto max-w-6xl px-5 py-20">
+    <TituloSeccion titulo="Plantas" epigrafe="De interior y de exterior" />
+
+    <div class="mt-14 grid items-start gap-10 lg:grid-cols-[minmax(0,22rem)_1fr]">
+      <figure class="order-last overflow-hidden rounded-xl border border-oliva/25 lg:order-first">
+        <Image
+          src={plantasVerde}
+          alt="Plantas de interior en macetas"
+          class="h-full w-full object-cover"
+          widths={[400, 800, 1200]}
+          sizes="(min-width: 1024px) 22rem, 100vw"
+        />
+      </figure>
+
+      <Tarjeta>
+        <div class="grid gap-x-12 sm:grid-cols-2">
+          {
+            PLANTAS.map((planta) => (
+              <div class="flex items-baseline gap-3 border-b border-oliva/15 py-3">
+                <h3 class="font-display font-semibold tracking-wide text-borravino uppercase">
+                  {planta.nombre}
+                  {planta.detalle && <span class="block text-xs font-normal normal-case opacity-70">{planta.detalle}</span>}
+                </h3>
+                <span class="min-w-4 flex-1 translate-y-[-0.3em] border-b border-dotted border-oliva/40" />
+                <p class="font-display shrink-0 text-lg font-semibold text-oliva">{precio(planta.precio)}</p>
+              </div>
+            ))
+          }
+        </div>
+      </Tarjeta>
+    </div>
+
+    <div class="mt-10 text-center">
+      <Boton href={enlaceContacto('¡Hola! Quiero consultar por plantas.')} variante="contorno">
+        Consultar disponibilidad
+      </Boton>
+    </div>
+  </section>
+
+  {/* ---------------------------------------------------------- Exhibidor */}
+  <section id="exhibidor" class="bg-papel-claro py-20">
+    <div class="mx-auto max-w-6xl px-5">
+      <TituloSeccion titulo="Exhibidor" epigrafe="Para locales y comercios" />
+
+      <p class="mx-auto mt-8 max-w-2xl text-center text-lg text-balance text-oliva">
+        Llevamos un exhibidor con ramos de estación a tu local y nos ocupamos de reponerlos.
+        Cuantos más ramos, más baja el precio por unidad.
+      </p>
+
+      <div class="mt-14 grid items-start gap-10 lg:grid-cols-[1fr_minmax(0,24rem)]">
+        <div class="space-y-6">
+          <Tarjeta>
+            <FilaPrecio item={EXHIBIDOR.inicio} />
+          </Tarjeta>
+
+          <Tarjeta>
+            <h3 class="epigrafe">Reposición de ramos</h3>
+            <div class="mt-2 divide-y divide-oliva/20">
+              {EXHIBIDOR.reposicion.map((item) => <FilaPrecio item={item} sufijo="c/u" />)}
+            </div>
+            <p class="mt-4 text-sm text-oliva/80 italic">Todos los ramos son de flores de estación.</p>
+          </Tarjeta>
+
+          <Tarjeta>
+            <p class="text-oliva">
+              Al finalizar el servicio, Margarita Nativa retira el exhibidor en las mismas
+              condiciones en las que fue entregado.
+            </p>
+          </Tarjeta>
+        </div>
+
+        <figure class="overflow-hidden rounded-xl border border-oliva/25">
+          <Image
+            src={exhibidorBaldes}
+            alt="Exhibidor con baldes de ramos de flores de estación"
+            class="h-full w-full object-cover"
+            widths={[400, 800, 1600]}
+            sizes="(min-width: 1024px) 24rem, 100vw"
+          />
+        </figure>
+      </div>
+
+      <div class="mt-10 text-center">
+        <Boton href={enlaceContacto('¡Hola! Tengo un local y quiero consultar por el exhibidor.')}>
+          Consultar por mi local
+        </Boton>
+      </div>
+    </div>
+  </section>
+
+  {/* ------------------------------------------------------------- Eventos */}
+  <section id="eventos" class="mx-auto max-w-6xl px-5 py-20">
+    <TituloSeccion titulo="Eventos" epigrafe="Ambientación floral" />
+
+    <div class="mt-14 grid items-center gap-10 lg:grid-cols-2">
+      <div>
+        <p class="text-lg text-balance text-oliva">
+          Ambientamos cumpleaños, fiestas y celebraciones con flores de estación.
+          Trabajamos sobre la paleta y el espacio que tengas, y armamos todo en el lugar.
+        </p>
+        <p class="mt-5 text-oliva">
+          También preparamos la barra de flores: tus invitados se arman su propio ramo
+          y se lo llevan de recuerdo.
+        </p>
+        <Boton
+          href={enlaceContacto('¡Hola! Quiero consultar por ambientación para un evento.')}
+          variante="contorno"
+          class="mt-8"
+        >
+          Pedir presupuesto
+        </Boton>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <figure class="overflow-hidden rounded-xl border border-oliva/25">
+          <Image src={liriosArreglo} alt="Arreglo con lirios" class="h-full w-full object-cover" widths={[300, 600]} sizes="(min-width: 1024px) 18rem, 45vw" />
+        </figure>
+        <figure class="overflow-hidden rounded-xl border border-oliva/25">
+          <Image src={orquideaBlanca} alt="Orquídea blanca" class="h-full w-full object-cover" widths={[300, 600]} sizes="(min-width: 1024px) 18rem, 45vw" />
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  {/* ------------------------------------------------------- Cómo funciona */}
+  <section class="bg-papel-claro py-20">
+    <div class="mx-auto max-w-5xl px-5">
+      <TituloSeccion titulo="Cómo funciona" epigrafe="Tres pasos" />
+
+      <div class="mt-14 grid gap-8 sm:grid-cols-3">
+        {
+          PASOS.map((paso) => (
+            <div class="text-center">
+              <p class="font-display text-5xl font-semibold text-borravino/25">{paso.n}</p>
+              <h3 class="font-display mt-3 text-xl font-semibold tracking-wide text-borravino uppercase">
+                {paso.titulo}
+              </h3>
+              <p class="mt-3 text-balance text-oliva">{paso.texto}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  {/* ---------------------------------------------------------------- FAQ */}
+  <section class="mx-auto max-w-3xl px-5 py-20">
+    <TituloSeccion titulo="Preguntas" epigrafe="Lo que más nos consultan" />
+
+    <div class="mt-12 divide-y divide-oliva/20 border-y border-oliva/20">
+      {
+        PREGUNTAS.map((item) => (
+          <details class="group py-5">
+            <summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-medium text-borravino [&::-webkit-details-marker]:hidden">
+              {item.p}
+              <svg
+                viewBox="0 0 20 20"
+                class="h-5 w-5 shrink-0 fill-oliva transition-transform duration-300 group-open:rotate-45"
+                aria-hidden="true"
+              >
+                <path d="M9 3h2v14H9z" />
+                <path d="M3 9h14v2H3z" />
+              </svg>
+            </summary>
+            <p class="mt-3 pr-9 text-oliva">{item.r}</p>
+          </details>
+        ))
+      }
+    </div>
+  </section>
+
+  {/* ----------------------------------------------------------- Contacto */}
+  <section id="contacto" class="relative isolate overflow-hidden py-24">
+    <Image
+      src={localExhibidor}
+      alt=""
+      class="absolute inset-0 -z-10 h-full w-full object-cover"
+      widths={[640, 1400]}
+      sizes="100vw"
+    />
+    <div class="absolute inset-0 -z-10 bg-borravino/88"></div>
+
+    <div class="mx-auto max-w-2xl px-5 text-center">
+      <TituloSeccion titulo="Contacto" epigrafe="Escribinos" claro />
+
+      <p class="mt-8 text-lg text-balance text-crema/90">
+        Contanos qué necesitás y te respondemos a la brevedad. Si es un regalo,
+        decinos para quién es y nos encargamos del resto.
+      </p>
+
+      <div class="mt-10 flex flex-wrap items-center justify-center gap-4">
+        <Boton href={SITIO.instagram} variante="claro">Instagram</Boton>
+        <Boton
+          href={`mailto:${SITIO.email}`}
+          variante="contorno"
+          class="border-crema/50 text-crema hover:border-crema hover:bg-crema/10"
+        >
+          Mandar un mail
+        </Boton>
+      </div>
+    </div>
+  </section>
 </Layout>

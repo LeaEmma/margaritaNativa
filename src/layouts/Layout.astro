@@ -1,15 +1,18 @@
 ---
 import '../styles/global.css';
+import Encabezado from '../components/Encabezado.astro';
+import PieDePagina from '../components/PieDePagina.astro';
+import { SITIO } from '../datos/sitio';
 
 interface Props {
-  title?: string;
-  description?: string;
+  titulo?: string;
+  descripcion?: string;
 }
 
-const {
-  title = 'Margarita Nativa',
-  description = 'Margarita Nativa — plantas y flores nativas.',
-} = Astro.props;
+const { titulo, descripcion = SITIO.descripcion } = Astro.props;
+
+const tituloCompleto = titulo ? `${titulo} — ${SITIO.nombre}` : `${SITIO.nombre} — ${SITIO.lema}`;
+const canonica = new URL(Astro.url.pathname, Astro.site ?? 'https://margaritanativa.com');
 ---
 
 <!doctype html>
@@ -17,15 +20,38 @@ const {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
-    <title>{title}</title>
-    <meta name="description" content={description} />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
+
+    <title>{tituloCompleto}</title>
+    <meta name="description" content={descripcion} />
+    <link rel="canonical" href={canonica} />
+
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" />
+    <link rel="icon" href="/favicon-512.png" sizes="512x512" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#500000" />
+
     <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_AR" />
+    <meta property="og:site_name" content={SITIO.nombre} />
+    <meta property="og:title" content={tituloCompleto} />
+    <meta property="og:description" content={descripcion} />
+    <meta property="og:url" content={canonica} />
+    <meta name="twitter:card" content="summary_large_image" />
   </head>
-  <body class="font-sans antialiased">
-    <slot />
+
+  <body class="antialiased">
+    <a
+      href="#contenido"
+      class="versalitas sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-[60] focus:rounded-full focus:bg-borravino focus:px-5 focus:py-3 focus:text-crema"
+    >
+      Saltar al contenido
+    </a>
+
+    <Encabezado />
+    <main id="contenido">
+      <slot />
+    </main>
+    <PieDePagina />
   </body>
 </html>

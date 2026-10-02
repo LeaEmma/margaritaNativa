@@ -1,0 +1,41 @@
+---
+import Ornamento from './Ornamento.astro';
+
+/**
+ * Encabezado de sección con filetes a los lados del título, epígrafe en
+ * versalitas espaciadas y trébol debajo. Replica el armado de las tarjetas
+ * impresas de Productos/.
+ */
+interface Props {
+  titulo: string;
+  epigrafe?: string;
+  /** Texto claro sobre foto, para el uso dentro del hero. */
+  claro?: boolean;
+  class?: string;
+}
+
+const { titulo, epigrafe, claro = false, class: clase = '' } = Astro.props;
+---
+
+<header class:list={['text-center', clase]}>
+  <div class="flex items-center justify-center gap-5">
+    <span class:list={['hidden h-px flex-1 sm:block', claro ? 'bg-crema/40' : 'bg-oliva/30']}></span>
+    <h2
+      class:list={[
+        'titulo-seccion text-4xl sm:text-5xl',
+        claro && 'text-crema',
+      ]}
+    >
+      {titulo}
+    </h2>
+    <span class:list={['hidden h-px flex-1 sm:block', claro ? 'bg-crema/40' : 'bg-oliva/30']}></span>
+  </div>
+
+  {
+    epigrafe && (
+      <p class:list={['epigrafe mt-3', claro && 'text-crema/80']}>{epigrafe}</p>
+    )
+  }
+
+  <Ornamento conFiletes claro={claro} class="mt-5" />
+</header>
