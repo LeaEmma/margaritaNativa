@@ -2,7 +2,8 @@
 import { Image } from 'astro:assets';
 import sello from '../assets/sello-margarita-nativa.png';
 import Ornamento from './Ornamento.astro';
-import { NAVEGACION, SITIO } from '../datos/sitio';
+import Icono from './Icono.astro';
+import { NAVEGACION, SITIO, enlaceContacto } from '../datos/sitio';
 
 const anio = 2026;
 ---
@@ -29,22 +30,37 @@ const anio = 2026;
       </ul>
     </nav>
 
-    <div class="mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-2">
+    <div class="mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
+      {
+        SITIO.whatsapp && (
+          <a
+            href={enlaceContacto('¡Hola! Te escribo desde la web.')}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center gap-2 text-borravino transition-colors hover:text-borravino-medio"
+          >
+            <Icono nombre="whatsapp" class="h-5 w-5" />
+            WhatsApp
+          </a>
+        )
+      }
       <a
         href={SITIO.instagram}
         target="_blank"
         rel="noopener noreferrer"
-        class="text-borravino transition-colors hover:text-borravino-medio"
+        class="flex items-center gap-2 text-borravino transition-colors hover:text-borravino-medio"
       >
-        Instagram {SITIO.instagramUsuario}
+        <Icono nombre="instagram" class="h-5 w-5" />
+        {SITIO.instagramUsuario}
       </a>
       <a
         href={SITIO.tiktok}
         target="_blank"
         rel="noopener noreferrer"
-        class="text-borravino transition-colors hover:text-borravino-medio"
+        class="flex items-center gap-2 text-borravino transition-colors hover:text-borravino-medio"
       >
-        TikTok {SITIO.tiktokUsuario}
+        <Icono nombre="tiktok" class="h-5 w-5" />
+        {SITIO.tiktokUsuario}
       </a>
       <a href={`mailto:${SITIO.email}`} class="text-borravino transition-colors hover:text-borravino-medio">
         {SITIO.email}

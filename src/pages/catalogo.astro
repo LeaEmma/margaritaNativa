@@ -1,0 +1,165 @@
+---
+import { Image } from 'astro:assets';
+
+import Layout from '../layouts/Layout.astro';
+import TituloSeccion from '../components/TituloSeccion.astro';
+import FilaPrecio from '../components/FilaPrecio.astro';
+import Tarjeta from '../components/Tarjeta.astro';
+import Boton from '../components/Boton.astro';
+import Icono from '../components/Icono.astro';
+
+import { CATEGORIAS, porCategoria, CUIDADOS, type Categoria } from '../datos/catalogo';
+import { enlaceContacto } from '../datos/sitio';
+
+import ramoDetalle from '../assets/fotos/ramo-detalle.jpg';
+import ramosVariedad from '../assets/fotos/ramos-variedad.jpg';
+import plantasVerde from '../assets/fotos/plantas-verde.jpg';
+import exhibidorBaldes from '../assets/fotos/exhibidor-baldes.jpg';
+
+const FOTOS: Record<Categoria, ImageMetadata> = {
+  ramos: ramoDetalle,
+  suscripcion: ramosVariedad,
+  plantas: plantasVerde,
+  exhibidor: exhibidorBaldes,
+};
+
+/** Nota al pie de cada categoría, tomada de las tarjetas impresas. */
+const NOTAS: Partial<Record<Categoria, string[]>> = {
+  suscripcion: CUIDADOS,
+  exhibidor: [
+    'Todos los ramos son de flores de estación.',
+    'Al finalizar el servicio, Margarita Nativa retira el exhibidor en las mismas condiciones en las que fue entregado.',
+  ],
+};
+
+const secciones = CATEGORIAS.map((categoria) => ({
+  ...categoria,
+  items: porCategoria(categoria.clave),
+  foto: FOTOS[categoria.clave],
+  notas: NOTAS[categoria.clave],
+}));
+---
+
+<Layout
+  titulo="Catálogo"
+  descripcion="Ramos, suscripciones, plantas y exhibidor para locales. Precios actualizados de Margarita Nativa."
+>
+  <section class="mx-auto max-w-5xl px-5 pt-16 pb-10">
+    <TituloSeccion titulo="Catálogo" epigrafe="Precios vigentes" />
+
+    <p class="mx-auto mt-8 max-w-2xl text-center text-lg text-balance text-oliva">
+      Todo lo que hacemos, en un solo lugar. Las flores son de estación, así que la
+      variedad cambia a lo largo del año.
+    </p>
+
+    {/* Sin JavaScript se ven todas las categorías: el filtro es una mejora, no un requisito. */}
+    <div id="filtros" class="mt-10 flex flex-wrap items-center justify-center gap-3">
+      <button
+        type="button"
+        data-filtro="todas"
+        aria-pressed="true"
+        class="chip versalitas rounded-full border border-borravino bg-borravino px-5 py-2.5 text-crema transition-colors"
+      >
+        Todo
+      </button>
+      {
+        CATEGORIAS.map((categoria) => (
+          <button
+            type="button"
+            data-filtro={categoria.clave}
+            aria-pressed="false"
+            class="chip versalitas rounded-full border border-oliva/35 px-5 py-2.5 text-oliva transition-colors hover:border-borravino hover:text-borravino"
+          >
+            {categoria.nombre}
+          </button>
+        ))
+      }
+    </div>
+  </section>
+
+  {
+    secciones.map((seccion) => (
+      <section id={seccion.clave} data-categoria={seccion.clave} class="mx-auto max-w-5xl scroll-mt-32 px-5 py-12">
+        <figure class="overflow-hidden rounded-xl border border-oliva/25">
+          <Image
+            src={seccion.foto}
+            alt={`${seccion.nombre} de Margarita Nativa`}
+            class="h-52 w-full object-cover sm:h-64"
+            widths={[640, 1024, 1600]}
+            sizes="(min-width: 1024px) 64rem, 100vw"
+          />
+        </figure>
+
+        <TituloSeccion titulo={seccion.nombre} epigrafe={seccion.epigrafe} class="mt-10" />
+
+        <Tarjeta class="mt-10">
+          <div class="divide-y divide-oliva/20">
+            {seccion.items.map((item) => (
+              <FilaPrecio item={item} sufijo={item.sufijo} />
+            ))}
+          </div>
+
+          {seccion.notas && (
+            <ul class="mt-6 space-y-2 border-t border-oliva/20 pt-5">
+              {seccion.notas.map((nota) => (
+                <li class="flex gap-3 text-sm text-oliva/85">
+                  <svg viewBox="0 0 10 14" class="mt-1.5 h-2.5 w-1.5 shrink-0 fill-oliva/50" aria-hidden="true">
+                    <path d="M5 0 9.5 7 5 14 .5 7Z" />
+                  </svg>
+                  <span>{nota}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </Tarjeta>
+
+        <div class="mt-8 text-center">
+          <Boton
+            href={enlaceContacto(`¡Hola! Quiero consultar por ${seccion.nombre.toLowerCase()}.`)}
+            variante="contorno"
+            class="gap-2.5"
+          >
+            <Icono nombre="whatsapp" class="h-5 w-5" />
+            Consultar por {seccion.nombre.toLowerCase()}
+          </Boton>
+        </div>
+      </section>
+    ))
+  }
+
+  <p id="sin-resultados" hidden class="mx-auto max-w-5xl px-5 py-12 text-center text-oliva">
+    No hay productos en esa categoría.
+  </p>
+</Layout>
+
+<script>
+  const filtros = document.querySelector<HTMLElement>('#filtros');
+  const secciones = document.querySelectorAll<HTMLElement>('section[data-categoria]');
+  const vacio = document.querySelector<HTMLElement>('#sin-resultados');
+
+  filtros?.addEventListener('click', (evento) => {
+    const boton = (evento.target as HTMLElement).closest<HTMLButtonElement>('button[data-filtro]');
+    if (!boton) return;
+
+    const elegida = boton.dataset.filtro;
+
+    for (const chip of filtros.querySelectorAll<HTMLButtonElement>('button[data-filtro]')) {
+      const activo = chip === boton;
+      chip.setAttribute('aria-pressed', String(activo));
+      chip.classList.toggle('border-borravino', activo);
+      chip.classList.toggle('bg-borravino', activo);
+      chip.classList.toggle('text-crema', activo);
+      chip.classList.toggle('border-oliva/35', !activo);
+      chip.classList.toggle('text-oliva', !activo);
+    }
+
+    let visibles = 0;
+    for (const seccion of secciones) {
+      const mostrar = elegida === 'todas' || seccion.dataset.categoria === elegida;
+      seccion.hidden = !mostrar;
+      if (mostrar) visibles++;
+    }
+
+    if (vacio) vacio.hidden = visibles > 0;
+  });
+</script>

@@ -7,6 +7,7 @@ import FilaPrecio from '../components/FilaPrecio.astro';
 import Tarjeta from '../components/Tarjeta.astro';
 import Boton from '../components/Boton.astro';
 import Ornamento from '../components/Ornamento.astro';
+import Icono from '../components/Icono.astro';
 
 import { RAMOS, SUSCRIPCION, PLANTAS, EXHIBIDOR, CUIDADOS, precio } from '../datos/catalogo';
 import { SITIO, enlaceContacto } from '../datos/sitio';
@@ -402,7 +403,18 @@ const PREGUNTAS = [
       </p>
 
       <div class="mt-10 flex flex-wrap items-center justify-center gap-4">
-        <Boton href={SITIO.instagram} variante="claro">Instagram</Boton>
+        <Boton href={enlaceContacto('¡Hola! Te escribo desde la web.')} variante="claro" class="gap-2.5">
+          <Icono nombre="whatsapp" class="h-5 w-5" />
+          WhatsApp
+        </Boton>
+        <Boton
+          href={SITIO.instagram}
+          variante="contorno"
+          class="gap-2.5 border-crema/50 text-crema hover:border-crema hover:bg-crema/10"
+        >
+          <Icono nombre="instagram" class="h-5 w-5" />
+          Instagram
+        </Boton>
         <Boton
           href={`mailto:${SITIO.email}`}
           variante="contorno"

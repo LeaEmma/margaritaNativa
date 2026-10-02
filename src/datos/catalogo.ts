@@ -85,3 +85,50 @@ export function precio(valor: number): string {
     .format(valor)
     .replace(/\s/g, '');
 }
+
+/* ------------------------------------------------------------------
+   Vista unificada para la página de catálogo
+   ------------------------------------------------------------------ */
+
+export type Categoria = 'ramos' | 'suscripcion' | 'plantas' | 'exhibidor';
+
+export interface ItemCatalogo extends Item {
+  categoria: Categoria;
+  /** Identificador estable para anclas y para mapear la foto del producto. */
+  slug: string;
+  /** Texto chico después del precio, p. ej. "c/u" o "por ramo". */
+  sufijo?: string;
+}
+
+export const CATEGORIAS: { clave: Categoria; nombre: string; epigrafe: string }[] = [
+  { clave: 'ramos', nombre: 'Ramos', epigrafe: 'Para todas las ocasiones' },
+  { clave: 'suscripcion', nombre: 'Suscripción', epigrafe: 'Flores frescas, siempre' },
+  { clave: 'plantas', nombre: 'Plantas', epigrafe: 'De interior y de exterior' },
+  { clave: 'exhibidor', nombre: 'Exhibidor', epigrafe: 'Para locales y comercios' },
+];
+
+function aSlug(texto: string): string {
+  return texto
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function marcar(items: Item[], categoria: Categoria, sufijo?: string): ItemCatalogo[] {
+  return items.map((item) => ({ ...item, categoria, slug: aSlug(item.nombre), sufijo }));
+}
+
+/** Todo el catálogo en una sola lista, para filtrar y recorrer. */
+export const CATALOGO: ItemCatalogo[] = [
+  ...marcar(RAMOS, 'ramos'),
+  ...marcar(SUSCRIPCION, 'suscripcion', 'por ramo'),
+  ...marcar(PLANTAS, 'plantas'),
+  ...marcar([EXHIBIDOR.inicio], 'exhibidor'),
+  ...marcar(EXHIBIDOR.reposicion, 'exhibidor', 'c/u'),
+];
+
+export function porCategoria(categoria: Categoria): ItemCatalogo[] {
+  return CATALOGO.filter((item) => item.categoria === categoria);
+}

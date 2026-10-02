@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import Encabezado from '../components/Encabezado.astro';
 import PieDePagina from '../components/PieDePagina.astro';
+import BotonWhatsApp from '../components/BotonWhatsApp.astro';
 import { SITIO } from '../datos/sitio';
 
 interface Props {
@@ -53,5 +54,6 @@ const canonica = new URL(Astro.url.pathname, Astro.site ?? 'https://margaritanat
       <slot />
     </main>
     <PieDePagina />
+    <BotonWhatsApp />
   </body>
 </html>

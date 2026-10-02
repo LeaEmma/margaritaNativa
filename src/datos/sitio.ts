@@ -12,10 +12,9 @@ export const SITIO = {
   tiktokUsuario: '@margarita.nativa',
   email: 'soymargaritanativa@gmail.com',
 
-  // PENDIENTE: completar con el número real, en formato internacional sin
-  // signos (ej. 5491122334455). Hasta entonces los botones de WhatsApp
-  // caen en Instagram.
-  whatsapp: '',
+  /** Formato internacional, solo dígitos. Si queda vacío, los botones de
+   *  WhatsApp desaparecen y el resto del contacto cae en Instagram. */
+  whatsapp: '5491135813920',
 } as const;
 
 /** Link de WhatsApp con mensaje prearmado, o Instagram si todavía no hay número. */
@@ -24,11 +23,13 @@ export function enlaceContacto(mensaje: string): string {
   return `https://wa.me/${SITIO.whatsapp}?text=${encodeURIComponent(mensaje)}`;
 }
 
+// Rutas absolutas con ancla ("/#eventos") en vez de solo el ancla: así los
+// enlaces funcionan igual desde la home que desde /catalogo.
 export const NAVEGACION = [
-  { texto: 'Ramos', href: '#ramos' },
-  { texto: 'Suscripción', href: '#suscripcion' },
-  { texto: 'Plantas', href: '#plantas' },
-  { texto: 'Locales', href: '#exhibidor' },
-  { texto: 'Eventos', href: '#eventos' },
-  { texto: 'Contacto', href: '#contacto' },
+  { texto: 'Ramos', href: '/catalogo#ramos' },
+  { texto: 'Suscripción', href: '/catalogo#suscripcion' },
+  { texto: 'Plantas', href: '/catalogo#plantas' },
+  { texto: 'Locales', href: '/catalogo#exhibidor' },
+  { texto: 'Eventos', href: '/#eventos' },
+  { texto: 'Contacto', href: '/#contacto' },
 ] as const;
