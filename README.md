@@ -33,7 +33,7 @@ src/
   components/        Piezas de UI reutilizables
   datos/             catalogo.ts (precios) y sitio.ts (contacto, navegación)
   layouts/           Layout base con <head>, SEO y Open Graph
-  pages/             Cada archivo .astro es una ruta
+  pages/             index.astro (resumen) y catalogo.astro (precios completos)
   styles/            global.css — Tailwind y los tokens de marca
 _resources/          Material de trabajo original. NO versionado.
 ```
@@ -75,15 +75,21 @@ El catálogo vive en [`src/datos/catalogo.ts`](src/datos/catalogo.ts), transcrit
 de esas mismas tarjetas. **Al actualizar precios, actualizar también las tarjetas
 impresas** para que el impreso y el sitio no se desfasen.
 
+La home es el resumen y no repite precios: solo muestra un "desde" por rubro,
+calculado con `precioDesde()`. El detalle completo vive en `/catalogo`. Agregar
+un producto al arreglo correspondiente alcanza para que aparezca en las dos
+páginas.
+
 ## Pendientes
 
 - [ ] **Confirmar la lógica de precios de la suscripción.** En la tarjeta,
       semanal ($40.000) es más barata que mensual ($50.000). Se interpretó como
       precio *por ramo* con descuento por frecuencia y así figura en el sitio.
       Si en realidad es el total del período, hay que invertirlo.
-- [ ] **Cargar el número de WhatsApp** en `src/datos/sitio.ts`. Mientras esté
-      vacío, todos los botones de contacto caen en Instagram.
 - [ ] Definir zonas de entrega y costo de envío (las tres referencias cobran por zona)
+- [ ] Foto propia por producto en el catálogo. Hoy hay una foto por categoría;
+      en `_resources/.../Fotos & Videos/` hay material para orquídeas, palmeras,
+      monstera y strelitzia, pero el resto de las plantas no está identificado.
 - [ ] Confirmar el dominio definitivo en `astro.config.mjs` (`site`)
 - [ ] Imagen de Open Graph propia (hoy no hay `og:image`)
 - [ ] Sección de eventos con fotos reales de ambientación

@@ -3,13 +3,11 @@ import { Image } from 'astro:assets';
 
 import Layout from '../layouts/Layout.astro';
 import TituloSeccion from '../components/TituloSeccion.astro';
-import FilaPrecio from '../components/FilaPrecio.astro';
-import Tarjeta from '../components/Tarjeta.astro';
 import Boton from '../components/Boton.astro';
 import Ornamento from '../components/Ornamento.astro';
 import Icono from '../components/Icono.astro';
 
-import { RAMOS, SUSCRIPCION, PLANTAS, EXHIBIDOR, CUIDADOS, precio } from '../datos/catalogo';
+import { SUSCRIPCION, CUIDADOS, precio, precioDesde } from '../datos/catalogo';
 import { SITIO, enlaceContacto } from '../datos/sitio';
 
 import sello from '../assets/sello-margarita-nativa.png';
@@ -22,11 +20,36 @@ import localExhibidor from '../assets/fotos/local-exhibidor.jpg';
 import plantasVerde from '../assets/fotos/plantas-verde.jpg';
 import liriosArreglo from '../assets/fotos/lirios-arreglo.jpg';
 
+// La home es el resumen; el detalle de precios vive en /catalogo.
 const RUBROS = [
-  { titulo: 'Ramos', texto: 'Para un cumpleaños, un gracias o un porque sí.', href: '#ramos', foto: ramoDetalle },
-  { titulo: 'Suscripción', texto: 'Flores frescas en casa, todas las semanas.', href: '#suscripcion', foto: ramosVariedad },
-  { titulo: 'Plantas', texto: 'De interior y de exterior, listas para llevar.', href: '#plantas', foto: plantasVerde },
-  { titulo: 'Locales', texto: 'Exhibidor con reposición para tu negocio.', href: '#exhibidor', foto: localExhibidor },
+  {
+    titulo: 'Ramos',
+    texto: 'Para un cumpleaños, un gracias o un porque sí.',
+    href: '/catalogo#ramos',
+    foto: ramoDetalle,
+    desde: precioDesde('ramos'),
+  },
+  {
+    titulo: 'Suscripción',
+    texto: 'Flores frescas en casa, todas las semanas.',
+    href: '#suscripcion',
+    foto: ramosVariedad,
+    desde: precioDesde('suscripcion'),
+  },
+  {
+    titulo: 'Plantas',
+    texto: 'De interior y de exterior, listas para llevar.',
+    href: '/catalogo#plantas',
+    foto: plantasVerde,
+    desde: precioDesde('plantas'),
+  },
+  {
+    titulo: 'Locales',
+    texto: 'Exhibidor con reposición para tu negocio.',
+    href: '#exhibidor',
+    foto: localExhibidor,
+    desde: precioDesde('exhibidor'),
+  },
 ];
 
 const PASOS = [
@@ -86,7 +109,7 @@ const PREGUNTAS = [
       </p>
 
       <div class="mt-10 flex flex-wrap items-center justify-center gap-4">
-        <Boton href="#ramos" variante="claro">Ver los ramos</Boton>
+        <Boton href="/catalogo" variante="claro">Ver el catálogo</Boton>
         <Boton href="#suscripcion" variante="contorno" class="border-crema/50 text-crema hover:border-crema hover:bg-crema/10">
           Suscribirme
         </Boton>
@@ -101,7 +124,7 @@ const PREGUNTAS = [
         RUBROS.map((rubro) => (
           <a
             href={rubro.href}
-            class="group overflow-hidden rounded-xl border border-oliva/25 bg-papel-claro transition-colors hover:border-borravino/40"
+            class="group flex flex-col overflow-hidden rounded-xl border border-oliva/25 bg-papel-claro transition-colors hover:border-borravino/40"
           >
             <Image
               src={rubro.foto}
@@ -110,42 +133,23 @@ const PREGUNTAS = [
               widths={[400, 800]}
               sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
             />
-            <div class="p-5">
+            <div class="flex flex-1 flex-col p-5">
               <h2 class="font-display text-xl font-semibold tracking-wide text-borravino uppercase">
                 {rubro.titulo}
               </h2>
-              <p class="mt-2 text-oliva/90">{rubro.texto}</p>
+              <p class="mt-2 flex-1 text-oliva/90">{rubro.texto}</p>
+              <p class="mt-4 flex items-baseline gap-2 border-t border-oliva/15 pt-3">
+                <span class="text-sm text-oliva/80">desde</span>
+                <span class="font-display text-xl font-semibold text-oliva">{precio(rubro.desde)}</span>
+              </p>
             </div>
           </a>
         ))
       }
     </div>
-  </section>
-
-  {/* -------------------------------------------------------------- Ramos */}
-  <section id="ramos" class="mx-auto max-w-6xl px-5 py-20">
-    <TituloSeccion titulo="Ramos" epigrafe="Para todas las ocasiones" />
-
-    <div class="mt-14 grid items-start gap-10 lg:grid-cols-[1fr_minmax(0,22rem)]">
-      <Tarjeta>
-        <div class="divide-y divide-oliva/20">
-          {RAMOS.map((item) => <FilaPrecio item={item} />)}
-        </div>
-      </Tarjeta>
-
-      <figure class="overflow-hidden rounded-xl border border-oliva/25">
-        <Image
-          src={ramoDetalle}
-          alt="Ramo de alstroemerias rosas y fucsias"
-          class="h-full w-full object-cover"
-          widths={[400, 800, 1200]}
-          sizes="(min-width: 1024px) 22rem, 100vw"
-        />
-      </figure>
-    </div>
 
     <div class="mt-10 text-center">
-      <Boton href={enlaceContacto('¡Hola! Quiero encargar un ramo.')}>Encargar un ramo</Boton>
+      <Boton href="/catalogo" variante="contorno">Ver catálogo completo</Boton>
     </div>
   </section>
 
@@ -201,7 +205,8 @@ const PREGUNTAS = [
       </div>
 
       <div class="mt-12 text-center">
-        <Boton href={enlaceContacto('¡Hola! Me interesa la suscripción de ramos.')} variante="claro">
+        <Boton href={enlaceContacto('¡Hola! Me interesa la suscripción de ramos.')} variante="claro" class="gap-2.5">
+          <Icono nombre="whatsapp" class="h-5 w-5" />
           Quiero suscribirme
         </Boton>
         <p class="mt-5 text-crema/75">
@@ -211,76 +216,42 @@ const PREGUNTAS = [
     </div>
   </section>
 
-  {/* ------------------------------------------------------------ Plantas */}
-  <section id="plantas" class="mx-auto max-w-6xl px-5 py-20">
-    <TituloSeccion titulo="Plantas" epigrafe="De interior y de exterior" />
-
-    <div class="mt-14 grid items-start gap-10 lg:grid-cols-[minmax(0,22rem)_1fr]">
-      <figure class="order-last overflow-hidden rounded-xl border border-oliva/25 lg:order-first">
-        <Image
-          src={plantasVerde}
-          alt="Plantas de interior en macetas"
-          class="h-full w-full object-cover"
-          widths={[400, 800, 1200]}
-          sizes="(min-width: 1024px) 22rem, 100vw"
-        />
-      </figure>
-
-      <Tarjeta>
-        <div class="grid gap-x-12 sm:grid-cols-2">
-          {
-            PLANTAS.map((planta) => (
-              <div class="flex items-baseline gap-3 border-b border-oliva/15 py-3">
-                <h3 class="font-display font-semibold tracking-wide text-borravino uppercase">
-                  {planta.nombre}
-                  {planta.detalle && <span class="block text-xs font-normal normal-case opacity-70">{planta.detalle}</span>}
-                </h3>
-                <span class="min-w-4 flex-1 translate-y-[-0.3em] border-b border-dotted border-oliva/40" />
-                <p class="font-display shrink-0 text-lg font-semibold text-oliva">{precio(planta.precio)}</p>
-              </div>
-            ))
-          }
-        </div>
-      </Tarjeta>
-    </div>
-
-    <div class="mt-10 text-center">
-      <Boton href={enlaceContacto('¡Hola! Quiero consultar por plantas.')} variante="contorno">
-        Consultar disponibilidad
-      </Boton>
-    </div>
-  </section>
-
   {/* ---------------------------------------------------------- Exhibidor */}
   <section id="exhibidor" class="bg-papel-claro py-20">
     <div class="mx-auto max-w-6xl px-5">
       <TituloSeccion titulo="Exhibidor" epigrafe="Para locales y comercios" />
 
-      <p class="mx-auto mt-8 max-w-2xl text-center text-lg text-balance text-oliva">
-        Llevamos un exhibidor con ramos de estación a tu local y nos ocupamos de reponerlos.
-        Cuantos más ramos, más baja el precio por unidad.
-      </p>
+      <div class="mt-14 grid items-center gap-12 lg:grid-cols-2">
+        <div>
+          <p class="text-lg text-balance text-oliva">
+            Llevamos un exhibidor con ramos de estación a tu local y nos ocupamos
+            de reponerlos. Cuantos más ramos, más baja el precio por unidad.
+          </p>
 
-      <div class="mt-14 grid items-start gap-10 lg:grid-cols-[1fr_minmax(0,24rem)]">
-        <div class="space-y-6">
-          <Tarjeta>
-            <FilaPrecio item={EXHIBIDOR.inicio} />
-          </Tarjeta>
+          <ul class="mt-8 space-y-4">
+            {
+              [
+                'Arranca con el exhibidor y seis ramos de estación.',
+                'Reponemos según el ritmo de tu local, desde seis ramos por vez.',
+                'Al terminar el servicio, retiramos el exhibidor.',
+              ].map((punto) => (
+                <li class="flex gap-3 text-oliva">
+                  <svg viewBox="0 0 10 14" class="mt-2 h-3 w-2 shrink-0 fill-oliva-medio" aria-hidden="true">
+                    <path d="M5 0 9.5 7 5 14 .5 7Z" />
+                  </svg>
+                  <span>{punto}</span>
+                </li>
+              ))
+            }
+          </ul>
 
-          <Tarjeta>
-            <h3 class="epigrafe">Reposición de ramos</h3>
-            <div class="mt-2 divide-y divide-oliva/20">
-              {EXHIBIDOR.reposicion.map((item) => <FilaPrecio item={item} sufijo="c/u" />)}
-            </div>
-            <p class="mt-4 text-sm text-oliva/80 italic">Todos los ramos son de flores de estación.</p>
-          </Tarjeta>
-
-          <Tarjeta>
-            <p class="text-oliva">
-              Al finalizar el servicio, Margarita Nativa retira el exhibidor en las mismas
-              condiciones en las que fue entregado.
-            </p>
-          </Tarjeta>
+          <div class="mt-9 flex flex-wrap items-center gap-4">
+            <Boton href={enlaceContacto('¡Hola! Tengo un local y quiero consultar por el exhibidor.')} class="gap-2.5">
+              <Icono nombre="whatsapp" class="h-5 w-5" />
+              Consultar por mi local
+            </Boton>
+            <Boton href="/catalogo#exhibidor" variante="contorno">Ver precios</Boton>
+          </div>
         </div>
 
         <figure class="overflow-hidden rounded-xl border border-oliva/25">
@@ -289,15 +260,9 @@ const PREGUNTAS = [
             alt="Exhibidor con baldes de ramos de flores de estación"
             class="h-full w-full object-cover"
             widths={[400, 800, 1600]}
-            sizes="(min-width: 1024px) 24rem, 100vw"
+            sizes="(min-width: 1024px) 32rem, 100vw"
           />
         </figure>
-      </div>
-
-      <div class="mt-10 text-center">
-        <Boton href={enlaceContacto('¡Hola! Tengo un local y quiero consultar por el exhibidor.')}>
-          Consultar por mi local
-        </Boton>
       </div>
     </div>
   </section>
@@ -319,8 +284,9 @@ const PREGUNTAS = [
         <Boton
           href={enlaceContacto('¡Hola! Quiero consultar por ambientación para un evento.')}
           variante="contorno"
-          class="mt-8"
+          class="mt-8 gap-2.5"
         >
+          <Icono nombre="whatsapp" class="h-5 w-5" />
           Pedir presupuesto
         </Boton>
       </div>

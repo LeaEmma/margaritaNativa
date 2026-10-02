@@ -132,3 +132,13 @@ export const CATALOGO: ItemCatalogo[] = [
 export function porCategoria(categoria: Categoria): ItemCatalogo[] {
   return CATALOGO.filter((item) => item.categoria === categoria);
 }
+
+/**
+ * Precio más bajo de una categoría, para los "desde $X" de la home.
+ * En exhibidor se toma el inicio de servicio y no la reposición: es lo que
+ * paga quien contrata, y mostrar el precio por ramo repuesto confundiría.
+ */
+export function precioDesde(categoria: Categoria): number {
+  if (categoria === 'exhibidor') return EXHIBIDOR.inicio.precio;
+  return Math.min(...porCategoria(categoria).map((item) => item.precio));
+}
