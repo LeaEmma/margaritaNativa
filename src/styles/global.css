@@ -1,0 +1,26 @@
+@import 'tailwindcss';
+
+/* Identidad de marca — tomada del logo de Margarita Nativa.
+   Se exponen como tokens de Tailwind v4, usables como bg-borravino,
+   text-oliva, border-salvia, etc. */
+@theme {
+  --color-borravino: #550000;
+  --color-borravino-claro: #7a1a1a;
+  --color-oliva: #636b2f;
+  --color-oliva-oscuro: #494f22;
+  --color-verde-profundo: #274903;
+  --color-salvia: #c1ca93;
+  --color-crema: #fffbee;
+
+  --font-display: Georgia, 'Times New Roman', serif;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-crema);
+  color: var(--color-oliva-oscuro);
+}
