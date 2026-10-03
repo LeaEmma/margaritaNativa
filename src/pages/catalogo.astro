@@ -133,18 +133,24 @@ const secciones = CATEGORIAS.map((categoria) => ({
 </Layout>
 
 <script>
+  /**
+   * El hash de la URL es la única fuente de verdad del filtro.
+   *
+   * Así "/catalogo#plantas" —el enlace de las fichas de la home— abre el
+   * catálogo ya filtrado en vez de intentar desplazarse a una sección que
+   * podría estar oculta, la URL queda compartible y el botón atrás funciona
+   * sin código extra.
+   */
   const filtros = document.querySelector<HTMLElement>('#filtros');
   const secciones = document.querySelectorAll<HTMLElement>('section[data-categoria]');
   const vacio = document.querySelector<HTMLElement>('#sin-resultados');
+  const categorias = new Set([...secciones].map((s) => s.dataset.categoria));
 
-  filtros?.addEventListener('click', (evento) => {
-    const boton = (evento.target as HTMLElement).closest<HTMLButtonElement>('button[data-filtro]');
-    if (!boton) return;
+  function aplicar(solicitada: string | undefined) {
+    const elegida = solicitada && categorias.has(solicitada) ? solicitada : 'todas';
 
-    const elegida = boton.dataset.filtro;
-
-    for (const chip of filtros.querySelectorAll<HTMLButtonElement>('button[data-filtro]')) {
-      const activo = chip === boton;
+    for (const chip of filtros?.querySelectorAll<HTMLButtonElement>('button[data-filtro]') ?? []) {
+      const activo = chip.dataset.filtro === elegida;
       chip.setAttribute('aria-pressed', String(activo));
       chip.classList.toggle('border-borravino', activo);
       chip.classList.toggle('bg-borravino', activo);
@@ -161,5 +167,33 @@ const secciones = CATEGORIAS.map((categoria) => ({
     }
 
     if (vacio) vacio.hidden = visibles > 0;
+  }
+
+  const desdeHash = () => aplicar(decodeURIComponent(location.hash.slice(1)));
+
+  filtros?.addEventListener('click', (evento) => {
+    const boton = (evento.target as HTMLElement).closest<HTMLButtonElement>('button[data-filtro]');
+    if (!boton) return;
+
+    const destino = boton.dataset.filtro;
+    if (destino === 'todas') {
+      // Sin hash: el estado "todo" es la URL limpia del catálogo.
+      history.pushState(null, '', location.pathname);
+      aplicar('todas');
+    } else if (location.hash.slice(1) === destino) {
+      aplicar(destino); // mismo hash: no hay hashchange que escuchar
+    } else {
+      location.hash = destino!;
+    }
   });
+
+  window.addEventListener('hashchange', () => {
+    desdeHash();
+    // Con una sola categoría visible, el desplazamiento del navegador dejaría
+    // los chips fuera de cuadro y no se vería qué filtro está puesto.
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  desdeHash();
+  if (location.hash) window.scrollTo({ top: 0 });
 </script>

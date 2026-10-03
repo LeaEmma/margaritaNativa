@@ -23,13 +23,18 @@ export function enlaceContacto(mensaje: string): string {
   return `https://wa.me/${SITIO.whatsapp}?text=${encodeURIComponent(mensaje)}`;
 }
 
-// Rutas absolutas con ancla ("/#eventos") en vez de solo el ancla: así los
-// enlaces funcionan igual desde la home que desde /catalogo.
+/**
+ * Navegación por destino, no por categoría: las categorías ya las maneja el
+ * filtro del catálogo. Cuando el menú también apuntaba a cada categoría, los
+ * dos competían y los enlaces a una sección filtrada no hacían nada.
+ *
+ * Rutas absolutas con ancla ("/#eventos") para que funcionen igual desde
+ * cualquier página. `pagina` marca cuáles son destinos propios: solo esas
+ * reciben el estado activo.
+ */
 export const NAVEGACION = [
-  { texto: 'Ramos', href: '/catalogo#ramos' },
-  { texto: 'Suscripción', href: '/catalogo#suscripcion' },
-  { texto: 'Plantas', href: '/catalogo#plantas' },
-  { texto: 'Locales', href: '/catalogo#exhibidor' },
+  { texto: 'Inicio', href: '/', pagina: '/' },
+  { texto: 'Catálogo', href: '/catalogo', pagina: '/catalogo' },
   { texto: 'Eventos', href: '/#eventos' },
   { texto: 'Contacto', href: '/#contacto' },
 ] as const;

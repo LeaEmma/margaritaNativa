@@ -3,11 +3,17 @@ import { Image } from 'astro:assets';
 import sello from '../assets/sello-margarita-nativa.png';
 import Icono from './Icono.astro';
 import { NAVEGACION, SITIO, enlaceContacto } from '../datos/sitio';
+
+// Sin barra final, para que "/catalogo" y "/catalogo/" se traten igual.
+const normalizar = (p: string) => p.replace(/\/+$/, '') || '/';
+const ruta = normalizar(Astro.url.pathname);
+const esActiva = (enlace: (typeof NAVEGACION)[number]) =>
+  'pagina' in enlace && normalizar(enlace.pagina) === ruta;
 ---
 
 <header class="sticky top-0 z-50 border-b border-oliva/20 bg-papel/95 backdrop-blur-sm">
   <div class="mx-auto flex max-w-6xl items-center gap-4 px-5 py-3">
-    <a href="#inicio" class="flex shrink-0 items-center gap-3" aria-label={`${SITIO.nombre} — inicio`}>
+    <a href="/" class="flex shrink-0 items-center gap-3" aria-label={`${SITIO.nombre} — inicio`}>
       <Image src={sello} alt="" width={96} height={96} class="h-12 w-12" loading="eager" />
       <span class="font-display text-lg leading-tight font-semibold tracking-[0.12em] text-oliva uppercase">
         Margarita<br /><span class="text-base">Nativa</span>
@@ -21,7 +27,13 @@ import { NAVEGACION, SITIO, enlaceContacto } from '../datos/sitio';
             <li>
               <a
                 href={enlace.href}
-                class="versalitas text-oliva transition-colors hover:text-borravino"
+                aria-current={esActiva(enlace) ? 'page' : undefined}
+                class:list={[
+                  'versalitas border-b-2 pb-1 transition-colors',
+                  esActiva(enlace)
+                    ? 'border-borravino text-borravino'
+                    : 'border-transparent text-oliva hover:text-borravino',
+                ]}
               >
                 {enlace.texto}
               </a>
@@ -63,7 +75,11 @@ import { NAVEGACION, SITIO, enlaceContacto } from '../datos/sitio';
       {
         NAVEGACION.map((enlace) => (
           <li class="shrink-0">
-            <a href={enlace.href} class="versalitas text-oliva">
+            <a
+              href={enlace.href}
+              aria-current={esActiva(enlace) ? 'page' : undefined}
+              class:list={['versalitas', esActiva(enlace) ? 'text-borravino underline underline-offset-4' : 'text-oliva']}
+            >
               {enlace.texto}
             </a>
           </li>
