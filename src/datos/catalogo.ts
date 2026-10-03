@@ -16,19 +16,25 @@ export interface Item {
 }
 
 export const RAMOS: Item[] = [
-  { nombre: 'Mini', detalle: 'Fresias.', precio: 15000 },
-  { nombre: 'Lirio o cala', detalle: 'Cada una.', precio: 20000 },
+  { nombre: 'Mini', detalle: 'Flores de temporada.', precio: 15000 },
+  { nombre: 'Lirio, cala o pajarito', detalle: 'Cada uno.', precio: 20000 },
   {
     nombre: 'Clásico',
-    detalle: 'Ramo mediano y abundante. Variedad de flores de temporada, con follaje y verde.',
+    detalle: 'Variedad de flores de temporada, con follaje y verde.',
     precio: 25000,
   },
   {
     nombre: 'Grande',
-    detalle: 'Con lirio o cala. Más cantidad de flores, follaje y verde.',
+    detalle: 'Variedad de flores de temporada, con follaje y verde. Con lirio, cala o pajarito.',
     precio: 35000,
   },
-  { nombre: 'Personalizado', detalle: 'Armado a medida, según la ocasión.', precio: 50000, desde: true },
+  {
+    nombre: 'Personalizado',
+    detalle: 'Ramos únicos pensados para cada ocasión.',
+    precio: 50000,
+    // La planilla no tiene columna para esto: el "desde" viene de la tarjeta impresa.
+    desde: true,
+  },
 ];
 
 /** `precio` es el valor por ramo; `precioMensual` es el total del período. */
