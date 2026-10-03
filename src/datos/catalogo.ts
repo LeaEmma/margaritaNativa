@@ -31,10 +31,24 @@ export const RAMOS: Item[] = [
   { nombre: 'Personalizado', detalle: 'Armado a medida, según la ocasión.', precio: 50000, desde: true },
 ];
 
-export const SUSCRIPCION: Item[] = [
-  { nombre: 'Semanal', detalle: 'Un ramo por semana.', precio: 40000 },
-  { nombre: 'Quincenal', detalle: 'Un ramo cada quince días.', precio: 45000 },
-  { nombre: 'Mensual', detalle: 'Un ramo por mes.', precio: 50000 },
+/** `precio` es el valor por ramo; `precioMensual` es el total del período. */
+export interface Plan extends Item {
+  ramosPorMes: number;
+  precioMensual: number;
+}
+
+export const SUSCRIPCION: Plan[] = [
+  { nombre: 'Semanal', detalle: '4 ramos al mes', precio: 20000, ramosPorMes: 4, precioMensual: 80000 },
+  { nombre: 'Quincenal', detalle: '2 ramos al mes', precio: 25000, ramosPorMes: 2, precioMensual: 50000 },
+  { nombre: 'Mensual', detalle: '1 ramo al mes', precio: 30000, ramosPorMes: 1, precioMensual: 30000 },
+];
+
+/** Los cuatro argumentos del flyer de suscripciones. */
+export const BENEFICIOS_SUSCRIPCION = [
+  'Flores de estación',
+  'Para tu hogar o tu negocio',
+  'Entregas a domicilio',
+  'Cancelá o modificá tu suscripción cuando lo necesites',
 ];
 
 export const PLANTAS: Item[] = [

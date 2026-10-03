@@ -7,7 +7,7 @@ import Boton from '../components/Boton.astro';
 import Ornamento from '../components/Ornamento.astro';
 import Icono from '../components/Icono.astro';
 
-import { SUSCRIPCION, EXHIBIDOR, CUIDADOS, precio } from '../datos/catalogo';
+import { SUSCRIPCION, EXHIBIDOR, CUIDADOS, BENEFICIOS_SUSCRIPCION, precio } from '../datos/catalogo';
 import { SITIO, enlaceContacto } from '../datos/sitio';
 
 import sello from '../assets/sello-margarita-nativa.png';
@@ -145,10 +145,26 @@ const PREGUNTAS = [
               <Ornamento claro class="mx-auto mt-5" />
               <p class="font-display mt-5 text-3xl font-semibold text-crema">{precio(plan.precio)}</p>
               <p class="mt-1 text-sm text-crema">por ramo</p>
+              <p class="mt-4 rounded-full border border-crema/25 py-1.5 text-sm text-crema">
+                {precio(plan.precioMensual)} al mes
+              </p>
             </div>
           ))
         }
       </div>
+
+      <ul class="mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
+        {
+          BENEFICIOS_SUSCRIPCION.map((beneficio) => (
+            <li class="flex items-center gap-2.5 text-crema">
+              <svg viewBox="0 0 10 14" class="h-3 w-2 shrink-0 fill-crema/70" aria-hidden="true">
+                <path d="M5 0 9.5 7 5 14 .5 7Z" />
+              </svg>
+              {beneficio}
+            </li>
+          ))
+        }
+      </ul>
 
       <div class="mx-auto mt-10 max-w-2xl rounded-xl border border-crema/20 p-7">
         <h3 class="versalitas text-center text-crema">Mantenimiento y cuidado</h3>
