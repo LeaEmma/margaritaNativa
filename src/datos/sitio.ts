@@ -2,7 +2,7 @@
 
 export const SITIO = {
   nombre: 'Margarita Nativa',
-  lema: 'Flores de estación, todas las semanas',
+  lema: 'Ramos de flores y plantas',
   descripcion:
     'Ramos de flores de estación, suscripciones, plantas y ambientación floral. Armamos cada ramo a mano con lo que da la temporada.',
 
