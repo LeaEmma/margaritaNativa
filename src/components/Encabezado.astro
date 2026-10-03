@@ -2,13 +2,15 @@
 import { Image } from 'astro:assets';
 import sello from '../assets/sello-margarita-nativa.png';
 import Icono from './Icono.astro';
-import { NAVEGACION, SITIO, enlaceContacto } from '../datos/sitio';
+import { NAVEGACION, NAVEGACION_SOCIAL, SITIO } from '../datos/sitio';
 
 // Sin barra final, para que "/catalogo" y "/catalogo/" se traten igual.
 const normalizar = (p: string) => p.replace(/\/+$/, '') || '/';
 const ruta = normalizar(Astro.url.pathname);
 const esActiva = (enlace: (typeof NAVEGACION)[number]) =>
   'pagina' in enlace && normalizar(enlace.pagina) === ruta;
+
+const sociales = NAVEGACION_SOCIAL.filter((s) => s.visible);
 ---
 
 <header class="sticky top-0 z-50 border-b border-oliva/20 bg-papel/95 backdrop-blur-sm">
@@ -21,7 +23,7 @@ const esActiva = (enlace: (typeof NAVEGACION)[number]) =>
     </a>
 
     <nav class="ml-auto hidden lg:block" aria-label="Principal">
-      <ul class="flex items-center gap-7">
+      <ul class="flex items-center gap-6">
         {
           NAVEGACION.map((enlace) => (
             <li>
@@ -40,47 +42,62 @@ const esActiva = (enlace: (typeof NAVEGACION)[number]) =>
             </li>
           ))
         }
+
+        <li aria-hidden="true"><span class="block h-5 w-px bg-oliva/30"></span></li>
+
+        {
+          sociales.map((social) => (
+            <li>
+              <a
+                href={social.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={social.etiqueta}
+                class="versalitas flex items-center gap-2 text-oliva transition-colors hover:text-borravino"
+              >
+                <Icono nombre={social.icono} class="h-5 w-5" />
+                {social.texto}
+              </a>
+            </li>
+          ))
+        }
       </ul>
     </nav>
-
-    <div class="ml-auto flex shrink-0 items-center gap-4 lg:ml-0">
-      {
-        SITIO.whatsapp && (
-          <a
-            href={enlaceContacto('¡Hola! Te escribo desde la web.')}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="text-oliva transition-colors hover:text-borravino"
-            aria-label="Escribinos por WhatsApp"
-          >
-            <Icono nombre="whatsapp" />
-          </a>
-        )
-      }
-
-      <a
-        href={SITIO.instagram}
-        target="_blank"
-        rel="noopener noreferrer"
-        class="text-oliva transition-colors hover:text-borravino"
-        aria-label={`Instagram ${SITIO.instagramUsuario}`}
-      >
-        <Icono nombre="instagram" />
-      </a>
-    </div>
   </div>
 
   <nav class="border-t border-oliva/15 lg:hidden" aria-label="Principal (móvil)">
-    <ul class="flex gap-6 overflow-x-auto px-5 py-2.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <ul class="flex items-center gap-6 overflow-x-auto px-5 py-2.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       {
         NAVEGACION.map((enlace) => (
           <li class="shrink-0">
             <a
               href={enlace.href}
               aria-current={esActiva(enlace) ? 'page' : undefined}
-              class:list={['versalitas', esActiva(enlace) ? 'text-borravino underline underline-offset-4' : 'text-oliva']}
+              class:list={[
+                'versalitas',
+                esActiva(enlace) ? 'text-borravino underline underline-offset-4' : 'text-oliva',
+              ]}
             >
               {enlace.texto}
+            </a>
+          </li>
+        ))
+      }
+
+      <li class="shrink-0" aria-hidden="true"><span class="block h-4 w-px bg-oliva/30"></span></li>
+
+      {
+        sociales.map((social) => (
+          <li class="shrink-0">
+            <a
+              href={social.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={social.etiqueta}
+              class="versalitas flex items-center gap-1.5 text-oliva"
+            >
+              <Icono nombre={social.icono} class="h-4 w-4" />
+              {social.texto}
             </a>
           </li>
         ))

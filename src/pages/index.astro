@@ -7,50 +7,22 @@ import Boton from '../components/Boton.astro';
 import Ornamento from '../components/Ornamento.astro';
 import Icono from '../components/Icono.astro';
 
-import { SUSCRIPCION, CUIDADOS, precio, precioDesde } from '../datos/catalogo';
+import { SUSCRIPCION, EXHIBIDOR, CUIDADOS, precio } from '../datos/catalogo';
 import { SITIO, enlaceContacto } from '../datos/sitio';
 
 import sello from '../assets/sello-margarita-nativa.png';
 import orquideaFucsia from '../assets/fotos/orquidea-fucsia.jpg';
 import orquideaBlanca from '../assets/fotos/orquidea-blanca.jpg';
-import ramoDetalle from '../assets/fotos/ramo-detalle.jpg';
 import ramosVariedad from '../assets/fotos/ramos-variedad.jpg';
 import exhibidorBaldes from '../assets/fotos/exhibidor-baldes.jpg';
 import localExhibidor from '../assets/fotos/local-exhibidor.jpg';
-import plantasVerde from '../assets/fotos/plantas-verde.jpg';
 import liriosArreglo from '../assets/fotos/lirios-arreglo.jpg';
 
-// La home es el resumen; el detalle de precios vive en /catalogo.
-const RUBROS = [
-  {
-    titulo: 'Ramos',
-    texto: 'Para un cumpleaños, un gracias o un porque sí.',
-    href: '/catalogo#ramos',
-    foto: ramoDetalle,
-    desde: precioDesde('ramos'),
-  },
-  {
-    titulo: 'Suscripción',
-    texto: 'Flores frescas en casa, todas las semanas.',
-    href: '/catalogo#suscripcion',
-    foto: ramosVariedad,
-    desde: precioDesde('suscripcion'),
-  },
-  {
-    titulo: 'Plantas',
-    texto: 'De interior y de exterior, listas para llevar.',
-    href: '/catalogo#plantas',
-    foto: plantasVerde,
-    desde: precioDesde('plantas'),
-  },
-  {
-    titulo: 'Locales',
-    texto: 'Exhibidor con reposición para tu negocio.',
-    href: '/catalogo#exhibidor',
-    foto: localExhibidor,
-    desde: precioDesde('exhibidor'),
-  },
-];
+/*
+ * Orden de secciones pensado para que no haya dos fondos oscuros seguidos:
+ * hero (borravino) · cómo funciona (papel claro) · suscripción (tinta) ·
+ * eventos (papel) · preguntas (papel claro) · contacto (borravino).
+ */
 
 const PASOS = [
   { n: '01', titulo: 'Escribinos', texto: 'Contanos para qué es y qué presupuesto tenés en mente. Te ayudamos a elegir.' },
@@ -106,7 +78,7 @@ const PREGUNTAS = [
       </h1>
 
       <p class="mx-auto mt-6 max-w-2xl text-xl text-balance text-crema">
-        Flores y plantas que transforman espacios y acompañan momentos especiales 
+        Flores y plantas que transforman espacios y acompañan momentos especiales.
       </p>
 
       <div class="mt-10 flex flex-wrap items-center justify-center gap-4">
@@ -118,43 +90,32 @@ const PREGUNTAS = [
     </div>
   </section>
 
-  {/* ------------------------------------------------------------- Rubros */}
-  <section class="mx-auto max-w-6xl px-5 py-20">
-    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-      {
-        RUBROS.map((rubro) => (
-          <a
-            href={rubro.href}
-            class="group flex flex-col overflow-hidden rounded-xl border border-oliva/25 bg-papel-claro transition-colors hover:border-borravino/40"
-          >
-            <Image
-              src={rubro.foto}
-              alt=""
-              class="h-44 w-full object-cover transition-transform duration-500 group-hover:scale-105"
-              widths={[400, 800]}
-              sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-            />
-            <div class="flex flex-1 flex-col p-5">
-              <h2 class="font-display text-xl font-semibold tracking-wide text-borravino uppercase">
-                {rubro.titulo}
-              </h2>
-              <p class="mt-2 flex-1 text-oliva">{rubro.texto}</p>
-              <p class="mt-4 flex items-baseline gap-2 border-t border-oliva/15 pt-3">
-                <span class="text-sm text-oliva">desde</span>
-                <span class="font-display text-xl font-semibold text-oliva">{precio(rubro.desde)}</span>
-              </p>
-            </div>
-          </a>
-        ))
-      }
-    </div>
+  {/* ------------------------------------------------------- Cómo funciona */}
+  <section class="bg-papel-claro py-20">
+    <div class="mx-auto max-w-5xl px-5">
+      <TituloSeccion titulo="Cómo funciona" epigrafe="Tres pasos" />
 
-    <div class="mt-10 text-center">
-      <Boton href="/catalogo" variante="contorno">Ver catálogo completo</Boton>
+      <div class="mt-14 grid gap-8 sm:grid-cols-3">
+        {
+          PASOS.map((paso) => (
+            <div class="text-center">
+              <p class="font-display text-5xl font-semibold text-borravino/50">{paso.n}</p>
+              <h3 class="font-display mt-3 text-xl font-semibold tracking-wide text-borravino uppercase">
+                {paso.titulo}
+              </h3>
+              <p class="mt-3 text-balance text-oliva">{paso.texto}</p>
+            </div>
+          ))
+        }
+      </div>
+
+      <div class="mt-12 text-center">
+        <Boton href="/catalogo" variante="contorno">Ver ramos y plantas</Boton>
+      </div>
     </div>
   </section>
 
-  {/* --------------------------------------------------------- Suscripción */}
+  {/* ------------------------------------------- Suscripción + exhibidor */}
   <section id="suscripcion" class="relative isolate overflow-hidden py-24">
     <Image
       src={ramosVariedad}
@@ -168,7 +129,7 @@ const PREGUNTAS = [
     <div class="mx-auto max-w-4xl px-5">
       <TituloSeccion titulo="Suscripción" epigrafe="Flores frescas, siempre" claro />
 
-      <p class="mx-auto mt-8 max-w-2xl text-center text-lg text-balance text-crema/90">
+      <p class="mx-auto mt-8 max-w-2xl text-center text-lg text-balance text-crema">
         Elegís cada cuánto querés recibir tu ramo y nos ocupamos del resto.
         Todos los ramos son de flores de estación.
       </p>
@@ -189,12 +150,12 @@ const PREGUNTAS = [
         }
       </div>
 
-      <div class="mx-auto mt-12 max-w-2xl rounded-xl border border-crema/20 p-7">
+      <div class="mx-auto mt-10 max-w-2xl rounded-xl border border-crema/20 p-7">
         <h3 class="versalitas text-center text-crema">Mantenimiento y cuidado</h3>
         <ul class="mt-5 space-y-3">
           {
             CUIDADOS.map((texto) => (
-              <li class="flex gap-3 text-crema/85">
+              <li class="flex gap-3 text-crema">
                 <svg viewBox="0 0 10 14" class="mt-2 h-3 w-2 shrink-0 fill-crema/60" aria-hidden="true">
                   <path d="M5 0 9.5 7 5 14 .5 7Z" />
                 </svg>
@@ -205,57 +166,70 @@ const PREGUNTAS = [
         </ul>
       </div>
 
-      <div class="mt-12 text-center">
+      <div class="mt-10 text-center">
         <Boton href={enlaceContacto('¡Hola! Me interesa la suscripción de ramos.')} variante="claro" class="gap-2.5">
           <Icono nombre="whatsapp" class="h-5 w-5" />
           Quiero suscribirme
         </Boton>
-        <p class="mt-5 text-crema/85">
+        <p class="mt-5 text-crema">
           ¿Preferís algo a medida? Consultanos por opciones y ramos personalizados.
         </p>
       </div>
-    </div>
-  </section>
 
-  {/* ---------------------------------------------------------- Exhibidor */}
-  <section id="exhibidor" class="bg-papel-claro py-20">
-    <div class="mx-auto max-w-6xl px-5">
-      <TituloSeccion titulo="Exhibidor" epigrafe="Para locales y comercios" />
+      {/* ------------------------------ Exhibidor: la suscripción para locales */}
+      <Ornamento conFiletes claro class="mt-20" />
 
-      <div class="mt-14 grid items-center gap-12 lg:grid-cols-2">
+      <div id="exhibidor" class="mt-20 scroll-mt-32 grid items-center gap-12 lg:grid-cols-2">
         <div>
-          <p class="text-lg text-balance text-oliva">
-            Llevamos un exhibidor con ramos de estación a tu local y nos ocupamos
-            de reponerlos. Cuantos más ramos, más baja el precio por unidad.
+          <p class="epigrafe text-crema">Para locales y comercios</p>
+          <h3 class="titulo-seccion mt-3 text-3xl text-crema sm:text-4xl">Exhibidor</h3>
+
+          <p class="mt-6 text-lg text-balance text-crema">
+            La misma idea, para tu negocio: llevamos un exhibidor con ramos de estación
+            y nos ocupamos de reponerlos. Cuantos más ramos, más baja el precio por unidad.
           </p>
 
-          <ul class="mt-8 space-y-4">
-            {
-              [
-                'Arranca con el exhibidor y seis ramos de estación.',
-                'Reponemos según el ritmo de tu local, desde seis ramos por vez.',
-                'Al terminar el servicio, retiramos el exhibidor.',
-              ].map((punto) => (
-                <li class="flex gap-3 text-oliva">
-                  <svg viewBox="0 0 10 14" class="mt-2 h-3 w-2 shrink-0 fill-oliva-medio" aria-hidden="true">
-                    <path d="M5 0 9.5 7 5 14 .5 7Z" />
-                  </svg>
-                  <span>{punto}</span>
-                </li>
-              ))
-            }
-          </ul>
+          <div class="mt-8 rounded-xl border border-crema/25 bg-crema/10 p-6 backdrop-blur-[2px]">
+            <div class="flex items-baseline justify-between gap-4">
+              <span class="versalitas text-crema">{EXHIBIDOR.inicio.nombre}</span>
+              <span class="font-display shrink-0 text-2xl font-semibold text-crema">
+                {precio(EXHIBIDOR.inicio.precio)}
+              </span>
+            </div>
+            <p class="mt-2 text-sm text-crema">{EXHIBIDOR.inicio.detalle}</p>
 
-          <div class="mt-9 flex flex-wrap items-center gap-4">
-            <Boton href={enlaceContacto('¡Hola! Tengo un local y quiero consultar por el exhibidor.')} class="gap-2.5">
-              <Icono nombre="whatsapp" class="h-5 w-5" />
-              Consultar por mi local
-            </Boton>
-            <Boton href="/catalogo#exhibidor" variante="contorno">Ver precios</Boton>
+            <p class="versalitas mt-7 text-crema">Reposición</p>
+            <ul class="mt-3 divide-y divide-crema/20">
+              {
+                EXHIBIDOR.reposicion.map((item) => (
+                  <li class="flex items-baseline justify-between gap-4 py-2.5">
+                    <span class="text-crema">{item.nombre}</span>
+                    <span class="shrink-0 text-crema">
+                      <span class="font-display text-xl font-semibold">{precio(item.precio)}</span>
+                      <span class="ml-1.5 text-sm">c/u</span>
+                    </span>
+                  </li>
+                ))
+              }
+            </ul>
           </div>
+
+          <p class="mt-5 text-sm text-crema">
+            Al finalizar el servicio retiramos el exhibidor en las mismas condiciones
+            en las que fue entregado.
+          </p>
+
+          <Boton
+            href={enlaceContacto('¡Hola! Tengo un local y quiero consultar por el exhibidor.')}
+            variante="claro"
+            class="mt-8 gap-2.5"
+          >
+            <Icono nombre="whatsapp" class="h-5 w-5" />
+            Consultar por mi local
+          </Boton>
         </div>
 
-        <figure class="overflow-hidden rounded-xl border border-oliva/25">
+        <figure class="overflow-hidden rounded-xl border border-crema/25">
           <Image
             src={exhibidorBaldes}
             alt="Exhibidor con baldes de ramos de flores de estación"
@@ -269,7 +243,7 @@ const PREGUNTAS = [
   </section>
 
   {/* ------------------------------------------------------------- Eventos */}
-  <section id="eventos" class="mx-auto max-w-6xl px-5 py-20">
+  <section id="eventos" class="mx-auto max-w-6xl scroll-mt-32 px-5 py-20">
     <TituloSeccion titulo="Eventos" epigrafe="Ambientación floral" />
 
     <div class="mt-14 grid items-center gap-10 lg:grid-cols-2">
@@ -303,55 +277,36 @@ const PREGUNTAS = [
     </div>
   </section>
 
-  {/* ------------------------------------------------------- Cómo funciona */}
+  {/* ---------------------------------------------------------- Preguntas */}
   <section class="bg-papel-claro py-20">
-    <div class="mx-auto max-w-5xl px-5">
-      <TituloSeccion titulo="Cómo funciona" epigrafe="Tres pasos" />
+    <div class="mx-auto max-w-3xl px-5">
+      <TituloSeccion titulo="Preguntas" epigrafe="Lo que más nos consultan" />
 
-      <div class="mt-14 grid gap-8 sm:grid-cols-3">
+      <div class="mt-12 divide-y divide-oliva/20 border-y border-oliva/20">
         {
-          PASOS.map((paso) => (
-            <div class="text-center">
-              <p class="font-display text-5xl font-semibold text-borravino/50">{paso.n}</p>
-              <h3 class="font-display mt-3 text-xl font-semibold tracking-wide text-borravino uppercase">
-                {paso.titulo}
-              </h3>
-              <p class="mt-3 text-balance text-oliva">{paso.texto}</p>
-            </div>
+          PREGUNTAS.map((item) => (
+            <details class="group py-5">
+              <summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-medium text-borravino [&::-webkit-details-marker]:hidden">
+                {item.p}
+                <svg
+                  viewBox="0 0 20 20"
+                  class="h-5 w-5 shrink-0 fill-oliva transition-transform duration-300 group-open:rotate-45"
+                  aria-hidden="true"
+                >
+                  <path d="M9 3h2v14H9z" />
+                  <path d="M3 9h14v2H3z" />
+                </svg>
+              </summary>
+              <p class="mt-3 pr-9 text-oliva">{item.r}</p>
+            </details>
           ))
         }
       </div>
     </div>
   </section>
 
-  {/* ---------------------------------------------------------------- FAQ */}
-  <section class="mx-auto max-w-3xl px-5 py-20">
-    <TituloSeccion titulo="Preguntas" epigrafe="Lo que más nos consultan" />
-
-    <div class="mt-12 divide-y divide-oliva/20 border-y border-oliva/20">
-      {
-        PREGUNTAS.map((item) => (
-          <details class="group py-5">
-            <summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-lg font-medium text-borravino [&::-webkit-details-marker]:hidden">
-              {item.p}
-              <svg
-                viewBox="0 0 20 20"
-                class="h-5 w-5 shrink-0 fill-oliva transition-transform duration-300 group-open:rotate-45"
-                aria-hidden="true"
-              >
-                <path d="M9 3h2v14H9z" />
-                <path d="M3 9h14v2H3z" />
-              </svg>
-            </summary>
-            <p class="mt-3 pr-9 text-oliva">{item.r}</p>
-          </details>
-        ))
-      }
-    </div>
-  </section>
-
   {/* ----------------------------------------------------------- Contacto */}
-  <section id="contacto" class="relative isolate overflow-hidden py-24">
+  <section id="contacto" class="relative isolate scroll-mt-32 overflow-hidden py-24">
     <Image
       src={localExhibidor}
       alt=""
@@ -364,7 +319,7 @@ const PREGUNTAS = [
     <div class="mx-auto max-w-2xl px-5 text-center">
       <TituloSeccion titulo="Contacto" epigrafe="Escribinos" claro />
 
-      <p class="mt-8 text-lg text-balance text-crema/90">
+      <p class="mt-8 text-lg text-balance text-crema">
         Contanos qué necesitás y te respondemos a la brevedad. Si es un regalo,
         decinos para quién es y nos encargamos del resto.
       </p>

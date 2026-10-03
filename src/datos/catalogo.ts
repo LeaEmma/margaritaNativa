@@ -100,12 +100,25 @@ export interface ItemCatalogo extends Item {
   sufijo?: string;
 }
 
-export const CATEGORIAS: { clave: Categoria; nombre: string; epigrafe: string }[] = [
-  { clave: 'ramos', nombre: 'Ramos', epigrafe: 'Para todas las ocasiones' },
-  { clave: 'suscripcion', nombre: 'Suscripción', epigrafe: 'Flores frescas, siempre' },
-  { clave: 'plantas', nombre: 'Plantas', epigrafe: 'De interior y de exterior' },
-  { clave: 'exhibidor', nombre: 'Exhibidor', epigrafe: 'Para locales y comercios' },
+/**
+ * `enCatalogo` marca qué categorías se listan en /catalogo. Suscripción y
+ * exhibidor quedan afuera: son servicios recurrentes y viven juntos en la
+ * sección de suscripción de la home, no en el listado de productos sueltos.
+ */
+export const CATEGORIAS: {
+  clave: Categoria;
+  nombre: string;
+  epigrafe: string;
+  enCatalogo: boolean;
+}[] = [
+  { clave: 'ramos', nombre: 'Ramos', epigrafe: 'Para todas las ocasiones', enCatalogo: true },
+  { clave: 'plantas', nombre: 'Plantas', epigrafe: 'De interior y de exterior', enCatalogo: true },
+  { clave: 'suscripcion', nombre: 'Suscripción', epigrafe: 'Flores frescas, siempre', enCatalogo: false },
+  { clave: 'exhibidor', nombre: 'Exhibidor', epigrafe: 'Para locales y comercios', enCatalogo: false },
 ];
+
+/** Solo lo que se muestra en /catalogo. */
+export const CATEGORIAS_CATALOGO = CATEGORIAS.filter((c) => c.enCatalogo);
 
 function aSlug(texto: string): string {
   return texto

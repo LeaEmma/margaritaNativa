@@ -8,34 +8,26 @@ import Tarjeta from '../components/Tarjeta.astro';
 import Boton from '../components/Boton.astro';
 import Icono from '../components/Icono.astro';
 
-import { CATEGORIAS, porCategoria, CUIDADOS, type Categoria } from '../datos/catalogo';
+import { CATEGORIAS_CATALOGO, porCategoria, type Categoria } from '../datos/catalogo';
 import { enlaceContacto } from '../datos/sitio';
 
 import ramoDetalle from '../assets/fotos/ramo-detalle.jpg';
-import ramosVariedad from '../assets/fotos/ramos-variedad.jpg';
 import plantasVerde from '../assets/fotos/plantas-verde.jpg';
-import exhibidorBaldes from '../assets/fotos/exhibidor-baldes.jpg';
 
-const FOTOS: Record<Categoria, ImageMetadata> = {
+const FOTOS: Partial<Record<Categoria, ImageMetadata>> = {
   ramos: ramoDetalle,
-  suscripcion: ramosVariedad,
   plantas: plantasVerde,
-  exhibidor: exhibidorBaldes,
 };
 
 /** Nota al pie de cada categoría, tomada de las tarjetas impresas. */
 const NOTAS: Partial<Record<Categoria, string[]>> = {
-  suscripcion: CUIDADOS,
-  exhibidor: [
-    'Todos los ramos son de flores de estación.',
-    'Al finalizar el servicio, Margarita Nativa retira el exhibidor en las mismas condiciones en las que fue entregado.',
-  ],
+  ramos: ['Todos los ramos son de flores de estación, así que la variedad cambia cada semana.'],
 };
 
-const secciones = CATEGORIAS.map((categoria) => ({
+const secciones = CATEGORIAS_CATALOGO.map((categoria) => ({
   ...categoria,
   items: porCategoria(categoria.clave),
-  foto: FOTOS[categoria.clave],
+  foto: FOTOS[categoria.clave]!,
   notas: NOTAS[categoria.clave],
 }));
 ---
@@ -48,8 +40,9 @@ const secciones = CATEGORIAS.map((categoria) => ({
     <TituloSeccion titulo="Catálogo" epigrafe="Precios vigentes" />
 
     <p class="mx-auto mt-8 max-w-2xl text-center text-lg text-balance text-oliva">
-      Todo lo que hacemos, en un solo lugar. Las flores son de estación, así que la
-      variedad cambia a lo largo del año.
+      Ramos y plantas, con sus precios. Las flores son de estación, así que la
+      variedad cambia a lo largo del año. ¿Buscás entregas periódicas?
+      <a href="/#suscripcion" class="text-borravino underline underline-offset-4">Mirá la suscripción</a>.
     </p>
 
     {/* Sin JavaScript se ven todas las categorías: el filtro es una mejora, no un requisito. */}
@@ -63,7 +56,7 @@ const secciones = CATEGORIAS.map((categoria) => ({
         Todo
       </button>
       {
-        CATEGORIAS.map((categoria) => (
+        CATEGORIAS_CATALOGO.map((categoria) => (
           <button
             type="button"
             data-filtro={categoria.clave}
