@@ -96,15 +96,23 @@ const PREGUNTAS = [
     />
     <div class="absolute inset-0 -z-10 bg-borravino/75"></div>
 
-    <div class="mx-auto max-w-3xl px-5 py-24 text-center">
+    {/* El relleno crece solo en pantallas altas: con el resumen de rubros, a
+        py-24 los botones caían debajo del pliegue en ventanas de ~650px. */}
+    <div class="mx-auto max-w-3xl px-5 py-16 text-center [@media(min-height:800px)]:py-24">
       <Image src={sello} alt={SITIO.nombre} width={320} height={320} class="mx-auto h-32 w-32 sm:h-40 sm:w-40" loading="eager" />
 
       <h1 class="font-display mt-8 text-4xl leading-[1.15] font-semibold text-balance text-crema sm:text-6xl">
         Ramos de flores y plantas
       </h1>
 
-      <p class="mx-auto mt-6 max-w-xl text-lg text-balance text-crema/85">
-        Cada semana traemos del mercado lo que da la temporada y lo convertimos en ramos.
+      <p class="mx-auto mt-6 max-w-2xl text-xl text-balance text-crema">
+        Ramos para regalar, suscripciones, plantas de interior y de exterior,
+        y ambientación floral para eventos y locales.
+      </p>
+
+      <p class="mx-auto mt-4 max-w-xl text-base text-balance text-crema">
+        Todo con flores de estación: las elegimos cada semana en el mercado
+        y armamos los ramos a mano.
       </p>
 
       <div class="mt-10 flex flex-wrap items-center justify-center gap-4">
