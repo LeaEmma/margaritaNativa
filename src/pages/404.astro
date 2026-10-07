@@ -1,0 +1,46 @@
+---
+import { Image } from 'astro:assets';
+
+import Layout from '../layouts/Layout.astro';
+import Ornamento from '../components/Ornamento.astro';
+import Boton from '../components/Boton.astro';
+import sello from '../assets/sello-margarita-nativa.png';
+import { SITIO } from '../datos/sitio';
+
+/*
+ * Importa sobre todo por los QR: si una variedad cambia de nombre, su dirección
+ * cambia, pero las etiquetas ya impresas siguen apuntando a la vieja. Quien
+ * escanea tiene la planta en la mano, así que lo primero es mandarlo a la lista
+ * de cuidados, no a la portada.
+ */
+---
+
+<Layout
+  titulo="Página no encontrada"
+  descripcion="La página que buscabas no existe o cambió de dirección."
+>
+  <section class="mx-auto flex min-h-[70vh] max-w-xl flex-col items-center justify-center px-5 py-20 text-center">
+    <Image src={sello} alt={SITIO.nombre} width={240} height={240} class="h-24 w-24" />
+
+    <p class="epigrafe mt-8">Error 404</p>
+    <h1 class="titulo-seccion mt-3 text-4xl text-balance sm:text-5xl">Esta página no existe</h1>
+
+    <Ornamento conFiletes class="mt-6" />
+
+    <p class="mt-7 text-lg text-balance text-oliva">
+      Puede que haya cambiado de dirección. Si llegaste escaneando el código de una
+      planta, buscala en la lista de cuidados.
+    </p>
+
+    <div class="mt-10 flex flex-wrap items-center justify-center gap-4">
+      <Boton href="/cuidados">Ver cuidados</Boton>
+      <Boton href="/catalogo" variante="contorno">Ver el catálogo</Boton>
+    </div>
+
+    <p class="mt-8 text-oliva">
+      ¿No la encontrás?{' '}
+      <a href="/#contacto" class="text-borravino underline underline-offset-4">Escribinos</a> y te
+      decimos cómo cuidarla.
+    </p>
+  </section>
+</Layout>

@@ -158,6 +158,28 @@ El contenido vive en [`src/datos/cuidados.ts`](src/datos/cuidados.ts), con cuatr
 datos por variedad y nada más. La tentación de extenderlo conviene resistirla:
 se lee de pie, en el celular, en el momento de recibir la planta.
 
+## Despliegue
+
+El sitio es estático: Netlify corre el build y sirve `dist/` desde su CDN. No
+hace falta adaptador de Astro ni funciones. La configuración está en
+[`netlify.toml`](netlify.toml).
+
+`site` en [`astro.config.mjs`](astro.config.mjs) sale de `SITE_URL` o, en su
+defecto, de la variable `URL` que expone Netlify. Así, mientras el dominio
+propio no esté conectado, las URL canónicas, el Open Graph y el sitemap apuntan
+a la dirección real de Netlify en vez de a un dominio que todavía no responde.
+
+Al conectar el dominio definitivo no hay nada que tocar en el código, salvo la
+línea `Sitemap:` de [`public/robots.txt`](public/robots.txt).
+
+### Por qué Netlify y no Vercel
+
+El plan gratuito de Vercel (Hobby) está limitado por términos de servicio a
+proyectos personales y no comerciales. Este sitio publica precios y recibe
+pedidos. El plan gratuito de Netlify no tiene esa restricción, y además expone
+*build hooks* como una URL simple, que es lo que va a disparar la
+republicación cuando la planilla de precios cambie.
+
 ## Pendientes
 
 - [ ] **Confirmar la lógica de precios de la suscripción.** En la tarjeta,
@@ -171,4 +193,4 @@ se lee de pie, en el celular, en el momento de recibir la planta.
 - [ ] Confirmar el dominio definitivo en `astro.config.mjs` (`site`)
 - [ ] Imagen de Open Graph propia (hoy no hay `og:image`)
 - [ ] Sección de eventos con fotos reales de ambientación
-- [ ] Elegir hosting (Netlify / Vercel / GitHub Pages) y configurar el deploy
+- [ ] Conectar el repositorio a Netlify y apuntar el dominio
