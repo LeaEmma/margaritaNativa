@@ -25,26 +25,15 @@ import { SITIO } from '../datos/sitio';
         type="button"
         id="carrito-lanzador"
         hidden
+        data-abrir-carrito
         aria-controls="carrito"
         aria-expanded="false"
         class="fixed right-5 bottom-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-borravino text-crema shadow-lg shadow-borravino/25 transition-transform hover:scale-105 hover:bg-borravino-medio sm:h-16 sm:w-16"
       >
         <span class="sr-only">Abrir tu pedido</span>
-        <svg
-          viewBox="0 0 24 24"
-          class="h-7 w-7 sm:h-8 sm:w-8"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.6"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
-        >
-          <path d="M5.2 7.8h13.6l-1.1 11a2 2 0 0 1-2 1.8H8.3a2 2 0 0 1-2-1.8Z" />
-          <path d="M8.8 10V6.6a3.2 3.2 0 0 1 6.4 0V10" />
-        </svg>
+        <Icono nombre="bolsa" class="h-7 w-7 sm:h-8 sm:w-8" />
         <span
-          data-insignia
+          data-insignia-carrito
           class="absolute -top-1 -right-1 flex h-6 min-w-6 items-center justify-center rounded-full border-2 border-papel bg-oliva px-1 text-xs font-semibold text-crema"
         >
           0
@@ -150,7 +139,9 @@ import { SITIO } from '../datos/sitio';
     const cliente = carrito.querySelector<HTMLInputElement>('[data-cliente]')!;
     const error = carrito.querySelector<HTMLElement>('[data-error]')!;
     const pedir = carrito.querySelector<HTMLAnchorElement>('[data-pedir]')!;
-    const insignia = lanzador.querySelector<HTMLElement>('[data-insignia]')!;
+    // El indicador vive tambien en el menu, asi que hay mas de uno.
+    const insignias = document.querySelectorAll<HTMLElement>('[data-insignia-carrito]');
+    const disparadores = document.querySelectorAll<HTMLButtonElement>('[data-abrir-carrito]');
 
     const plata = new Intl.NumberFormat('es-AR', {
       style: 'currency',
@@ -213,7 +204,10 @@ import { SITIO } from '../datos/sitio';
       const total = pedido.reduce((s, l) => s + l.precio * l.cantidad, 0);
 
       lanzador.hidden = unidades === 0;
-      insignia.textContent = String(unidades);
+      for (const marca of insignias) {
+        marca.textContent = String(unidades);
+        marca.hidden = unidades === 0;
+      }
       // El lanzador y el flotante comparten esquina.
       if (flotante) flotante.hidden = unidades > 0;
       carrito.querySelector('[data-total]')!.textContent = precio(total);
@@ -253,7 +247,7 @@ import { SITIO } from '../datos/sitio';
       carrito.setAttribute('aria-hidden', 'false');
       carrito.classList.remove('translate-x-full');
       fondo.classList.remove('pointer-events-none', 'opacity-0');
-      lanzador.setAttribute('aria-expanded', 'true');
+      for (const d of disparadores) d.setAttribute('aria-expanded', 'true');
       document.body.style.overflow = 'hidden';
       carrito.querySelector<HTMLButtonElement>('[data-cerrar]')!.focus();
     }
@@ -263,12 +257,12 @@ import { SITIO } from '../datos/sitio';
       carrito.setAttribute('aria-hidden', 'true');
       carrito.classList.add('translate-x-full');
       fondo.classList.add('pointer-events-none', 'opacity-0');
-      lanzador.setAttribute('aria-expanded', 'false');
+      for (const d of disparadores) d.setAttribute('aria-expanded', 'false');
       document.body.style.overflow = '';
       devolverFocoA?.focus();
     }
 
-    lanzador.addEventListener('click', abrir);
+    for (const d of disparadores) d.addEventListener('click', abrir);
     fondo.addEventListener('click', cerrar);
     carrito.querySelector('[data-cerrar]')!.addEventListener('click', cerrar);
 
