@@ -29,7 +29,7 @@ import { SITIO } from '../datos/sitio';
         data-abrir-carrito
         aria-controls="carrito"
         aria-expanded="false"
-        class="fixed right-5 bottom-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-borravino text-crema shadow-lg shadow-borravino/25 transition-transform hover:scale-105 hover:bg-borravino-medio sm:h-16 sm:w-16"
+        class="fixed right-5 bottom-[max(1.25rem,env(safe-area-inset-bottom))] z-40 flex h-14 w-14 items-center justify-center rounded-full bg-borravino text-crema shadow-lg shadow-borravino/25 transition-transform hover:scale-105 hover:bg-borravino-medio sm:h-16 sm:w-16"
       >
         <span class="sr-only">Abrir tu pedido</span>
         <Icono nombre="bolsa" class="h-7 w-7 sm:h-8 sm:w-8" />
@@ -55,7 +55,7 @@ import { SITIO } from '../datos/sitio';
         aria-labelledby="carrito-titulo"
         aria-hidden="true"
         data-whatsapp={SITIO.whatsapp}
-        class="fixed inset-y-0 right-0 z-50 flex w-full max-w-sm translate-x-full flex-col border-l border-oliva/30 bg-papel-claro shadow-2xl transition-transform duration-300 ease-out"
+        class="fixed inset-y-0 right-0 z-50 flex h-dvh w-full max-w-sm translate-x-full flex-col border-l border-oliva/30 bg-papel-claro shadow-2xl transition-transform duration-300 ease-out"
       >
         <header class="flex items-center justify-between gap-4 border-b border-oliva/25 px-5 py-4">
           <h2 id="carrito-titulo" class="font-display text-xl font-semibold tracking-wide text-borravino uppercase">
@@ -93,7 +93,10 @@ import { SITIO } from '../datos/sitio';
           </a>
         </div>
 
-        <footer data-controles class="border-t border-oliva/25 px-5 py-5">
+        <footer
+          data-controles
+          class="border-t border-oliva/25 px-5 pt-5 pb-[max(1.25rem,env(safe-area-inset-bottom))]"
+        >
           <label class="block">
             <span class="versalitas text-oliva">
               Tu nombre <span aria-hidden="true" class="text-borravino">*</span>

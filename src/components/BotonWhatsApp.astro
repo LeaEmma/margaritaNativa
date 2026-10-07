@@ -26,7 +26,7 @@ const { mensaje = '¡Hola! Te escribo desde la web.' } = Astro.props;
       href={enlaceContacto(mensaje)}
       target="_blank"
       rel="noopener noreferrer"
-      class="fixed right-5 bottom-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-borravino text-crema shadow-lg shadow-borravino/25 transition-transform hover:scale-105 hover:bg-borravino-medio sm:h-16 sm:w-16"
+      class="fixed right-5 bottom-[max(1.25rem,env(safe-area-inset-bottom))] z-50 flex h-14 w-14 items-center justify-center rounded-full bg-borravino text-crema shadow-lg shadow-borravino/25 transition-transform hover:scale-105 hover:bg-borravino-medio sm:h-16 sm:w-16"
       aria-label="Escribinos por WhatsApp"
     >
       <Icono nombre="whatsapp" class="h-7 w-7 sm:h-8 sm:w-8" />

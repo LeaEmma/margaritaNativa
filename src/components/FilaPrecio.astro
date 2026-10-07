@@ -6,6 +6,12 @@ import { precio as formatear, type ItemCatalogo } from '../datos/catalogo';
  * Fila de precio con guía punteada, como en las tarjetas impresas:
  * NOMBRE ········· ♦ $25.000
  *
+ * El nombre y el precio comparten la primera línea y la descripción va debajo,
+ * igual que en el impreso. En pantallas angostas el precio cae a la línea
+ * siguiente por `flex-wrap`: con miniatura y botón de agregar el ancho útil
+ * baja a ~180px, y manteniéndolos en la misma línea el nombre se partía letra
+ * por letra.
+ *
  * La miniatura es opcional: si el producto todavía no tiene foto, la fila se
  * muestra igual, sin hueco. Así se pueden ir sumando fotos de a poco.
  */
@@ -25,7 +31,7 @@ interface Props {
 const { item, sufijo, foto, cuidados, agregable = false } = Astro.props;
 ---
 
-<div class="flex items-center gap-4 py-4">
+<div class="flex items-center gap-3 py-4 sm:gap-4">
   {
     foto && (
       <Image
@@ -33,42 +39,43 @@ const { item, sufijo, foto, cuidados, agregable = false } = Astro.props;
         alt={item.nombre}
         width={176}
         height={176}
-        class="h-16 w-16 shrink-0 rounded-lg border border-oliva/20 object-cover sm:h-20 sm:w-20"
+        class="h-14 w-14 shrink-0 rounded-lg border border-oliva/20 object-cover sm:h-20 sm:w-20"
         loading="lazy"
       />
     )
   }
 
-  <div class="flex min-w-0 flex-1 items-baseline gap-3 sm:gap-4">
-    <div class="min-w-0 flex-shrink">
-      <h3 class="font-display text-lg font-semibold tracking-wide text-borravino uppercase sm:text-xl">
+  <div class="min-w-0 flex-1">
+    <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1 sm:flex-nowrap sm:gap-x-4">
+      <h3 class="font-display min-w-0 text-lg font-semibold tracking-wide text-borravino uppercase sm:text-xl">
         {item.nombre}
       </h3>
-      {item.detalle && <p class="mt-1 text-balance text-oliva">{item.detalle}</p>}
-      {
-        cuidados && (
-          <a
-            href={cuidados}
-            class="mt-1.5 inline-block text-sm text-borravino underline underline-offset-4 transition-colors hover:text-borravino-medio"
-          >
-            Ver cuidados →
-          </a>
-        )
-      }
+
+      <span class="hidden min-w-6 flex-1 translate-y-[-0.3em] border-b border-dotted border-oliva/40 sm:block"></span>
+
+      <p class="flex shrink-0 items-baseline gap-2">
+        <svg viewBox="0 0 10 14" class="h-3 w-2 self-center fill-oliva-medio" aria-hidden="true">
+          <path d="M5 0 9.5 7 5 14 .5 7Z" />
+        </svg>
+        {item.desde && <span class="text-sm text-oliva">desde</span>}
+        <span class="font-display text-xl font-semibold text-oliva sm:text-3xl">
+          {formatear(item.precio)}
+        </span>
+        {sufijo && <span class="text-sm text-oliva">{sufijo}</span>}
+      </p>
     </div>
 
-    <span class="hidden min-w-6 flex-1 translate-y-[-0.3em] border-b border-dotted border-oliva/40 sm:block"></span>
-
-    <p class="ml-auto flex shrink-0 items-baseline gap-2 sm:ml-0">
-      <svg viewBox="0 0 10 14" class="h-3 w-2 self-center fill-oliva-medio" aria-hidden="true">
-        <path d="M5 0 9.5 7 5 14 .5 7Z" />
-      </svg>
-      {item.desde && <span class="text-sm text-oliva">desde</span>}
-      <span class="font-display text-2xl font-semibold text-oliva sm:text-3xl">
-        {formatear(item.precio)}
-      </span>
-      {sufijo && <span class="text-sm text-oliva">{sufijo}</span>}
-    </p>
+    {item.detalle && <p class="mt-1.5 text-balance text-oliva">{item.detalle}</p>}
+    {
+      cuidados && (
+        <a
+          href={cuidados}
+          class="mt-1.5 inline-block text-sm text-borravino underline underline-offset-4 transition-colors hover:text-borravino-medio"
+        >
+          Ver cuidados →
+        </a>
+      )
+    }
   </div>
 
   {

@@ -71,7 +71,9 @@ const hayPedido = Boolean(SITIO.whatsapp);
   </div>
 
   <nav class="border-t border-oliva/15 lg:hidden" aria-label="Principal (móvil)">
-    <ul class="flex items-center gap-6 overflow-x-auto px-5 py-2.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <!-- El relleno va en cada enlace y no en la lista: asi el area de toque
+         es la fila entera y no solo la altura del texto. -->
+    <ul class="flex items-center gap-6 overflow-x-auto px-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       {
         NAVEGACION.map((enlace) => (
           <li class="shrink-0">
@@ -79,7 +81,7 @@ const hayPedido = Boolean(SITIO.whatsapp);
               href={enlace.href}
               aria-current={esActiva(enlace) ? 'page' : undefined}
               class:list={[
-                'versalitas',
+                'versalitas block py-3',
                 esActiva(enlace) ? 'text-borravino underline underline-offset-4' : 'text-oliva',
               ]}
             >
@@ -99,7 +101,7 @@ const hayPedido = Boolean(SITIO.whatsapp);
               <button
                 type="button"
                 data-abrir-carrito
-                class="versalitas flex items-center gap-1.5 text-oliva"
+                class="versalitas flex items-center gap-1.5 py-3 text-oliva"
               >
                 <Icono nombre="bolsa" class="h-4 w-4" />
                 <span class="sr-only">Abrir tu pedido</span>
