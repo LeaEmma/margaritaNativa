@@ -2,7 +2,7 @@
 import { Image } from 'astro:assets';
 import sello from '../assets/sello-margarita-nativa.png';
 import Icono from './Icono.astro';
-import { NAVEGACION, NAVEGACION_SOCIAL, SITIO } from '../datos/sitio';
+import { NAVEGACION, SITIO } from '../datos/sitio';
 
 // Sin barra final, para que "/catalogo" y "/catalogo/" se traten igual.
 const normalizar = (p: string) => p.replace(/\/+$/, '') || '/';
@@ -10,14 +10,12 @@ const ruta = normalizar(Astro.url.pathname);
 const esActiva = (enlace: (typeof NAVEGACION)[number]) =>
   'pagina' in enlace && normalizar(enlace.pagina) === ruta;
 
-const sociales = NAVEGACION_SOCIAL.filter((s) => s.visible);
-
-// El pedido solo existe si hay numero adonde mandarlo.
+// El pedido solo existe si hay número adonde mandarlo.
 const hayPedido = Boolean(SITIO.whatsapp);
 ---
 
 <header class="sticky top-0 z-50 border-b border-oliva/20 bg-papel/95 backdrop-blur-sm">
-  <div class="mx-auto flex max-w-7xl items-center gap-4 px-5 py-3">
+  <div class="mx-auto flex max-w-6xl items-center gap-4 px-5 py-3">
     <a href="/" class="flex shrink-0 items-center gap-3" aria-label={`${SITIO.nombre} — inicio`}>
       <Image src={sello} alt="" width={96} height={96} class="h-12 w-12" loading="eager" />
       <span class="font-display text-lg leading-tight font-semibold tracking-[0.12em] text-oliva uppercase">
@@ -25,8 +23,8 @@ const hayPedido = Boolean(SITIO.whatsapp);
       </span>
     </a>
 
-    <nav class="ml-auto hidden xl:block" aria-label="Principal">
-      <ul class="flex items-center gap-5">
+    <nav class="ml-auto hidden lg:block" aria-label="Principal">
+      <ul class="flex items-center gap-6">
         {
           NAVEGACION.map((enlace) => (
             <li>
@@ -41,25 +39,6 @@ const hayPedido = Boolean(SITIO.whatsapp);
                 ]}
               >
                 {enlace.texto}
-              </a>
-            </li>
-          ))
-        }
-
-        <li aria-hidden="true"><span class="block h-5 w-px bg-oliva/30"></span></li>
-
-        {
-          sociales.map((social) => (
-            <li>
-              <a
-                href={social.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={social.etiqueta}
-                class="versalitas flex items-center gap-2 text-oliva transition-colors hover:text-borravino"
-              >
-                <Icono nombre={social.icono} class="h-5 w-5" />
-                {social.texto}
               </a>
             </li>
           ))
@@ -91,7 +70,7 @@ const hayPedido = Boolean(SITIO.whatsapp);
     </nav>
   </div>
 
-  <nav class="border-t border-oliva/15 xl:hidden" aria-label="Principal (móvil)">
+  <nav class="border-t border-oliva/15 lg:hidden" aria-label="Principal (móvil)">
     <ul class="flex items-center gap-6 overflow-x-auto px-5 py-2.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       {
         NAVEGACION.map((enlace) => (
@@ -105,25 +84,6 @@ const hayPedido = Boolean(SITIO.whatsapp);
               ]}
             >
               {enlace.texto}
-            </a>
-          </li>
-        ))
-      }
-
-      <li class="shrink-0" aria-hidden="true"><span class="block h-4 w-px bg-oliva/30"></span></li>
-
-      {
-        sociales.map((social) => (
-          <li class="shrink-0">
-            <a
-              href={social.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={social.etiqueta}
-              class="versalitas flex items-center gap-1.5 text-oliva"
-            >
-              <Icono nombre={social.icono} class="h-4 w-4" />
-              {social.texto}
             </a>
           </li>
         ))

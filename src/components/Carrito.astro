@@ -1,5 +1,6 @@
 ---
 import Icono from './Icono.astro';
+import Ornamento from './Ornamento.astro';
 import { SITIO } from '../datos/sitio';
 
 /**
@@ -74,7 +75,25 @@ import { SITIO } from '../datos/sitio';
 
         <ul data-lista class="flex-1 divide-y divide-oliva/20 overflow-y-auto px-5" />
 
-        <footer class="border-t border-oliva/25 px-5 py-5">
+        {/* Se puede abrir el pedido vacío desde el menú: sin esto queda un hueco. */}
+        <div data-vacio hidden class="flex flex-1 flex-col items-center justify-center px-8 text-center">
+          <Ornamento />
+          <p class="font-display mt-5 text-xl font-semibold tracking-wide text-borravino uppercase">
+            Todavía no elegiste nada
+          </p>
+          <p class="mt-3 text-balance text-oliva">
+            Las flores cambian con la estación: lo que hay esta semana no es lo que va a haber
+            en la próxima.
+          </p>
+          <a
+            href="/catalogo"
+            class="versalitas mt-7 inline-flex items-center justify-center rounded-full border border-borravino/40 px-6 py-3 text-borravino transition-colors hover:border-borravino hover:bg-borravino/5"
+          >
+            Ver el catálogo
+          </a>
+        </div>
+
+        <footer data-controles class="border-t border-oliva/25 px-5 py-5">
           <label class="block">
             <span class="versalitas text-oliva">
               Tu nombre <span aria-hidden="true" class="text-borravino">*</span>
@@ -232,7 +251,13 @@ import { SITIO } from '../datos/sitio';
         lista.appendChild(li);
       }
 
-      if (unidades === 0) cerrar();
+      // Con el pedido vacío el cajón sigue abierto mostrando el estado vacío:
+      // cerrarlo de golpe al vaciar se siente como que algo falló.
+      const vacio = pedido.length === 0;
+      lista.hidden = vacio;
+      carrito.querySelector<HTMLElement>('[data-vacio]')!.hidden = !vacio;
+      carrito.querySelector<HTMLElement>('[data-controles]')!.hidden = vacio;
+
       pintarPedir();
     }
 

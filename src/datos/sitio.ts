@@ -40,21 +40,3 @@ export const NAVEGACION = [
   { texto: 'Eventos', href: '/#eventos' },
   { texto: 'Contacto', href: '/#contacto' },
 ] as const;
-
-/** Van al final del mismo menú, después de Contacto. */
-export const NAVEGACION_SOCIAL = [
-  {
-    texto: 'WhatsApp',
-    icono: 'whatsapp',
-    href: enlaceContacto('¡Hola! Te escribo desde la web.'),
-    etiqueta: 'Escribinos por WhatsApp',
-    visible: Boolean(SITIO.whatsapp),
-  },
-  {
-    texto: 'IG',
-    icono: 'instagram',
-    href: SITIO.instagram,
-    etiqueta: `Instagram ${SITIO.instagramUsuario}`,
-    visible: true,
-  },
-] as const;
