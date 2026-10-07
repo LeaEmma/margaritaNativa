@@ -10,69 +10,126 @@ import { SITIO } from '../datos/sitio';
  * responder. Lo que resuelve es que el pedido llegue detallado en vez de
  * "hola, quiero flores".
  *
+ * Es un cajón lateral y no una barra inferior porque la barra tapaba el
+ * catálogo justo mientras se elige, que es cuando más se lo necesita ver.
+ *
  * Todo vive en localStorage: no hay servidor ni sesión.
  */
 ---
 
 {
   SITIO.whatsapp && (
-    <aside
-      id="carrito"
-      data-whatsapp={SITIO.whatsapp}
-      hidden
-      aria-label="Tu pedido"
-      class="fixed inset-x-0 bottom-0 z-50 border-t border-oliva/30 bg-papel-claro/97 backdrop-blur-sm"
-    >
-      <div data-detalle hidden class="mx-auto max-w-3xl px-5 pt-4">
-        <ul data-lista class="max-h-48 divide-y divide-oliva/20 overflow-y-auto" />
-
-        <label class="mt-4 block">
-          <span class="versalitas text-oliva">Tu nombre</span>
-          <input
-            type="text"
-            data-cliente
-            autocomplete="name"
-            placeholder="Para saber con quién hablamos"
-            class="mt-1.5 w-full rounded-lg border border-oliva/35 bg-papel px-4 py-2.5 text-tinta placeholder:text-oliva/60 focus:border-borravino focus:outline-none"
-          />
-        </label>
-      </div>
-
-      <div class="mx-auto flex max-w-3xl items-center gap-3 px-5 py-3 sm:gap-4">
-        <button
-          type="button"
-          data-alternar
-          aria-expanded="false"
-          aria-controls="carrito-detalle"
-          class="flex min-w-0 flex-1 items-baseline gap-2 text-left"
+    <>
+      {/* Lanzador: reemplaza al flotante de WhatsApp mientras haya pedido */}
+      <button
+        type="button"
+        id="carrito-lanzador"
+        hidden
+        aria-controls="carrito"
+        aria-expanded="false"
+        class="fixed right-5 bottom-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-borravino text-crema shadow-lg shadow-borravino/25 transition-transform hover:scale-105 hover:bg-borravino-medio sm:h-16 sm:w-16"
+      >
+        <span class="sr-only">Abrir tu pedido</span>
+        <svg
+          viewBox="0 0 24 24"
+          class="h-7 w-7 sm:h-8 sm:w-8"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
         >
-          <span class="versalitas text-oliva">
-            <span data-cuenta>0</span> <span data-palabra>productos</span>
-          </span>
-          <span class="font-display text-xl font-semibold text-borravino" data-total />
-        </button>
-
-        <button
-          type="button"
-          data-vaciar
-          class="shrink-0 text-sm text-oliva underline underline-offset-4 transition-colors hover:text-borravino"
+          <path d="M5.2 7.8h13.6l-1.1 11a2 2 0 0 1-2 1.8H8.3a2 2 0 0 1-2-1.8Z" />
+          <path d="M8.8 10V6.6a3.2 3.2 0 0 1 6.4 0V10" />
+        </svg>
+        <span
+          data-insignia
+          class="absolute -top-1 -right-1 flex h-6 min-w-6 items-center justify-center rounded-full border-2 border-papel bg-oliva px-1 text-xs font-semibold text-crema"
         >
-          Vaciar
-        </button>
+          0
+        </span>
+      </button>
 
-        <a
-          data-pedir
-          href="#"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="versalitas inline-flex shrink-0 items-center gap-2 rounded-full bg-borravino px-5 py-3 text-crema transition-colors hover:bg-borravino-medio"
-        >
-          <Icono nombre="whatsapp" class="h-5 w-5" />
-          <span class="hidden sm:inline">Pedir por WhatsApp</span>
-          <span class="sm:hidden">Pedir</span>
-        </a>
-      </div>
-    </aside>
+      {/* Fondo */}
+      <div
+        id="carrito-fondo"
+        class="pointer-events-none fixed inset-0 z-40 bg-tinta/50 opacity-0 transition-opacity duration-300"
+      />
+
+      {/* Cajón */}
+      <aside
+        id="carrito"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="carrito-titulo"
+        aria-hidden="true"
+        data-whatsapp={SITIO.whatsapp}
+        class="fixed inset-y-0 right-0 z-50 flex w-full max-w-sm translate-x-full flex-col border-l border-oliva/30 bg-papel-claro shadow-2xl transition-transform duration-300 ease-out"
+      >
+        <header class="flex items-center justify-between gap-4 border-b border-oliva/25 px-5 py-4">
+          <h2 id="carrito-titulo" class="font-display text-xl font-semibold tracking-wide text-borravino uppercase">
+            Tu pedido
+          </h2>
+          <button
+            type="button"
+            data-cerrar
+            class="flex h-9 w-9 items-center justify-center rounded-full text-oliva transition-colors hover:bg-oliva/10 hover:text-borravino"
+          >
+            <span class="sr-only">Cerrar</span>
+            <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+              <path d="M6 6l12 12M18 6L6 18" />
+            </svg>
+          </button>
+        </header>
+
+        <ul data-lista class="flex-1 divide-y divide-oliva/20 overflow-y-auto px-5" />
+
+        <footer class="border-t border-oliva/25 px-5 py-5">
+          <label class="block">
+            <span class="versalitas text-oliva">
+              Tu nombre <span aria-hidden="true" class="text-borravino">*</span>
+            </span>
+            <input
+              type="text"
+              data-cliente
+              required
+              autocomplete="name"
+              aria-describedby="carrito-error"
+              placeholder="Para saber con quién hablamos"
+              class="mt-1.5 w-full rounded-lg border border-oliva/35 bg-papel px-4 py-2.5 text-tinta placeholder:text-oliva/60 focus:border-borravino focus:outline-none"
+            />
+          </label>
+          <p id="carrito-error" data-error hidden class="mt-2 text-sm text-borravino">
+            Escribí tu nombre así sabemos con quién hablamos.
+          </p>
+
+          <div class="mt-5 flex items-baseline justify-between gap-4">
+            <span class="versalitas text-oliva">Total</span>
+            <span class="font-display text-2xl font-semibold text-borravino" data-total />
+          </div>
+
+          <a
+            data-pedir
+            href="#"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="versalitas mt-4 flex w-full items-center justify-center gap-2.5 rounded-full bg-borravino px-5 py-3.5 text-crema transition-colors hover:bg-borravino-medio aria-disabled:cursor-not-allowed aria-disabled:bg-borravino/40"
+          >
+            <Icono nombre="whatsapp" class="h-5 w-5" />
+            Pedir por WhatsApp
+          </a>
+
+          <button
+            type="button"
+            data-vaciar
+            class="mt-3 w-full text-sm text-oliva underline underline-offset-4 transition-colors hover:text-borravino"
+          >
+            Vaciar pedido
+          </button>
+        </footer>
+      </aside>
+    </>
   )
 }
 
@@ -86,14 +143,14 @@ import { SITIO } from '../datos/sitio';
   if (raiz) iniciar(raiz);
 
   function iniciar(carrito: HTMLElement) {
-    const lista = carrito.querySelector<HTMLUListElement>('[data-lista]')!;
-    const detalle = carrito.querySelector<HTMLElement>('[data-detalle]')!;
-    const alternar = carrito.querySelector<HTMLButtonElement>('[data-alternar]')!;
-    const pedir = carrito.querySelector<HTMLAnchorElement>('[data-pedir]')!;
-    const cliente = carrito.querySelector<HTMLInputElement>('[data-cliente]')!;
+    const fondo = document.querySelector<HTMLElement>('#carrito-fondo')!;
+    const lanzador = document.querySelector<HTMLButtonElement>('#carrito-lanzador')!;
     const flotante = document.querySelector<HTMLElement>('#whatsapp-flotante');
-
-    detalle.id = 'carrito-detalle';
+    const lista = carrito.querySelector<HTMLUListElement>('[data-lista]')!;
+    const cliente = carrito.querySelector<HTMLInputElement>('[data-cliente]')!;
+    const error = carrito.querySelector<HTMLElement>('[data-error]')!;
+    const pedir = carrito.querySelector<HTMLAnchorElement>('[data-pedir]')!;
+    const insignia = lanzador.querySelector<HTMLElement>('[data-insignia]')!;
 
     const plata = new Intl.NumberFormat('es-AR', {
       style: 'currency',
@@ -103,7 +160,7 @@ import { SITIO } from '../datos/sitio';
     const precio = (v: number) => plata.format(v).replace(/\s/g, '');
 
     // localStorage puede fallar (ventana privada, cookies bloqueadas). Si falla,
-    // el sitio tiene que seguir funcionando sin carrito y no romper la página.
+    // el sitio tiene que seguir andando sin carrito en vez de romperse.
     function leer(): Linea[] {
       try {
         const crudo = localStorage.getItem(CLAVE);
@@ -126,17 +183,10 @@ import { SITIO } from '../datos/sitio';
     try {
       cliente.value = localStorage.getItem(CLAVE_CLIENTE) ?? '';
     } catch {
-      /* sin persistencia: se escribe a mano cada vez */
+      /* se escribe a mano cada vez */
     }
 
-    cliente.addEventListener('input', () => {
-      try {
-        localStorage.setItem(CLAVE_CLIENTE, cliente.value.trim());
-      } catch {
-        /* idem */
-      }
-      pedir.href = `https://wa.me/${carrito.dataset.whatsapp}?text=${encodeURIComponent(mensaje())}`;
-    });
+    const conNombre = () => cliente.value.trim().length > 0;
 
     function mensaje(): string {
       const items = pedido
@@ -144,49 +194,108 @@ import { SITIO } from '../datos/sitio';
         .join('\n');
       const total = pedido.reduce((s, l) => s + l.precio * l.cantidad, 0);
       // El número lo aporta WhatsApp; el nombre no, y sin él el pedido llega
-      // de un desconocido. Si no lo cargaron, se manda igual.
-      const nombre = cliente.value.trim();
-      const saludo = nombre
-        ? `¡Hola! Soy ${nombre} y quiero hacer un pedido:`
-        : '¡Hola! Quiero hacer un pedido:';
+      // de un desconocido.
+      const saludo = `¡Hola! Soy ${cliente.value.trim()} y quiero hacer un pedido:`;
       return `${saludo}\n\n${items}\n\nTotal: ${precio(total)}`;
+    }
+
+    function pintarPedir() {
+      const listo = conNombre() && pedido.length > 0;
+      pedir.setAttribute('aria-disabled', String(!listo));
+      pedir.href = listo
+        ? `https://wa.me/${carrito.dataset.whatsapp}?text=${encodeURIComponent(mensaje())}`
+        : '#';
+      if (listo) error.hidden = true;
     }
 
     function pintar() {
       const unidades = pedido.reduce((s, l) => s + l.cantidad, 0);
       const total = pedido.reduce((s, l) => s + l.precio * l.cantidad, 0);
 
-      carrito.hidden = unidades === 0;
-      // El flotante y la barra ocupan la misma esquina: con pedido abierto,
-      // la barra ya ofrece el WhatsApp.
+      lanzador.hidden = unidades === 0;
+      insignia.textContent = String(unidades);
+      // El lanzador y el flotante comparten esquina.
       if (flotante) flotante.hidden = unidades > 0;
-
-      carrito.querySelector('[data-cuenta]')!.textContent = String(unidades);
-      carrito.querySelector('[data-palabra]')!.textContent = unidades === 1 ? 'producto' : 'productos';
       carrito.querySelector('[data-total]')!.textContent = precio(total);
 
       lista.innerHTML = '';
       for (const linea of pedido) {
         const li = document.createElement('li');
-        li.className = 'flex items-center gap-3 py-2.5';
+        li.className = 'flex items-center gap-3 py-3';
         li.innerHTML = `
-          <span class="min-w-0 flex-1 truncate text-oliva">${linea.nombre}</span>
-          <span class="flex shrink-0 items-center gap-2">
-            <button type="button" data-menos="${linea.slug}" aria-label="Quitar uno de ${linea.nombre}"
-              class="h-7 w-7 rounded-full border border-oliva/40 text-oliva">−</button>
-            <span class="w-5 text-center text-oliva">${linea.cantidad}</span>
-            <button type="button" data-mas="${linea.slug}" aria-label="Agregar otro de ${linea.nombre}"
-              class="h-7 w-7 rounded-full border border-oliva/40 text-oliva">+</button>
+          <span class="min-w-0 flex-1">
+            <span class="block truncate text-tinta">${linea.nombre}</span>
+            <span class="text-sm text-oliva">${precio(linea.precio)} c/u</span>
           </span>
-          <span class="w-24 shrink-0 text-right font-display font-semibold text-oliva">${precio(linea.precio * linea.cantidad)}</span>`;
+          <span class="flex shrink-0 items-center gap-1.5">
+            <button type="button" data-menos="${linea.slug}" aria-label="Quitar uno de ${linea.nombre}"
+              class="h-8 w-8 rounded-full border border-oliva/40 text-oliva transition-colors hover:border-borravino hover:text-borravino">−</button>
+            <span class="w-6 text-center text-tinta">${linea.cantidad}</span>
+            <button type="button" data-mas="${linea.slug}" aria-label="Agregar otro de ${linea.nombre}"
+              class="h-8 w-8 rounded-full border border-oliva/40 text-oliva transition-colors hover:border-borravino hover:text-borravino">+</button>
+          </span>
+          <span class="font-display w-20 shrink-0 text-right font-semibold text-oliva">${precio(linea.precio * linea.cantidad)}</span>`;
         lista.appendChild(li);
       }
 
-      pedir.href = `https://wa.me/${carrito.dataset.whatsapp}?text=${encodeURIComponent(mensaje())}`;
+      if (unidades === 0) cerrar();
+      pintarPedir();
     }
 
+    /* ----------------------------- apertura ----------------------------- */
+
+    let devolverFocoA: HTMLElement | null = null;
+
+    const estaAbierto = () => carrito.getAttribute('aria-hidden') === 'false';
+
+    function abrir() {
+      devolverFocoA = document.activeElement as HTMLElement;
+      carrito.setAttribute('aria-hidden', 'false');
+      carrito.classList.remove('translate-x-full');
+      fondo.classList.remove('pointer-events-none', 'opacity-0');
+      lanzador.setAttribute('aria-expanded', 'true');
+      document.body.style.overflow = 'hidden';
+      carrito.querySelector<HTMLButtonElement>('[data-cerrar]')!.focus();
+    }
+
+    function cerrar() {
+      if (!estaAbierto()) return;
+      carrito.setAttribute('aria-hidden', 'true');
+      carrito.classList.add('translate-x-full');
+      fondo.classList.add('pointer-events-none', 'opacity-0');
+      lanzador.setAttribute('aria-expanded', 'false');
+      document.body.style.overflow = '';
+      devolverFocoA?.focus();
+    }
+
+    lanzador.addEventListener('click', abrir);
+    fondo.addEventListener('click', cerrar);
+    carrito.querySelector('[data-cerrar]')!.addEventListener('click', cerrar);
+
+    document.addEventListener('keydown', (evento) => {
+      if (!estaAbierto()) return;
+      if (evento.key === 'Escape') return cerrar();
+
+      // Mientras el cajón es modal, el foco no debería salirse por detrás.
+      if (evento.key !== 'Tab') return;
+      const focolables = carrito.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input, [tabindex]:not([tabindex="-1"])',
+      );
+      if (!focolables.length) return;
+      const primero = focolables[0]!;
+      const ultimo = focolables[focolables.length - 1]!;
+      if (evento.shiftKey && document.activeElement === primero) {
+        evento.preventDefault();
+        ultimo.focus();
+      } else if (!evento.shiftKey && document.activeElement === ultimo) {
+        evento.preventDefault();
+        primero.focus();
+      }
+    });
+
+    /* ------------------------------ acciones ---------------------------- */
+
     function cambiar(slug: string, delta: number, datos?: Omit<Linea, 'cantidad'>) {
-      const estabaVacio = pedido.length === 0;
       const existente = pedido.find((l) => l.slug === slug);
       if (existente) {
         existente.cantidad += delta;
@@ -195,17 +304,11 @@ import { SITIO } from '../datos/sitio';
         pedido.push({ ...datos, cantidad: delta });
       }
       guardar(pedido);
-      // Al abrir el pedido se despliega el detalle una vez, así el campo del
-      // nombre no queda escondido detrás de un botón que nadie toca.
-      if (estabaVacio && pedido.length > 0) {
-        detalle.hidden = false;
-        alternar.setAttribute('aria-expanded', 'true');
-      }
       pintar();
     }
 
-    // Delegado en el documento: sirve para todas las filas sin registrar
-    // un escuchador por producto.
+    // Delegado en el documento: sirve para todas las filas sin registrar un
+    // escuchador por producto.
     document.addEventListener('click', (evento) => {
       const objetivo = evento.target as HTMLElement;
 
@@ -216,6 +319,7 @@ import { SITIO } from '../datos/sitio';
           nombre: agregar.dataset.nombre!,
           precio: Number(agregar.dataset.precio),
         });
+        abrir();
         return;
       }
 
@@ -226,17 +330,27 @@ import { SITIO } from '../datos/sitio';
       if (menos) return cambiar(menos.dataset.menos!, -1);
     });
 
-    alternar.addEventListener('click', () => {
-      const abierto = !detalle.hidden;
-      detalle.hidden = abierto;
-      alternar.setAttribute('aria-expanded', String(!abierto));
+    cliente.addEventListener('input', () => {
+      try {
+        localStorage.setItem(CLAVE_CLIENTE, cliente.value.trim());
+      } catch {
+        /* idem */
+      }
+      pintarPedir();
+    });
+
+    // El enlace sigue siendo un enlace, pero sin nombre no se deja salir:
+    // deshabilitarlo a secas dejaría a la persona sin saber qué falta.
+    pedir.addEventListener('click', (evento) => {
+      if (conNombre() && pedido.length > 0) return;
+      evento.preventDefault();
+      error.hidden = false;
+      cliente.focus();
     });
 
     carrito.querySelector('[data-vaciar]')!.addEventListener('click', () => {
       pedido = [];
       guardar(pedido);
-      detalle.hidden = true;
-      alternar.setAttribute('aria-expanded', 'false');
       pintar();
     });
 

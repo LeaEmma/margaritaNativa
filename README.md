@@ -136,8 +136,13 @@ Cobrar antes de confirmar abre la puerta a vender algo que no hay. Lo que el
 carrito resuelve es que el pedido llegue detallado en vez de "hola, quiero
 flores".
 
-El campo del nombre existe porque WhatsApp aporta el número pero no quién
-escribe. Si queda vacío el pedido se manda igual, sin la presentación.
+Es un cajón lateral y no una barra inferior: la barra tapaba el catálogo justo
+mientras se elige, que es cuando más se lo necesita ver.
+
+El nombre es obligatorio porque WhatsApp aporta el número pero no quién
+escribe. En vez de deshabilitar el botón a secas —que deja a la persona sin
+saber qué falta— el enlace se frena, se muestra el motivo y el foco va al
+campo.
 
 Los productos marcados `desde` no se pueden agregar: no tienen precio cerrado.
 
