@@ -16,7 +16,7 @@ interface Props {
 const { titulo, descripcion = SITIO.descripcion, mensajeWhatsApp } = Astro.props;
 
 const tituloCompleto = titulo ? `${titulo} — ${SITIO.nombre}` : `${SITIO.nombre} — ${SITIO.lema}`;
-const canonica = new URL(Astro.url.pathname, Astro.site ?? 'https://margaritanativa.com');
+const canonica = new URL(Astro.url.pathname, Astro.site ?? 'https://margaritanativa.com.ar');
 ---
 
 <!doctype html>

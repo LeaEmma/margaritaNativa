@@ -10,7 +10,7 @@ import tailwindcss from '@tailwindcss/vite';
  * sitio igual se publica con URLs correctas en vez de apuntar a un dominio que
  * todavía no responde.
  */
-const sitio = process.env.SITE_URL ?? process.env.URL ?? 'https://margaritanativa.com';
+const sitio = process.env.SITE_URL ?? process.env.URL ?? 'https://margaritanativa.com.ar';
 
 // https://astro.build/config
 export default defineConfig({
