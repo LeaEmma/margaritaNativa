@@ -1,0 +1,118 @@
+---
+import { Image } from 'astro:assets';
+
+import Layout from '../../layouts/Layout.astro';
+import Ornamento from '../../components/Ornamento.astro';
+import Icono from '../../components/Icono.astro';
+import Boton from '../../components/Boton.astro';
+
+import { CUIDADOS_POR_PLANTA, type Cuidado } from '../../datos/cuidados';
+import { porCategoria, precio, type ItemCatalogo } from '../../datos/catalogo';
+import { enlaceContacto } from '../../datos/sitio';
+
+const FOTOS = import.meta.glob<{ default: ImageMetadata }>('../../assets/fotos/plantas/*.jpg', {
+  eager: true,
+});
+
+export async function getStaticPaths() {
+  const { CUIDADOS_POR_PLANTA } = await import('../../datos/cuidados');
+  const { porCategoria } = await import('../../datos/catalogo');
+  const plantas = porCategoria('plantas');
+
+  return Object.entries(CUIDADOS_POR_PLANTA).map(([slug, cuidado]) => ({
+    params: { slug },
+    props: { cuidado, planta: plantas.find((p) => p.slug === slug) },
+  }));
+}
+
+interface Props {
+  cuidado: Cuidado;
+  planta?: ItemCatalogo;
+}
+
+const { cuidado, planta } = Astro.props;
+const { slug } = Astro.params;
+
+const nombre = planta?.nombre ?? slug;
+const foto = FOTOS[`../../assets/fotos/plantas/${slug}.jpg`]?.default;
+
+const PAUTAS = [
+  { icono: 'sol' as const, titulo: 'Luz', texto: cuidado.luz },
+  { icono: 'gota' as const, titulo: 'Riego', texto: cuidado.riego },
+  { icono: 'maceta' as const, titulo: 'Dónde ponerla', texto: cuidado.ubicacion },
+];
+---
+
+<Layout
+  titulo={`Cómo cuidar ${nombre}`}
+  descripcion={`${cuidado.resumen} Luz, riego y ubicación para que tu ${nombre.toLowerCase()} dure.`}
+>
+  <article class="mx-auto max-w-2xl px-5 pt-12 pb-20">
+    <a href="/cuidados" class="versalitas text-oliva transition-colors hover:text-borravino">
+      ← Cuidados
+    </a>
+
+    {
+      foto && (
+        <figure class="mt-6 overflow-hidden rounded-xl border border-oliva/25">
+          <Image
+            src={foto}
+            alt={nombre}
+            class="h-56 w-full object-cover sm:h-72"
+            widths={[480, 900]}
+            sizes="(min-width: 640px) 42rem, 100vw"
+            loading="eager"
+          />
+        </figure>
+      )
+    }
+
+    <header class="mt-8 text-center">
+      <p class="epigrafe">Cuidados</p>
+      <h1 class="titulo-seccion mt-3 text-4xl sm:text-5xl">{nombre}</h1>
+      <Ornamento conFiletes class="mt-5" />
+      <p class="mt-6 text-lg text-balance text-oliva">{cuidado.resumen}</p>
+    </header>
+
+    <dl class="mt-10 divide-y divide-oliva/20 border-y border-oliva/20">
+      {
+        PAUTAS.map((pauta) => (
+          <div class="flex gap-5 py-5">
+            <span class="mt-0.5 shrink-0 text-oliva">
+              <Icono nombre={pauta.icono} class="h-7 w-7" />
+            </span>
+            <div>
+              <dt class="versalitas text-borravino">{pauta.titulo}</dt>
+              <dd class="mt-1.5 text-oliva">{pauta.texto}</dd>
+            </div>
+          </div>
+        ))
+      }
+    </dl>
+
+    <aside class="mt-8 rounded-xl border border-borravino/25 bg-papel-claro p-6">
+      <div class="flex items-center gap-3">
+        <Ornamento />
+        <h2 class="versalitas text-borravino">Un dato</h2>
+      </div>
+      <p class="mt-3 text-oliva">{cuidado.dato}</p>
+    </aside>
+
+    <div class="mt-12 text-center">
+      <Boton
+        href={enlaceContacto(`¡Hola! Tengo una consulta sobre mi ${nombre.toLowerCase()}.`)}
+        class="gap-2.5"
+      >
+        <Icono nombre="whatsapp" class="h-5 w-5" />
+        Consultanos
+      </Boton>
+
+      <p class="mt-6 text-oliva">
+        {planta && <>La conseguís en {precio(planta.precio)}. </>}
+        <a href="/catalogo#plantas" class="text-borravino underline underline-offset-4">
+          Ver todas las plantas
+        </a>
+      </p>
+    </div>
+  </article>
+</Layout>

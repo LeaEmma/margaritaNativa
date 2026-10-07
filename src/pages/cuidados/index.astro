@@ -1,0 +1,74 @@
+---
+import { Image } from 'astro:assets';
+
+import Layout from '../../layouts/Layout.astro';
+import TituloSeccion from '../../components/TituloSeccion.astro';
+import Boton from '../../components/Boton.astro';
+
+import { CUIDADOS_POR_PLANTA } from '../../datos/cuidados';
+import { porCategoria } from '../../datos/catalogo';
+
+const FOTOS = import.meta.glob<{ default: ImageMetadata }>('../../assets/fotos/plantas/*.jpg', {
+  eager: true,
+});
+
+const plantas = porCategoria('plantas');
+
+const variedades = Object.entries(CUIDADOS_POR_PLANTA)
+  .map(([slug, cuidado]) => ({
+    slug,
+    cuidado,
+    nombre: plantas.find((p) => p.slug === slug)?.nombre ?? slug,
+    foto: FOTOS[`../../assets/fotos/plantas/${slug}.jpg`]?.default,
+  }))
+  // Una sola ficha por planta: lavanda chica y grande comparten cuidados.
+  .filter((v) => v.slug !== 'lavanda-grande')
+  .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+---
+
+<Layout
+  titulo="Cuidados"
+  descripcion="Cómo cuidar cada variedad: luz, riego y ubicación, en pocas líneas."
+>
+  <section class="mx-auto max-w-5xl px-5 pt-16 pb-20">
+    <TituloSeccion titulo="Cuidados" epigrafe="Para que te duren" />
+
+    <p class="mx-auto mt-8 max-w-2xl text-center text-lg text-balance text-oliva">
+      Lo esencial de cada variedad en cuatro líneas: luz, riego, dónde ponerla
+      y el error que casi todos cometen.
+    </p>
+
+    <ul class="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      {
+        variedades.map((variedad) => (
+          <li>
+            <a
+              href={`/cuidados/${variedad.slug}`}
+              class="group flex h-full flex-col overflow-hidden rounded-xl border border-oliva/25 bg-papel-claro transition-colors hover:border-borravino/40"
+            >
+              {variedad.foto && (
+                <Image
+                  src={variedad.foto}
+                  alt=""
+                  class="h-40 w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  widths={[300, 600]}
+                  sizes="(min-width: 1024px) 20rem, (min-width: 640px) 50vw, 100vw"
+                />
+              )}
+              <div class="flex flex-1 flex-col p-5">
+                <h2 class="font-display text-lg font-semibold tracking-wide text-borravino uppercase">
+                  {variedad.nombre}
+                </h2>
+                <p class="mt-2 flex-1 text-balance text-oliva">{variedad.cuidado.resumen}</p>
+              </div>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="mt-12 text-center">
+      <Boton href="/catalogo#plantas" variante="contorno">Ver precios</Boton>
+    </div>
+  </section>
+</Layout>

@@ -33,7 +33,8 @@ src/
   components/        Piezas de UI reutilizables
   datos/             catalogo.ts (precios) y sitio.ts (contacto, navegación)
   layouts/           Layout base con <head>, SEO y Open Graph
-  pages/             index.astro (resumen) y catalogo.astro (precios completos)
+  pages/             index.astro (resumen), catalogo.astro (precios) y
+                     cuidados/ (una ficha por variedad, destino de los QR)
   styles/            global.css — Tailwind y los tokens de marca
 _resources/          Material de trabajo original. NO versionado.
 ```
@@ -96,6 +97,44 @@ La home es el resumen y no repite precios: solo muestra un "desde" por rubro,
 calculado con `precioDesde()`. El detalle completo vive en `/catalogo`. Agregar
 un producto al arreglo correspondiente alcanza para que aparezca en las dos
 páginas.
+
+## Fotos de producto
+
+Las fotos llegan a una carpeta compartida de Drive, con una subcarpeta por
+producto cuyo nombre coincide con el de la planilla:
+
+```
+<origen>/Plantas/<Nombre del producto>/<cualquier foto>
+```
+
+Para importarlas:
+
+```bash
+node scripts/importar-fotos.mjs            # lee la carpeta de Drive en G:
+node scripts/importar-fotos.mjs <ruta>     # o cualquier otro origen
+```
+
+El script recorta cuadrado, deja el resultado en `src/assets/fotos/<categoria>/`
+y **reporta en los dos sentidos**: qué productos quedaron sin foto y qué carpetas
+no coinciden con ningún producto. Ese segundo reporte es el que detecta los
+errores de nombre, que de otro modo pasan desapercibidos.
+
+Las carpetas cuyo nombre no puede coincidir con el producto se resuelven con el
+mapa `ALIAS` del script, no renombrando en Drive: `Monstera` no puede llamarse
+`Monstera / Costilla de Adán` porque la barra no es válida en un nombre de
+archivo.
+
+## Cuidados
+
+`/cuidados/<variedad>` es el destino de los QR que van en la etiqueta de cada
+planta. Son páginas separadas y no una sección única a propósito: quien escanea
+tiene esa planta en la mano y quiere esos cuidados, no una lista de diecisiete.
+Además cada una posiciona por su cuenta en búsquedas del tipo "cómo cuidar
+monstera".
+
+El contenido vive en [`src/datos/cuidados.ts`](src/datos/cuidados.ts), con cuatro
+datos por variedad y nada más. La tentación de extenderlo conviene resistirla:
+se lee de pie, en el celular, en el momento de recibir la planta.
 
 ## Pendientes
 
