@@ -24,6 +24,19 @@ const NOTAS: Partial<Record<Categoria, string[]>> = {
   ramos: ['Todos los ramos son de flores de estación, así que la variedad cambia cada semana.'],
 };
 
+/**
+ * Fotos por producto, resueltas en el build. Las deja
+ * scripts/importar-fotos.mjs como src/assets/fotos/<categoria>/<slug>.jpg;
+ * el producto que no tenga foto simplemente no muestra miniatura.
+ */
+const FOTOS_PRODUCTO = import.meta.glob<{ default: ImageMetadata }>(
+  '../assets/fotos/*/*.jpg',
+  { eager: true },
+);
+
+const fotoDe = (categoria: Categoria, slug: string): ImageMetadata | undefined =>
+  FOTOS_PRODUCTO[`../assets/fotos/${categoria}/${slug}.jpg`]?.default;
+
 const secciones = CATEGORIAS_CATALOGO.map((categoria) => ({
   ...categoria,
   items: porCategoria(categoria.clave),
@@ -88,7 +101,7 @@ const secciones = CATEGORIAS_CATALOGO.map((categoria) => ({
         <Tarjeta class="mt-10">
           <div class="divide-y divide-oliva/20">
             {seccion.items.map((item) => (
-              <FilaPrecio item={item} sufijo={item.sufijo} />
+              <FilaPrecio item={item} sufijo={item.sufijo} foto={fotoDe(seccion.clave, item.slug)} />
             ))}
           </div>
 
