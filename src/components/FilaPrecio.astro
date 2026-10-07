@@ -14,9 +14,13 @@ interface Props {
   /** Texto chico después del precio, p. ej. "c/u". */
   sufijo?: string;
   foto?: ImageMetadata;
+  /** Si el producto tiene ficha de cuidados, el enlace a esa página.
+   *  El texto del enlace va sin género: hay plantas masculinas (jazmín,
+   *  lilium, pino) y femeninas (lavanda, monstera) en la misma lista. */
+  cuidados?: string;
 }
 
-const { item, sufijo, foto } = Astro.props;
+const { item, sufijo, foto, cuidados } = Astro.props;
 ---
 
 <div class="flex items-center gap-4 py-4">
@@ -39,6 +43,16 @@ const { item, sufijo, foto } = Astro.props;
         {item.nombre}
       </h3>
       {item.detalle && <p class="mt-1 text-balance text-oliva">{item.detalle}</p>}
+      {
+        cuidados && (
+          <a
+            href={cuidados}
+            class="mt-1.5 inline-block text-sm text-borravino underline underline-offset-4 transition-colors hover:text-borravino-medio"
+          >
+            Ver cuidados →
+          </a>
+        )
+      }
     </div>
 
     <span class="hidden min-w-6 flex-1 translate-y-[-0.3em] border-b border-dotted border-oliva/40 sm:block"></span>
