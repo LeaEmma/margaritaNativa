@@ -5,24 +5,19 @@ import Layout from '../../layouts/Layout.astro';
 import TituloSeccion from '../../components/TituloSeccion.astro';
 import Boton from '../../components/Boton.astro';
 
-import { CUIDADOS_POR_PLANTA } from '../../datos/cuidados';
-import { porCategoria } from '../../datos/catalogo';
+import { CUIDADOS } from '../../datos/cuidados';
 
 const FOTOS = import.meta.glob<{ default: ImageMetadata }>('../../assets/fotos/plantas/*.jpg', {
   eager: true,
 });
 
-const plantas = porCategoria('plantas');
-
-const variedades = Object.entries(CUIDADOS_POR_PLANTA)
+const variedades = Object.entries(CUIDADOS)
   .map(([slug, cuidado]) => ({
     slug,
     cuidado,
-    nombre: plantas.find((p) => p.slug === slug)?.nombre ?? slug,
-    foto: FOTOS[`../../assets/fotos/plantas/${slug}.jpg`]?.default,
+    nombre: cuidado.nombre,
+    foto: FOTOS[`../../assets/fotos/plantas/${cuidado.productos[0]}.jpg`]?.default,
   }))
-  // Una sola ficha por planta: lavanda chica y grande comparten cuidados.
-  .filter((v) => v.slug !== 'lavanda-grande')
   .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
 ---
 

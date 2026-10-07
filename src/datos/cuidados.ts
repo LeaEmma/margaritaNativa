@@ -6,11 +6,17 @@
  * la gente comete más seguido con esa planta en particular. Un texto largo en
  * ese momento no se lee.
  *
- * La clave es el slug del producto en el catálogo, así la foto y el precio
- * salen de los mismos datos sin duplicar nada.
+ * Una ficha por variedad, no por producto: la lavanda chica y la grande son la
+ * misma planta y se cuidan igual, así que comparten página. `productos` lista
+ * los slugs del catálogo que cubre cada ficha, y de ahí salen la foto y el
+ * precio sin duplicar nada.
  */
 
 export interface Cuidado {
+  /** Nombre de la variedad, que puede diferir del nombre comercial. */
+  nombre: string;
+  /** Slugs del catálogo que cubre esta ficha. */
+  productos: string[];
   /** Una línea que ubique la planta antes de los detalles. */
   resumen: string;
   luz: string;
@@ -18,107 +24,111 @@ export interface Cuidado {
   ubicacion: string;
   /** El dato que cambia el resultado: lo que casi todos hacen mal. */
   dato: string;
-  /** Interior, exterior o ambas: define el ícono de ubicación. */
-  ambiente: 'interior' | 'exterior' | 'ambos';
 }
 
-export const CUIDADOS_POR_PLANTA: Record<string, Cuidado> = {
-  'lavanda-chica': {
-    resumen: 'Aromática, rústica y de sol. Cuanto menos la mimes, mejor responde.',
+export const CUIDADOS: Record<string, Cuidado> = {
+  lavanda: {
+    nombre: 'Lavanda',
+    productos: ['lavanda-chica', 'lavanda-grande'],
+    resumen: 'Aromática, rústica y de sol. Podala después de la floración y dura años.',
     luz: 'Pleno sol, al menos seis horas directas por día.',
     riego: 'Poco. Regá recién cuando la tierra esté seca al tacto.',
     ubicacion: 'Exterior, en maceta con buen drenaje. Balcón, patio o jardín.',
     dato: 'El exceso de agua la mata mucho más rápido que la sequía. Si dudás, no riegues.',
-    ambiente: 'exterior',
-  },
-  'lavanda-grande': {
-    resumen: 'Aromática, rústica y de sol. Cuanto menos la mimes, mejor responde.',
-    luz: 'Pleno sol, al menos seis horas directas por día.',
-    riego: 'Poco. Regá recién cuando la tierra esté seca al tacto.',
-    ubicacion: 'Exterior, en maceta con buen drenaje. Balcón, patio o jardín.',
-    dato: 'Podala después de la floración para que no se ponga leñosa por dentro.',
-    ambiente: 'exterior',
   },
   'jazmin-chino': {
+    nombre: 'Jazmín chino',
+    productos: ['jazmin-chino'],
     resumen: 'Trepadora de hoja perenne y flor muy perfumada en primavera.',
     luz: 'Sol directo o media sombra.',
     riego: 'Regular en verano, bastante más espaciado en invierno.',
     ubicacion: 'Exterior. Dale una reja, un tutor o una pared para agarrarse.',
     dato: 'Podala apenas termina de florecer: si la podás después, cortás los brotes del año que viene.',
-    ambiente: 'exterior',
   },
   'santa-rita': {
+    nombre: 'Santa Rita',
+    productos: ['santa-rita'],
     resumen: 'Explosión de color en verano. Es de las más resistentes que hay.',
     luz: 'Pleno sol. Cuanto más, mejor.',
     riego: 'Poco. Florece más cuando pasa algo de sed.',
     ubicacion: 'Exterior, protegida de los vientos fuertes.',
     dato: 'Si le das mucha agua y abono, te hace hojas en vez de flores.',
-    ambiente: 'exterior',
   },
   'bambu-de-la-suerte': {
+    nombre: 'Bambú de la suerte',
+    productos: ['bambu-de-la-suerte'],
     resumen: 'No es un bambú: es una dracena. Vive en agua o en tierra.',
     luz: 'Luz indirecta. El sol directo le quema las hojas.',
     riego: 'En agua, cambiala cada quince días. En tierra, mantenela húmeda.',
     ubicacion: 'Interior. Anda bien en escritorios y ambientes con poca luz.',
     dato: 'Usá agua sin cloro: dejá reposar la de la canilla 24 horas antes de usarla.',
-    ambiente: 'interior',
   },
   'palo-de-agua': {
+    nombre: 'Palo de agua',
+    productos: ['palo-de-agua'],
     resumen: 'Clásica de interior, de las que más perdonan el olvido.',
     luz: 'Luz indirecta abundante, aunque tolera ambientes poco iluminados.',
     riego: 'Moderado. Dejá secar los primeros centímetros de tierra.',
     ubicacion: 'Interior, lejos de estufas y del aire acondicionado.',
     dato: 'Puntas marrones casi siempre significan cloro en el agua o aire muy seco.',
-    ambiente: 'interior',
   },
   pandurata: {
+    nombre: 'Pandurata',
+    productos: ['pandurata'],
     resumen: 'Hojas grandes y escultóricas. Exigente, pero vale la pena.',
     luz: 'Mucha luz indirecta, cerca de una ventana.',
     riego: 'Cuando los primeros tres centímetros de tierra estén secos.',
     ubicacion: 'Interior. Elegí un lugar bueno y dejala ahí.',
     dato: 'Odia los cambios. Si la movés de lugar, es probable que tire algunas hojas.',
-    ambiente: 'interior',
   },
   lilium: {
+    nombre: 'Lilium',
+    productos: ['lilium'],
     resumen: 'Florece de un bulbo y vuelve cada año si lo cuidás bien.',
     luz: 'Sol de mañana y media sombra a la tarde.',
     riego: 'Mantené la tierra húmeda, sin llegar a encharcarla.',
     ubicacion: 'Interior o exterior, mientras tenga buena luz.',
     dato: 'Cuando termina de florecer, cortá la flor pero dejá las hojas: son las que alimentan el bulbo.',
-    ambiente: 'ambos',
   },
   'palmera-areca': {
+    nombre: 'Palmera areca',
+    productos: ['palmera-areca'],
     resumen: 'Palmera de interior, liviana y de crecimiento parejo.',
     luz: 'Luz indirecta. El sol directo le amarillea las hojas.',
     riego: 'Regular. Tierra apenas húmeda, nunca encharcada.',
     ubicacion: 'Interior luminoso. Agradece que le pulverices las hojas.',
     dato: 'Si el ambiente es seco le salen puntas marrones. Un plato con piedras y agua debajo ayuda.',
-    ambiente: 'interior',
   },
   santuario: {
+    nombre: 'Santuario',
+    productos: ['santuario'],
     resumen: 'Floración roja que dura semanas enteras.',
     luz: 'Mucha luz indirecta.',
     riego: 'Cuando la capa superior de la tierra esté seca.',
     ubicacion: 'Interior con algo de humedad. El baño le viene bien.',
     dato: 'Lo rojo no es la flor sino una hoja modificada. Por eso dura tanto.',
-    ambiente: 'interior',
   },
   'stromanthe-tricolor': {
+    nombre: 'Stromanthe tricolor',
+    productos: ['stromanthe-tricolor'],
     resumen: 'Hojas en rosa, verde y crema. De las más decorativas.',
     luz: 'Luz indirecta filtrada. Nada de sol directo.',
     riego: 'Tierra siempre húmeda, sin excesos.',
     ubicacion: 'Interior con buena humedad.',
     dato: 'A la noche levanta las hojas y las vuelve a abrir de día. Es normal: está sana.',
-    ambiente: 'interior',
   },
   'monstera-costilla-de-adan': {
+    nombre: 'Monstera / Costilla de Adán',
+    productos: ['monstera-costilla-de-adan'],
     resumen: 'La trepadora de interior por excelencia. Crece rápido y perdona.',
     luz: 'Luz indirecta. Tolera sombra, pero ahí crece más lento.',
     riego: 'Cuando los primeros centímetros estén secos. Mejor de menos que de más.',
     ubicacion: 'Interior. Con un tutor trepa y saca hojas bastante más grandes.',
     dato: 'Los agujeros de las hojas llegan con la madurez. Si no los tiene, le falta luz o tiempo.',
-    ambiente: 'interior',
   },
 };
 
-export const tieneCuidados = (slug: string): boolean => slug in CUIDADOS_POR_PLANTA;
+/** Ficha de cuidados que cubre a un producto del catálogo, si existe. */
+export function variedadDe(slugProducto: string): string | undefined {
+  return Object.keys(CUIDADOS).find((v) => CUIDADOS[v]!.productos.includes(slugProducto));
+}
