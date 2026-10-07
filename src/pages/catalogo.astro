@@ -38,6 +38,8 @@ const FOTOS_PRODUCTO = import.meta.glob<{ default: ImageMetadata }>(
 const fotoDe = (categoria: Categoria, slug: string): ImageMetadata | undefined =>
   FOTOS_PRODUCTO[`../assets/fotos/${categoria}/${slug}.jpg`]?.default;
 
+// Los productos "desde" no se pueden agregar al pedido: no tienen precio
+// cerrado, se cotizan hablando.
 const secciones = CATEGORIAS_CATALOGO.map((categoria) => ({
   ...categoria,
   items: porCategoria(categoria.clave),
@@ -108,6 +110,7 @@ const secciones = CATEGORIAS_CATALOGO.map((categoria) => ({
                 sufijo={item.sufijo}
                 foto={fotoDe(seccion.clave, item.slug)}
                 cuidados={variedadDe(item.slug) && `/cuidados/${variedadDe(item.slug)}`}
+                agregable={!item.desde}
               />
             ))}
           </div>

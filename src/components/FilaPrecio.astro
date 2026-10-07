@@ -1,6 +1,6 @@
 ---
 import { Image } from 'astro:assets';
-import { precio as formatear, type Item } from '../datos/catalogo';
+import { precio as formatear, type ItemCatalogo } from '../datos/catalogo';
 
 /**
  * Fila de precio con guía punteada, como en las tarjetas impresas:
@@ -10,7 +10,7 @@ import { precio as formatear, type Item } from '../datos/catalogo';
  * muestra igual, sin hueco. Así se pueden ir sumando fotos de a poco.
  */
 interface Props {
-  item: Item;
+  item: ItemCatalogo;
   /** Texto chico después del precio, p. ej. "c/u". */
   sufijo?: string;
   foto?: ImageMetadata;
@@ -18,9 +18,11 @@ interface Props {
    *  El texto del enlace va sin género: hay plantas masculinas (jazmín,
    *  lilium, pino) y femeninas (lavanda, monstera) en la misma lista. */
   cuidados?: string;
+  /** Muestra el botón de agregar al pedido. */
+  agregable?: boolean;
 }
 
-const { item, sufijo, foto, cuidados } = Astro.props;
+const { item, sufijo, foto, cuidados, agregable = false } = Astro.props;
 ---
 
 <div class="flex items-center gap-4 py-4">
@@ -68,4 +70,20 @@ const { item, sufijo, foto, cuidados } = Astro.props;
       {sufijo && <span class="text-sm text-oliva">{sufijo}</span>}
     </p>
   </div>
+
+  {
+    agregable && (
+      <button
+        type="button"
+        data-agregar
+        data-slug={item.slug}
+        data-nombre={item.nombre}
+        data-precio={item.precio}
+        aria-label={`Agregar ${item.nombre} al pedido`}
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-borravino/40 text-xl leading-none text-borravino transition-colors hover:border-borravino hover:bg-borravino hover:text-crema"
+      >
+        +
+      </button>
+    )
+  }
 </div>

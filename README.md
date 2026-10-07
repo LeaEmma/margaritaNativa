@@ -124,6 +124,23 @@ mapa `ALIAS` del script, no renombrando en Drive: `Monstera` no puede llamarse
 `Monstera / Costilla de Adán` porque la barra no es válida en un nombre de
 archivo.
 
+## Pedido por WhatsApp
+
+El carrito ([`src/components/Carrito.astro`](src/components/Carrito.astro)) arma
+el pedido en el navegador y lo envía como mensaje de WhatsApp ya detallado.
+Vive en `localStorage`: no hay servidor, ni sesión, ni base de datos.
+
+**No cobra ni reserva stock, y es deliberado.** Las flores son de estación y las
+plantas salen del mercado, así que la disponibilidad real cambia día a día.
+Cobrar antes de confirmar abre la puerta a vender algo que no hay. Lo que el
+carrito resuelve es que el pedido llegue detallado en vez de "hola, quiero
+flores".
+
+El campo del nombre existe porque WhatsApp aporta el número pero no quién
+escribe. Si queda vacío el pedido se manda igual, sin la presentación.
+
+Los productos marcados `desde` no se pueden agregar: no tienen precio cerrado.
+
 ## Cuidados
 
 `/cuidados/<variedad>` es el destino de los QR que van en la etiqueta de cada

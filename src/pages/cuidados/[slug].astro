@@ -7,7 +7,7 @@ import Icono from '../../components/Icono.astro';
 import Boton from '../../components/Boton.astro';
 
 import { type Cuidado } from '../../datos/cuidados';
-import { porCategoria, precio, type ItemCatalogo } from '../../datos/catalogo';
+import { precio, type ItemCatalogo } from '../../datos/catalogo';
 import { enlaceContacto } from '../../datos/sitio';
 
 const FOTOS = import.meta.glob<{ default: ImageMetadata }>('../../assets/fotos/plantas/*.jpg', {
