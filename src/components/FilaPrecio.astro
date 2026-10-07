@@ -3,8 +3,8 @@ import { Image } from 'astro:assets';
 import { precio as formatear, type ItemCatalogo } from '../datos/catalogo';
 
 /**
- * Fila de precio con guía punteada, como en las tarjetas impresas:
- * NOMBRE ········· ♦ $25.000
+ * Fila de precio: el nombre a la izquierda y el precio a la derecha.
+ * NOMBRE                ♦ $25.000
  *
  * El nombre y el precio comparten la primera línea y la descripción va debajo,
  * igual que en el impreso. En pantallas angostas el precio cae a la línea
@@ -47,12 +47,11 @@ const { item, sufijo, foto, cuidados, agregable = false } = Astro.props;
 
   <div class="min-w-0 flex-1">
     <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1 sm:flex-nowrap sm:gap-x-4">
-      <h3 class="font-display min-w-0 text-lg font-semibold tracking-wide text-borravino uppercase sm:text-xl">
+      <h3 class="font-display min-w-0 flex-1 text-lg font-semibold tracking-wide text-borravino uppercase sm:text-xl">
         {item.nombre}
       </h3>
 
-      <span class="hidden min-w-6 flex-1 translate-y-[-0.3em] border-b border-dotted border-oliva/40 sm:block"></span>
-
+      {/* Precio a la derecha: así los de todas las filas quedan alineados. */}
       <p class="flex shrink-0 items-baseline gap-2">
         <svg viewBox="0 0 10 14" class="h-3 w-2 self-center fill-oliva-medio" aria-hidden="true">
           <path d="M5 0 9.5 7 5 14 .5 7Z" />

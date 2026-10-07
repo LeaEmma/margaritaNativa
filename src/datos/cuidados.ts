@@ -15,6 +15,8 @@
 export interface Cuidado {
   /** Nombre de la variedad, que puede diferir del nombre comercial. */
   nombre: string;
+  /** Las fichas son de plantas salvo que se indique otra cosa. */
+  tipo?: 'planta' | 'ramo';
   /** Slugs del catálogo que cubre esta ficha. */
   productos: string[];
   /** Una línea que ubique la planta antes de los detalles. */
@@ -27,6 +29,18 @@ export interface Cuidado {
 }
 
 export const CUIDADOS: Record<string, Cuidado> = {
+  // Sin productos: aplica a todos los ramos, y un "Ver cuidados" en cada fila
+  // del catálogo de ramos repetiría el mismo enlace cinco veces.
+  'ramos-de-flores': {
+    nombre: 'Ramos de flores',
+    tipo: 'ramo',
+    productos: [],
+    resumen: 'Flores de estación, recién cortadas. Con unos cuidados simples duran bastante más.',
+    luz: 'Luz natural, pero nunca sol directo.',
+    riego: 'Cambiá el agua cada dos días y lavá el florero. Cada vez, recortá un centímetro de los tallos en diagonal.',
+    ubicacion: 'Lejos de estufas, del aire acondicionado y de la fruta, que suelta un gas que marchita las flores.',
+    dato: 'Sacá las hojas que queden bajo el agua: se pudren, enturbian el agua y acortan la vida del ramo.',
+  },
   lavanda: {
     nombre: 'Lavanda',
     productos: ['lavanda-chica', 'lavanda-grande'],

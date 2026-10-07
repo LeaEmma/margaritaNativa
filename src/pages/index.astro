@@ -7,14 +7,13 @@ import Boton from '../components/Boton.astro';
 import Ornamento from '../components/Ornamento.astro';
 import Icono from '../components/Icono.astro';
 
-import { SUSCRIPCION, EXHIBIDOR, CUIDADOS, BENEFICIOS_SUSCRIPCION, precio } from '../datos/catalogo';
+import { SUSCRIPCION, EXHIBIDOR, CUIDADOS, precio } from '../datos/catalogo';
 import { SITIO, enlaceContacto } from '../datos/sitio';
 
 import sello from '../assets/sello-margarita-nativa.png';
 import orquideaFucsia from '../assets/fotos/orquidea-fucsia.jpg';
 import orquideaBlanca from '../assets/fotos/orquidea-blanca.jpg';
 import ramosVariedad from '../assets/fotos/ramos-variedad.jpg';
-import exhibidorBaldes from '../assets/fotos/exhibidor-baldes.jpg';
 import localExhibidor from '../assets/fotos/local-exhibidor.jpg';
 import liriosArreglo from '../assets/fotos/lirios-arreglo.jpg';
 
@@ -25,15 +24,34 @@ import liriosArreglo from '../assets/fotos/lirios-arreglo.jpg';
  */
 
 const PASOS = [
-  { n: '01', titulo: 'Escribinos', texto: 'Contanos para qué es y qué presupuesto tenés en mente. Te ayudamos a elegir.' },
-  { n: '02', titulo: 'Lo armamos', texto: 'Preparamos el ramo a mano con las flores que trajo la semana del mercado.' },
+  { n: '01', titulo: 'Escribinos', texto: 'Contanos para quién es y para qué ocasión. Te ayudamos a elegir.' },
+  { n: '02', titulo: 'Lo armamos', texto: 'Preparamos tu ramo a mano, con flores frescas de estación.' },
   { n: '03', titulo: 'Lo entregamos', texto: 'Coordinamos día y horario. Llega envuelto y listo para regalar.' },
+];
+
+/** Las tres tarjetas del exhibidor, con el mismo armado que las de suscripción. */
+const PLANES_EXHIBIDOR = [
+  { nombre: 'Exhibidor', detalle: 'Para tu local', valor: 'Sin costo', unidad: 'te lo dejamos', nota: 'Blanco o negro' },
+  {
+    nombre: 'Ramos',
+    detalle: 'Flores de estación',
+    valor: precio(EXHIBIDOR.ramos.precio),
+    unidad: 'desde, por ramo',
+    nota: 'Consultá la variedad',
+  },
+  {
+    nombre: 'Servicio',
+    detalle: 'Reposición de ramos',
+    valor: 'Mensual',
+    unidad: 'se cobra por mes',
+    nota: 'Según tu demanda',
+  },
 ];
 
 const PREGUNTAS = [
   {
     p: '¿Qué flores vienen en cada ramo?',
-    r: 'Las de estación. Trabajamos con lo que da la temporada, así que el ramo cambia a lo largo del año. Por eso cada entrega es distinta: esa es la gracia.',
+    r: 'Las de estación. Trabajamos con lo que da la temporada, así que el ramo cambia a lo largo del año. Por eso cada entrega es distinta y única.',
   },
   {
     p: '¿Puedo pedir flores o colores puntuales?',
@@ -44,12 +62,8 @@ const PREGUNTAS = [
     r: 'Cambiá el agua cada dos días, mantené limpio el recipiente y ubicá el ramo lejos del sol directo y de fuentes de calor.',
   },
   {
-    p: '¿Y si alguna flor llega en mal estado?',
-    r: 'La reponemos. Si una flor se deteriora antes de tiempo, escribinos y la cambiamos sin cargo.',
-  },
-  {
     p: 'Tengo un local, ¿cómo funciona el exhibidor?',
-    r: 'Llevamos el exhibidor con seis ramos de estación y después vamos reponiendo. Cuanto más alto el volumen, más baja el precio por ramo. Al terminar el servicio retiramos el exhibidor.',
+    r: 'Te dejamos un exhibidor sin costo, en blanco o negro, con ramos de estación desde ' + precio(EXHIBIDOR.ramos.precio) + '. El servicio se cobra por mes y vamos reponiendo los ramos según lo que necesite tu negocio. Al terminar el servicio retiramos el exhibidor.',
   },
 ];
 ---
@@ -93,7 +107,7 @@ const PREGUNTAS = [
   {/* ------------------------------------------------------- Cómo funciona */}
   <section class="bg-papel-claro py-20">
     <div class="mx-auto max-w-5xl px-5">
-      <TituloSeccion titulo="Cómo funciona" epigrafe="Tres pasos" />
+      <TituloSeccion titulo="Ramos a tu medida" epigrafe="Cómo funciona" />
 
       <div class="mt-14 grid gap-8 sm:grid-cols-3">
         {
@@ -110,7 +124,7 @@ const PREGUNTAS = [
       </div>
 
       <div class="mt-12 text-center">
-        <Boton href="/catalogo" variante="contorno">Ver ramos y plantas</Boton>
+        <Boton href="/catalogo#ramos" variante="contorno">Ver ramos</Boton>
       </div>
     </div>
   </section>
@@ -153,20 +167,57 @@ const PREGUNTAS = [
         }
       </div>
 
-      <ul class="mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
-        {
-          BENEFICIOS_SUSCRIPCION.map((beneficio) => (
-            <li class="flex items-center gap-2.5 text-crema">
-              <svg viewBox="0 0 10 14" class="h-3 w-2 shrink-0 fill-crema/70" aria-hidden="true">
-                <path d="M5 0 9.5 7 5 14 .5 7Z" />
-              </svg>
-              {beneficio}
-            </li>
-          ))
-        }
-      </ul>
+      <div class="mt-10 text-center">
+        <Boton href={enlaceContacto('¡Hola! Me interesa la suscripción de ramos.')} variante="claro" class="gap-2.5">
+          <Icono nombre="whatsapp" class="h-5 w-5" />
+          Quiero suscribirme
+        </Boton>
+        <p class="mt-5 text-crema">
+          ¿Preferís algo a medida? Consultanos por opciones y ramos personalizados.
+        </p>
+      </div>
 
-      <div class="mx-auto mt-10 max-w-2xl rounded-xl border border-crema/20 p-7">
+      {/* ------------------------- Exhibidor: la misma suscripción, para locales */}
+      <div id="exhibidor" class="mt-20 scroll-mt-32">
+        <TituloSeccion titulo="Suscripción con exhibidor" epigrafe="Para locales y comercios" claro />
+
+        <p class="mx-auto mt-8 max-w-2xl text-center text-lg text-balance text-crema">
+          La misma idea, para tu negocio: te dejamos un exhibidor con ramos de estación
+          y nos ocupamos de reponerlos.
+        </p>
+
+        <div class="mt-12 grid gap-5 sm:grid-cols-3">
+          {
+            PLANES_EXHIBIDOR.map((plan) => (
+              <div class="rounded-xl border border-crema/25 bg-crema/10 p-7 text-center backdrop-blur-[2px]">
+                <h3 class="font-display text-xl font-semibold tracking-[0.1em] text-crema uppercase">
+                  {plan.nombre}
+                </h3>
+                <p class="mt-2 text-sm text-crema">{plan.detalle}</p>
+                <Ornamento claro class="mx-auto mt-5" />
+                <p class="font-display mt-5 text-3xl font-semibold text-crema">{plan.valor}</p>
+                <p class="mt-1 text-sm text-crema">{plan.unidad}</p>
+                <p class="mt-4 rounded-full border border-crema/25 py-1.5 text-sm text-crema">{plan.nota}</p>
+              </div>
+            ))
+          }
+        </div>
+
+        <div class="mt-10 text-center">
+          <p class="text-crema">Al finalizar el servicio retiramos el exhibidor.</p>
+          <Boton
+            href={enlaceContacto('¡Hola! Tengo un local y quiero consultar por el exhibidor.')}
+            variante="claro"
+            class="mt-6 gap-2.5"
+          >
+            <Icono nombre="whatsapp" class="h-5 w-5" />
+            Consultar por exhibidor
+          </Boton>
+        </div>
+      </div>
+
+      {/* ---------------------- Condiciones comunes a suscripción y exhibidor */}
+      <div class="mx-auto mt-12 max-w-2xl rounded-xl border border-crema/20 p-7">
         <h3 class="versalitas text-center text-crema">Mantenimiento y cuidado</h3>
         <ul class="mt-5 space-y-3">
           {
@@ -181,80 +232,6 @@ const PREGUNTAS = [
           }
         </ul>
       </div>
-
-      <div class="mt-10 text-center">
-        <Boton href={enlaceContacto('¡Hola! Me interesa la suscripción de ramos.')} variante="claro" class="gap-2.5">
-          <Icono nombre="whatsapp" class="h-5 w-5" />
-          Quiero suscribirme
-        </Boton>
-        <p class="mt-5 text-crema">
-          ¿Preferís algo a medida? Consultanos por opciones y ramos personalizados.
-        </p>
-      </div>
-
-      {/* ------------------------------ Exhibidor: la suscripción para locales */}
-      <Ornamento conFiletes claro class="mt-20" />
-
-      <div id="exhibidor" class="mt-20 scroll-mt-32 grid items-center gap-12 lg:grid-cols-2">
-        <div>
-          <p class="epigrafe text-crema">Para locales y comercios</p>
-          <h3 class="titulo-seccion mt-3 text-3xl text-crema sm:text-4xl">Exhibidor</h3>
-
-          <p class="mt-6 text-lg text-balance text-crema">
-            La misma idea, para tu negocio: llevamos un exhibidor con ramos de estación
-            y nos ocupamos de reponerlos. Cuantos más ramos, más baja el precio por unidad.
-          </p>
-
-          <div class="mt-8 rounded-xl border border-crema/25 bg-crema/10 p-6 backdrop-blur-[2px]">
-            <div class="flex items-baseline justify-between gap-4">
-              <span class="versalitas text-crema">{EXHIBIDOR.inicio.nombre}</span>
-              <span class="font-display shrink-0 text-2xl font-semibold text-crema">
-                {precio(EXHIBIDOR.inicio.precio)}
-              </span>
-            </div>
-            <p class="mt-2 text-sm text-crema">{EXHIBIDOR.inicio.detalle}</p>
-
-            <p class="versalitas mt-7 text-crema">Reposición</p>
-            <ul class="mt-3 divide-y divide-crema/20">
-              {
-                EXHIBIDOR.reposicion.map((item) => (
-                  <li class="flex items-baseline justify-between gap-4 py-2.5">
-                    <span class="text-crema">{item.nombre}</span>
-                    <span class="shrink-0 text-crema">
-                      <span class="font-display text-xl font-semibold">{precio(item.precio)}</span>
-                      <span class="ml-1.5 text-sm">c/u</span>
-                    </span>
-                  </li>
-                ))
-              }
-            </ul>
-          </div>
-
-          <p class="mt-5 text-sm text-crema">
-            Al finalizar el servicio retiramos el exhibidor en las mismas condiciones
-            en las que fue entregado.
-          </p>
-
-          <Boton
-            href={enlaceContacto('¡Hola! Tengo un local y quiero consultar por el exhibidor.')}
-            variante="claro"
-            class="mt-8 gap-2.5"
-          >
-            <Icono nombre="whatsapp" class="h-5 w-5" />
-            Consultar por mi local
-          </Boton>
-        </div>
-
-        <figure class="overflow-hidden rounded-xl border border-crema/25">
-          <Image
-            src={exhibidorBaldes}
-            alt="Exhibidor con baldes de ramos de flores de estación"
-            class="h-full w-full object-cover"
-            widths={[400, 800, 1600]}
-            sizes="(min-width: 1024px) 32rem, 100vw"
-          />
-        </figure>
-      </div>
     </div>
   </section>
 
@@ -268,7 +245,7 @@ const PREGUNTAS = [
           Ambientamos cumpleaños, fiestas y celebraciones con flores de estación.
           Trabajamos sobre la paleta y el espacio que tengas, y armamos todo en el lugar.
         </p>
-        <p class="mt-5 text-oliva">
+        <p class="mt-5 text-lg text-balance text-oliva">
           También preparamos la barra de flores: tus invitados se arman su propio ramo
           y se lo llevan de recuerdo.
         </p>

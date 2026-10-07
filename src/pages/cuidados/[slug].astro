@@ -10,6 +10,8 @@ import { type Cuidado } from '../../datos/cuidados';
 import { precio, type ItemCatalogo } from '../../datos/catalogo';
 import { enlaceContacto } from '../../datos/sitio';
 
+import ramoDetalle from '../../assets/fotos/ramo-detalle.jpg';
+
 const FOTOS = import.meta.glob<{ default: ImageMetadata }>('../../assets/fotos/plantas/*.jpg', {
   eager: true,
 });
@@ -38,7 +40,8 @@ interface Props {
 
 const { cuidado, productos } = Astro.props;
 
-const foto = FOTOS[`../../assets/fotos/plantas/${cuidado.productos[0]}.jpg`]?.default;
+const esRamo = cuidado.tipo === 'ramo';
+const foto = esRamo ? ramoDetalle : FOTOS[`../../assets/fotos/plantas/${cuidado.productos[0]}.jpg`]?.default;
 const desde = productos.length ? Math.min(...productos.map((p) => p.precio)) : null;
 const variosTamanos = productos.length > 1;
 
@@ -47,14 +50,14 @@ const consulta = `¡Hola! Tengo una consulta sobre ${cuidado.nombre}.`;
 
 const PAUTAS = [
   { icono: 'sol' as const, titulo: 'Luz', texto: cuidado.luz },
-  { icono: 'gota' as const, titulo: 'Riego', texto: cuidado.riego },
-  { icono: 'maceta' as const, titulo: 'Dónde ponerla', texto: cuidado.ubicacion },
+  { icono: 'gota' as const, titulo: esRamo ? 'Agua' : 'Riego', texto: cuidado.riego },
+  { icono: 'maceta' as const, titulo: esRamo ? 'Dónde ponerlo' : 'Dónde ponerla', texto: cuidado.ubicacion },
 ];
 ---
 
 <Layout
-  titulo={`Cómo cuidar ${cuidado.nombre}`}
-  descripcion={`${cuidado.resumen} Luz, riego y ubicación para que tu ${cuidado.nombre.toLowerCase()} dure.`}
+  titulo={esRamo ? "Cómo cuidar tus ramos de flores" : `Cómo cuidar ${cuidado.nombre}`}
+  descripcion={`${cuidado.resumen} Luz, ${esRamo ? 'agua' : 'riego'} y ubicación para que ${esRamo ? 'tu ramo' : `tu ${cuidado.nombre.toLowerCase()}`} dure.`}
   mensajeWhatsApp={consulta}
 >
   <article class="mx-auto max-w-2xl px-5 pt-12 pb-20">
@@ -114,7 +117,7 @@ const PAUTAS = [
         class="gap-2.5"
       >
         <Icono nombre="whatsapp" class="h-5 w-5" />
-        Consultar por esta planta
+        {esRamo ? 'Consultar por los ramos' : 'Consultar por esta planta'}
       </Boton>
 
       <p class="mt-6 text-oliva">
@@ -125,8 +128,8 @@ const PAUTAS = [
             </>
           )
         }
-        <a href="/catalogo#plantas" class="text-borravino underline underline-offset-4">
-          Ver todas las plantas
+        <a href={esRamo ? '/catalogo#ramos' : '/catalogo#plantas'} class="text-borravino underline underline-offset-4">
+          {esRamo ? 'Ver todos los ramos' : 'Ver todas las plantas'}
         </a>
       </p>
     </div>

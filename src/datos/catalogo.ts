@@ -49,14 +49,6 @@ export const SUSCRIPCION: Plan[] = [
   { nombre: 'Mensual', detalle: '1 ramo al mes', precio: 30000, ramosPorMes: 1, precioMensual: 30000 },
 ];
 
-/** Los cuatro argumentos del flyer de suscripciones. */
-export const BENEFICIOS_SUSCRIPCION = [
-  'Flores de estación',
-  'Para tu hogar o tu negocio',
-  'Entregas a domicilio',
-  'Cancelá o modificá tu suscripción cuando lo necesites',
-];
-
 export const PLANTAS: Item[] = [
   { nombre: 'Lavanda chica', precio: 12000 },
   { nombre: 'Jazmín chino', precio: 15000 },
@@ -77,17 +69,23 @@ export const PLANTAS: Item[] = [
   { nombre: 'Stromanthe tricolor', precio: 35000 },
 ];
 
+/**
+ * El exhibidor se presta sin costo: lo que se cobra es el servicio mensual de
+ * ramos, que se reponen según lo que venda el local.
+ */
 export const EXHIBIDOR = {
-  inicio: {
-    nombre: 'Inicio de servicio',
-    detalle: 'Entrega del exhibidor más seis ramos de estación.',
-    precio: 60000,
+  exhibidor: {
+    nombre: 'Exhibidor',
+    detalle: 'Sin costo. Disponible en blanco o negro.',
+    precio: 0,
   } satisfies Item,
-  reposicion: [
-    { nombre: '6 unidades', precio: 10000 },
-    { nombre: '12 unidades', precio: 8000 },
-    { nombre: '24 unidades o más', precio: 6000 },
-  ] satisfies Item[],
+  ramos: {
+    nombre: 'Ramos',
+    detalle: 'Consultá la variedad de ramos.',
+    precio: 8000,
+    desde: true,
+  } satisfies Item,
+  servicio: 'El servicio se cobra por mes, con reposición de ramos según la demanda de tu negocio.',
 };
 
 /** Condiciones comunes a suscripción y exhibidor, tal como figuran en las tarjetas. */
@@ -129,11 +127,11 @@ export interface ItemCatalogo extends Item {
 export const CATEGORIAS: {
   clave: Categoria;
   nombre: string;
-  epigrafe: string;
+  epigrafe?: string;
   enCatalogo: boolean;
 }[] = [
   { clave: 'ramos', nombre: 'Ramos', epigrafe: 'Para todas las ocasiones', enCatalogo: true },
-  { clave: 'plantas', nombre: 'Plantas', epigrafe: 'De interior y de exterior', enCatalogo: true },
+  { clave: 'plantas', nombre: 'Plantas', enCatalogo: true },
   { clave: 'suscripcion', nombre: 'Suscripción', epigrafe: 'Flores frescas, siempre', enCatalogo: false },
   { clave: 'exhibidor', nombre: 'Exhibidor', epigrafe: 'Para locales y comercios', enCatalogo: false },
 ];
@@ -159,8 +157,8 @@ export const CATALOGO: ItemCatalogo[] = [
   ...marcar(RAMOS, 'ramos'),
   ...marcar(SUSCRIPCION, 'suscripcion', 'por ramo'),
   ...marcar(PLANTAS, 'plantas'),
-  ...marcar([EXHIBIDOR.inicio], 'exhibidor'),
-  ...marcar(EXHIBIDOR.reposicion, 'exhibidor', 'c/u'),
+  ...marcar([EXHIBIDOR.exhibidor], 'exhibidor'),
+  ...marcar([EXHIBIDOR.ramos], 'exhibidor', 'c/u'),
 ];
 
 export function porCategoria(categoria: Categoria): ItemCatalogo[] {
@@ -169,10 +167,9 @@ export function porCategoria(categoria: Categoria): ItemCatalogo[] {
 
 /**
  * Precio más bajo de una categoría, para los "desde $X" de la home.
- * En exhibidor se toma el inicio de servicio y no la reposición: es lo que
- * paga quien contrata, y mostrar el precio por ramo repuesto confundiría.
+ * En exhibidor se toma el precio por ramo: el exhibidor en sí no se cobra.
  */
 export function precioDesde(categoria: Categoria): number {
-  if (categoria === 'exhibidor') return EXHIBIDOR.inicio.precio;
+  if (categoria === 'exhibidor') return EXHIBIDOR.ramos.precio;
   return Math.min(...porCategoria(categoria).map((item) => item.precio));
 }

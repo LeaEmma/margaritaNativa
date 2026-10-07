@@ -1,6 +1,4 @@
 ---
-import { Image } from 'astro:assets';
-import sello from '../assets/sello-margarita-nativa.png';
 import Icono from './Icono.astro';
 import { NAVEGACION, SITIO } from '../datos/sitio';
 
@@ -15,65 +13,13 @@ const hayPedido = Boolean(SITIO.whatsapp);
 ---
 
 <header class="sticky top-0 z-50 border-b border-oliva/20 bg-papel/95 backdrop-blur-sm">
-  <div class="mx-auto flex max-w-6xl items-center gap-4 px-5 py-3">
-    <a href="/" class="flex shrink-0 items-center gap-3" aria-label={`${SITIO.nombre} — inicio`}>
-      <Image src={sello} alt="" width={96} height={96} class="h-12 w-12" loading="eager" />
-      <span class="font-display text-lg leading-tight font-semibold tracking-[0.12em] text-oliva uppercase">
-        Margarita<br /><span class="text-base">Nativa</span>
-      </span>
-    </a>
-
-    <nav class="ml-auto hidden lg:block" aria-label="Principal">
-      <ul class="flex items-center gap-6">
-        {
-          NAVEGACION.map((enlace) => (
-            <li>
-              <a
-                href={enlace.href}
-                aria-current={esActiva(enlace) ? 'page' : undefined}
-                class:list={[
-                  'versalitas border-b-2 pb-1 transition-colors',
-                  esActiva(enlace)
-                    ? 'border-borravino text-borravino'
-                    : 'border-transparent text-oliva hover:text-borravino',
-                ]}
-              >
-                {enlace.texto}
-              </a>
-            </li>
-          ))
-        }
-
-        {
-          hayPedido && (
-            <>
-              <li aria-hidden="true">
-                <span class="block h-5 w-px bg-oliva/30" />
-              </li>
-              <li>
-                <button
-                  type="button"
-                  data-abrir-carrito
-                  class="versalitas flex items-center gap-2 text-oliva transition-colors hover:text-borravino"
-                >
-                  <Icono nombre="bolsa" class="h-5 w-5" />
-                  <span class="sr-only">Abrir tu pedido</span>
-                  <span data-insignia-carrito hidden class="rounded-full bg-oliva px-2 py-0.5 text-xs text-crema">
-                    0
-                  </span>
-                </button>
-              </li>
-            </>
-          )
-        }
-      </ul>
-    </nav>
-  </div>
-
-  <nav class="border-t border-oliva/15 lg:hidden" aria-label="Principal (móvil)">
+  <!-- Sin franja de logo: el sello ya está a la vista en el inicio de la home.
+       En pantallas angostas la lista se desplaza de costado; en las anchas
+       queda centrada. -->
+  <nav aria-label="Principal">
     <!-- El relleno va en cada enlace y no en la lista: asi el area de toque
          es la fila entera y no solo la altura del texto. -->
-    <ul class="flex items-center gap-6 overflow-x-auto px-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <ul class="mx-auto flex max-w-6xl items-center gap-5 justify-center-safe overflow-x-auto px-4 lg:px-5 [scrollbar-width:none] lg:gap-8 [&::-webkit-scrollbar]:hidden">
       {
         NAVEGACION.map((enlace) => (
           <li class="shrink-0">
@@ -81,8 +27,10 @@ const hayPedido = Boolean(SITIO.whatsapp);
               href={enlace.href}
               aria-current={esActiva(enlace) ? 'page' : undefined}
               class:list={[
-                'versalitas block py-3',
-                esActiva(enlace) ? 'text-borravino underline underline-offset-4' : 'text-oliva',
+                'versalitas block py-4 transition-colors',
+                esActiva(enlace)
+                  ? 'text-borravino underline underline-offset-4'
+                  : 'text-oliva hover:text-borravino',
               ]}
             >
               {enlace.texto}
@@ -101,9 +49,9 @@ const hayPedido = Boolean(SITIO.whatsapp);
               <button
                 type="button"
                 data-abrir-carrito
-                class="versalitas flex items-center gap-1.5 py-3 text-oliva"
+                class="versalitas flex items-center gap-1.5 py-4 text-oliva transition-colors hover:text-borravino"
               >
-                <Icono nombre="bolsa" class="h-4 w-4" />
+                <Icono nombre="bolsa" class="h-5 w-5" />
                 <span class="sr-only">Abrir tu pedido</span>
                 <span data-insignia-carrito hidden class="rounded-full bg-oliva px-1.5 py-0.5 text-xs text-crema">
                   0

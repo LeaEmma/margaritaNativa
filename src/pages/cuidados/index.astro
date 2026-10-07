@@ -7,6 +7,8 @@ import Boton from '../../components/Boton.astro';
 
 import { CUIDADOS } from '../../datos/cuidados';
 
+import ramoDetalle from '../../assets/fotos/ramo-detalle.jpg';
+
 const FOTOS = import.meta.glob<{ default: ImageMetadata }>('../../assets/fotos/plantas/*.jpg', {
   eager: true,
 });
@@ -16,23 +18,26 @@ const variedades = Object.entries(CUIDADOS)
     slug,
     cuidado,
     nombre: cuidado.nombre,
-    foto: FOTOS[`../../assets/fotos/plantas/${cuidado.productos[0]}.jpg`]?.default,
+    foto:
+      cuidado.tipo === 'ramo'
+        ? ramoDetalle
+        : FOTOS[`../../assets/fotos/plantas/${cuidado.productos[0]}.jpg`]?.default,
   }))
-  .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+  // Los ramos primero y después las plantas, por orden alfabético.
+  .sort(
+    (a, b) =>
+      Number(b.cuidado.tipo === 'ramo') - Number(a.cuidado.tipo === 'ramo') ||
+      a.nombre.localeCompare(b.nombre, 'es'),
+  );
 ---
 
 <Layout
   titulo="Cuidados"
-  descripcion="Cómo cuidar cada variedad: luz, riego y ubicación, en pocas líneas."
-  mensajeWhatsApp="¡Hola! Tengo una consulta sobre el cuidado de una planta."
+  descripcion="Cómo cuidar tus ramos de flores y cada variedad de planta: luz, riego y ubicación, en pocas líneas."
+  mensajeWhatsApp="¡Hola! Tengo una consulta sobre cuidados."
 >
   <section class="mx-auto max-w-5xl px-5 pt-16 pb-20">
     <TituloSeccion titulo="Cuidados" epigrafe="Para que te duren" />
-
-    <p class="mx-auto mt-8 max-w-2xl text-center text-lg text-balance text-oliva">
-      Lo esencial de cada variedad en cuatro líneas: luz, riego, dónde ponerla
-      y el error que casi todos cometen.
-    </p>
 
     <ul class="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {
