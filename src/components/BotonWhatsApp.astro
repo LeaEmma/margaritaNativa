@@ -7,7 +7,16 @@ import { SITIO, enlaceContacto } from '../datos/sitio';
  * WhatsApp: el verde sería el único de la paleta y chocaría con el oliva.
  * Solo se renderiza si hay número cargado en datos/sitio.ts.
  */
-const mensaje = '¡Hola! Te escribo desde la web.';
+interface Props {
+  /**
+   * Mensaje prearmado. Cada página pasa el suyo para que el mensaje llegue
+   * diciendo desde dónde escriben: si alguien consulta leyendo los cuidados
+   * de una planta, el nombre de esa planta tiene que viajar en el mensaje.
+   */
+  mensaje?: string;
+}
+
+const { mensaje = '¡Hola! Te escribo desde la web.' } = Astro.props;
 ---
 
 {

@@ -8,9 +8,11 @@ import { SITIO } from '../datos/sitio';
 interface Props {
   titulo?: string;
   descripcion?: string;
+  /** Mensaje prearmado del botón flotante de WhatsApp para esta página. */
+  mensajeWhatsApp?: string;
 }
 
-const { titulo, descripcion = SITIO.descripcion } = Astro.props;
+const { titulo, descripcion = SITIO.descripcion, mensajeWhatsApp } = Astro.props;
 
 const tituloCompleto = titulo ? `${titulo} — ${SITIO.nombre}` : `${SITIO.nombre} — ${SITIO.lema}`;
 const canonica = new URL(Astro.url.pathname, Astro.site ?? 'https://margaritanativa.com');
@@ -54,6 +56,6 @@ const canonica = new URL(Astro.url.pathname, Astro.site ?? 'https://margaritanat
       <slot />
     </main>
     <PieDePagina />
-    <BotonWhatsApp />
+    <BotonWhatsApp mensaje={mensajeWhatsApp} />
   </body>
 </html>
