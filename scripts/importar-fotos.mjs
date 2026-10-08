@@ -11,8 +11,8 @@
  *   <origen>/Plantas/<Nombre del producto>/<cualquier foto>
  *   <origen>/Ramos/<Nombre del producto>/<cualquier foto>
  *
- * Se toma la primera foto de cada carpeta en orden alfabético. Para elegir otra,
- * nombrarla de modo que ordene primero (por ejemplo "1.jpg" o "principal.jpg").
+ * Se toma la foto más reciente de cada carpeta (por fecha de modificación): así,
+ * para cambiar la foto de un producto alcanza con subir una nueva a su carpeta.
  */
 import fs from 'node:fs/promises';
 import { existsSync } from 'node:fs';
@@ -89,7 +89,13 @@ for (const categoria of CATEGORIAS) {
   const sinMatch = [];
 
   for (const carpeta of carpetas) {
-    const fotos = (await fs.readdir(path.join(dirOrigen, carpeta.name))).filter(esImagen).sort();
+    const dirCarpeta = path.join(dirOrigen, carpeta.name);
+    const nombres = (await fs.readdir(dirCarpeta)).filter(esImagen);
+    const conFecha = await Promise.all(
+      nombres.map(async (f) => ({ f, t: (await fs.stat(path.join(dirCarpeta, f))).mtimeMs })),
+    );
+    // La más reciente primero.
+    const fotos = conFecha.sort((a, b) => b.t - a.t).map((x) => x.f);
     if (!fotos.length) {
       sinMatch.push(`${carpeta.name} (carpeta vacía)`);
       continue;

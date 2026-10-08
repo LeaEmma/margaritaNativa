@@ -1,5 +1,7 @@
 ---
+import { Image } from 'astro:assets';
 import Icono from './Icono.astro';
+import sello from '../assets/sello-margarita-nativa.png';
 import { NAVEGACION, SITIO } from '../datos/sitio';
 
 // Sin barra final, para que "/catalogo" y "/catalogo/" se traten igual.
@@ -12,11 +14,13 @@ const esActiva = (enlace: (typeof NAVEGACION)[number]) =>
 const hayPedido = Boolean(SITIO.whatsapp);
 ---
 
-<header class="sticky top-0 z-50 border-b border-oliva/20 bg-papel/95 backdrop-blur-sm">
-  <!-- Sin franja de logo: el sello ya está a la vista en el inicio de la home.
-       En pantallas anchas las secciones van en una fila centrada; en las
-       angostas no entran, así que van en un menú desplegable. -->
-  <div class="mx-auto flex max-w-6xl items-center justify-between px-4 lg:justify-center lg:px-5">
+<header id="encabezado" class="group sticky top-0 z-50 border-b border-oliva/20 bg-papel/95 backdrop-blur-sm">
+  <!-- Arriba de todo no hay logo: en la home el sello grande ya está a la
+       vista. Al bajar (data-desplazado) aparece el sello chico para no perder
+       la referencia: en celulares reemplaza la palabra "Menú", en pantallas
+       anchas va a la izquierda de la fila de secciones. -->
+  <div class="relative mx-auto flex max-w-6xl items-center justify-between px-4 lg:justify-center lg:px-5">
+    <div class="flex items-center gap-1">
     <button
       type="button"
       id="menu-boton"
@@ -28,8 +32,18 @@ const hayPedido = Boolean(SITIO.whatsapp);
         <path data-icono-abrir d="M4 7h16M4 12h16M4 17h16" />
         <path data-icono-cerrar class="hidden" d="M6 6l12 12M18 6L6 18" />
       </svg>
-      Menú
+      <span class="group-data-desplazado:hidden">Menú</span>
+      <span class="sr-only hidden group-data-desplazado:inline">Menú</span>
     </button>
+
+    <a
+      href="/"
+      aria-label="Margarita Nativa — inicio"
+      class="hidden opacity-0 transition-opacity duration-300 group-data-desplazado:block group-data-desplazado:opacity-100 lg:absolute lg:top-1/2 lg:left-5 lg:-translate-y-1/2"
+    >
+      <Image src={sello} alt="" width={96} height={96} class="h-10 w-10" loading="eager" />
+    </a>
+    </div>
 
     <nav class="hidden lg:block" aria-label="Principal">
       <ul class="flex items-center gap-8">
@@ -101,6 +115,12 @@ const hayPedido = Boolean(SITIO.whatsapp);
 </header>
 
 <script>
+  // Marca el encabezado cuando la página ya no está arriba de todo.
+  const encabezado = document.querySelector<HTMLElement>('#encabezado');
+  const marcar = () => encabezado?.toggleAttribute('data-desplazado', window.scrollY > 120);
+  marcar();
+  window.addEventListener('scroll', marcar, { passive: true });
+
   const boton = document.querySelector<HTMLButtonElement>('#menu-boton');
   const menu = document.querySelector<HTMLElement>('#menu-movil');
 

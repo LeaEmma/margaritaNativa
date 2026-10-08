@@ -67,6 +67,8 @@ export const PLANTAS: Item[] = [
   { nombre: 'Pandurata', precio: 60000 },
   { nombre: 'Palmera areca', precio: 75000 },
   { nombre: 'Stromanthe tricolor', precio: 35000 },
+  { nombre: 'Hortensia', precio: 60000 },
+  { nombre: 'Helecho', precio: 50000 },
 ];
 
 /**
