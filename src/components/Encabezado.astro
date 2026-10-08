@@ -14,23 +14,81 @@ const hayPedido = Boolean(SITIO.whatsapp);
 
 <header class="sticky top-0 z-50 border-b border-oliva/20 bg-papel/95 backdrop-blur-sm">
   <!-- Sin franja de logo: el sello ya está a la vista en el inicio de la home.
-       En pantallas angostas la lista se desplaza de costado; en las anchas
-       queda centrada. -->
-  <nav aria-label="Principal">
-    <!-- El relleno va en cada enlace y no en la lista: asi el area de toque
-         es la fila entera y no solo la altura del texto. -->
-    <ul class="mx-auto flex max-w-6xl items-center gap-5 justify-center-safe overflow-x-auto px-4 lg:px-5 [scrollbar-width:none] lg:gap-8 [&::-webkit-scrollbar]:hidden">
+       En pantallas anchas las secciones van en una fila centrada; en las
+       angostas no entran, así que van en un menú desplegable. -->
+  <div class="mx-auto flex max-w-6xl items-center justify-between px-4 lg:justify-center lg:px-5">
+    <button
+      type="button"
+      id="menu-boton"
+      aria-expanded="false"
+      aria-controls="menu-movil"
+      class="versalitas -ml-2 flex items-center gap-2.5 px-2 py-4 text-oliva transition-colors hover:text-borravino lg:hidden"
+    >
+      <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+        <path data-icono-abrir d="M4 7h16M4 12h16M4 17h16" />
+        <path data-icono-cerrar class="hidden" d="M6 6l12 12M18 6L6 18" />
+      </svg>
+      Menú
+    </button>
+
+    <nav class="hidden lg:block" aria-label="Principal">
+      <ul class="flex items-center gap-8">
+        {
+          NAVEGACION.map((enlace) => (
+            <li>
+              <a
+                href={enlace.href}
+                aria-current={esActiva(enlace) ? 'page' : undefined}
+                class:list={[
+                  'versalitas block py-4 transition-colors',
+                  esActiva(enlace)
+                    ? 'text-borravino underline underline-offset-4'
+                    : 'text-oliva hover:text-borravino',
+                ]}
+              >
+                {enlace.texto}
+              </a>
+            </li>
+          ))
+        }
+        {
+          hayPedido && (
+            <li aria-hidden="true">
+              <span class="block h-4 w-px bg-oliva/30" />
+            </li>
+          )
+        }
+      </ul>
+    </nav>
+
+    {
+      hayPedido && (
+        <button
+          type="button"
+          data-abrir-carrito
+          class="versalitas -mr-2 flex items-center gap-1.5 px-2 py-4 text-oliva transition-colors hover:text-borravino lg:mr-0 lg:ml-8 lg:px-0"
+        >
+          <Icono nombre="bolsa" class="h-5 w-5" />
+          <span class="sr-only">Abrir tu pedido</span>
+          <span data-insignia-carrito hidden class="rounded-full bg-oliva px-1.5 py-0.5 text-xs text-crema">
+            0
+          </span>
+        </button>
+      )
+    }
+  </div>
+
+  <nav id="menu-movil" hidden class="border-t border-oliva/15 lg:hidden" aria-label="Principal (móvil)">
+    <ul class="divide-y divide-oliva/15 px-4">
       {
         NAVEGACION.map((enlace) => (
-          <li class="shrink-0">
+          <li>
             <a
               href={enlace.href}
               aria-current={esActiva(enlace) ? 'page' : undefined}
               class:list={[
-                'versalitas block py-4 transition-colors',
-                esActiva(enlace)
-                  ? 'text-borravino underline underline-offset-4'
-                  : 'text-oliva hover:text-borravino',
+                'versalitas block py-4',
+                esActiva(enlace) ? 'text-borravino' : 'text-oliva',
               ]}
             >
               {enlace.texto}
@@ -38,29 +96,33 @@ const hayPedido = Boolean(SITIO.whatsapp);
           </li>
         ))
       }
-
-      {
-        hayPedido && (
-          <>
-            <li class="shrink-0" aria-hidden="true">
-              <span class="block h-4 w-px bg-oliva/30" />
-            </li>
-            <li class="shrink-0">
-              <button
-                type="button"
-                data-abrir-carrito
-                class="versalitas flex items-center gap-1.5 py-4 text-oliva transition-colors hover:text-borravino"
-              >
-                <Icono nombre="bolsa" class="h-5 w-5" />
-                <span class="sr-only">Abrir tu pedido</span>
-                <span data-insignia-carrito hidden class="rounded-full bg-oliva px-1.5 py-0.5 text-xs text-crema">
-                  0
-                </span>
-              </button>
-            </li>
-          </>
-        )
-      }
     </ul>
   </nav>
 </header>
+
+<script>
+  const boton = document.querySelector<HTMLButtonElement>('#menu-boton');
+  const menu = document.querySelector<HTMLElement>('#menu-movil');
+
+  function abrir(abierto: boolean) {
+    if (!boton || !menu) return;
+    menu.hidden = !abierto;
+    boton.setAttribute('aria-expanded', String(abierto));
+    boton.querySelector('[data-icono-abrir]')?.classList.toggle('hidden', abierto);
+    boton.querySelector('[data-icono-cerrar]')?.classList.toggle('hidden', !abierto);
+  }
+
+  boton?.addEventListener('click', () => abrir(menu?.hidden ?? false));
+
+  // Los enlaces con ancla ("/#eventos") no cambian de página: hay que cerrar a mano.
+  menu?.addEventListener('click', (evento) => {
+    if ((evento.target as HTMLElement).closest('a')) abrir(false);
+  });
+
+  document.addEventListener('keydown', (evento) => {
+    if (evento.key === 'Escape' && menu && !menu.hidden) {
+      abrir(false);
+      boton?.focus();
+    }
+  });
+</script>
