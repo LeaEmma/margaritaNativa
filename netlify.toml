@@ -1,4 +1,4 @@
-# Despliegue de margaritanativa.com
+# Despliegue de margaritanativa.com.ar
 #
 # El sitio es estático: Netlify corre el build y sirve ./dist desde su CDN.
 # No hace falta adaptador de Astro ni funciones.
@@ -10,6 +10,14 @@
 [build.environment]
   # Astro 7 y sus dependencias piden Node 22.19 o superior.
   NODE_VERSION = "22"
+
+# El subdominio de Netlify sigue respondiendo; lo mandamos al dominio propio
+# para que los buscadores no vean dos copias del mismo sitio.
+[[redirects]]
+  from = "https://subtle-starlight-98e33c.netlify.app/*"
+  to = "https://margaritanativa.com.ar/:splat"
+  status = 301
+  force = true
 
 # Los archivos de /_astro/ llevan un hash del contenido en el nombre: si cambian,
 # cambia la URL. Por eso se pueden cachear para siempre sin riesgo de servir

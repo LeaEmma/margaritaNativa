@@ -2,9 +2,13 @@
 
 export const SITIO = {
   nombre: 'Margarita Nativa',
-  lema: 'Ramos de flores y plantas',
+  lema: 'Ramos de flores & plantas',
+  /** Zona de trabajo: va en el título de la home, la descripción y la ficha
+   *  de negocio para Google. */
+  zona: 'Ciudad Autónoma de Buenos Aires',
+  zonaCorta: 'CABA',
   descripcion:
-    'Ramos de flores de estación, suscripciones, plantas y ambientación floral. Armamos cada ramo a mano con lo que da la temporada.',
+    'Florería en la Ciudad Autónoma de Buenos Aires. Ramos de flores de estación, suscripciones, plantas y ambientación floral. Armamos cada ramo a mano con lo que da la temporada.',
 
   instagram: 'https://instagram.com/margaritanativa',
   instagramUsuario: '@margaritanativa',

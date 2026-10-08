@@ -48,6 +48,32 @@ const PLANES_EXHIBIDOR = [
   },
 ];
 
+/**
+ * Ficha de negocio para buscadores (schema.org). Es lo que le dice a Google
+ * que esto es una florería y dónde trabaja. Falta la dirección con calle:
+ * se agrega en `address` cuando se decida cuál publicar.
+ */
+const FICHA_NEGOCIO = {
+  '@context': 'https://schema.org',
+  '@type': 'Florist',
+  name: SITIO.nombre,
+  description: SITIO.descripcion,
+  url: Astro.site?.href ?? 'https://margaritanativa.com.ar/',
+  logo: new URL('/favicon-512.png', Astro.site ?? 'https://margaritanativa.com.ar').href,
+  image: new URL('/og-margarita-nativa.jpg', Astro.site ?? 'https://margaritanativa.com.ar').href,
+  telephone: `+${SITIO.whatsapp}`,
+  email: SITIO.email,
+  sameAs: [SITIO.instagram, SITIO.tiktok],
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: SITIO.zona,
+    addressRegion: SITIO.zonaCorta,
+    addressCountry: 'AR',
+  },
+  areaServed: { '@type': 'City', name: SITIO.zona },
+  priceRange: '$$',
+};
+
 const PREGUNTAS = [
   {
     p: '¿Qué flores vienen en cada ramo?',
@@ -69,6 +95,7 @@ const PREGUNTAS = [
 ---
 
 <Layout>
+  <script type="application/ld+json" slot="head" set:html={JSON.stringify(FICHA_NEGOCIO)} />
   {/* ---------------------------------------------------------------- Hero */}
   <section id="inicio" class="relative isolate flex min-h-[78vh] items-center justify-center overflow-hidden">
     <Image

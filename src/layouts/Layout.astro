@@ -15,8 +15,13 @@ interface Props {
 
 const { titulo, descripcion = SITIO.descripcion, mensajeWhatsApp } = Astro.props;
 
-const tituloCompleto = titulo ? `${titulo} — ${SITIO.nombre}` : `${SITIO.nombre} — ${SITIO.lema}`;
+const tituloCompleto = titulo
+  ? `${titulo} — ${SITIO.nombre}`
+  : `${SITIO.nombre} — ${SITIO.lema} en ${SITIO.zonaCorta}`;
 const canonica = new URL(Astro.url.pathname, Astro.site ?? 'https://margaritanativa.com.ar');
+// La imagen que muestran WhatsApp y las redes al compartir un link. Va con
+// dirección absoluta: varias plataformas no resuelven rutas relativas.
+const imagenCompartir = new URL('/og-margarita-nativa.jpg', canonica);
 ---
 
 <!doctype html>
@@ -41,7 +46,15 @@ const canonica = new URL(Astro.url.pathname, Astro.site ?? 'https://margaritanat
     <meta property="og:title" content={tituloCompleto} />
     <meta property="og:description" content={descripcion} />
     <meta property="og:url" content={canonica} />
+    <meta property="og:image" content={imagenCompartir} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={`${SITIO.nombre}: ramos de flores de estación`} />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={imagenCompartir} />
+
+    <!-- Para que cada página sume lo suyo, p. ej. datos estructurados. -->
+    <slot name="head" />
   </head>
 
   <body class="antialiased">
