@@ -7,10 +7,10 @@ import { precio as formatear, type ItemCatalogo } from '../datos/catalogo';
  * NOMBRE                ♦ $25.000
  *
  * El nombre y el precio comparten la primera línea y la descripción va debajo,
- * igual que en el impreso. En pantallas angostas el precio cae a la línea
- * siguiente por `flex-wrap`: con miniatura y botón de agregar el ancho útil
- * baja a ~180px, y manteniéndolos en la misma línea el nombre se partía letra
- * por letra.
+ * igual que en el impreso. En pantallas angostas el precio va siempre en la
+ * línea siguiente: con miniatura y botón de agregar el ancho útil baja a
+ * ~180px, y compartiendo línea el nombre se partía y se montaba sobre el
+ * precio.
  *
  * La miniatura es opcional: si el producto todavía no tiene foto, la fila se
  * muestra igual, sin hueco. Así se pueden ir sumando fotos de a poco.
@@ -46,8 +46,10 @@ const { item, sufijo, foto, cuidados, agregable = false } = Astro.props;
   }
 
   <div class="min-w-0 flex-1">
-    <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1 sm:flex-nowrap sm:gap-x-4">
-      <h3 class="font-display min-w-0 flex-1 text-lg font-semibold tracking-wide text-borravino uppercase sm:text-xl">
+    {/* En celulares el nombre va arriba a todo el ancho y el precio debajo:
+        compartiendo línea, los nombres largos se apretaban sobre el precio. */}
+    <div class="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-4">
+      <h3 class="font-display text-lg font-semibold tracking-wide text-borravino uppercase sm:min-w-0 sm:flex-1 sm:text-xl">
         {item.nombre}
       </h3>
 
