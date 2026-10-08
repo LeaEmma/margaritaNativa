@@ -9,22 +9,22 @@
 @import '@fontsource/playfair-display/latin-700.css';
 
 /* El signo $ de Playfair Display lleva doble barra, que no es el que se usa
-   en Argentina. Esta familia cubre solo ese carácter (unicode-range) con el
-   $ de Lora, de una sola barra, y va primera en --font-display: los números
-   siguen saliendo de Playfair. */
+   en Argentina, y su & es muy ornamentada. Esta familia cubre solo esos dos
+   caracteres (unicode-range) con los de Lora, más comunes, y va primera en
+   --font-display: todo lo demás sigue saliendo de Playfair. */
 @font-face {
   font-family: 'Pesos';
   font-weight: 400 500;
   font-display: swap;
   src: url('@fontsource/lora/files/lora-latin-500-normal.woff2') format('woff2');
-  unicode-range: U+0024;
+  unicode-range: U+0024, U+0026;
 }
 @font-face {
   font-family: 'Pesos';
   font-weight: 600 900;
   font-display: swap;
   src: url('@fontsource/lora/files/lora-latin-700-normal.woff2') format('woff2');
-  unicode-range: U+0024;
+  unicode-range: U+0024, U+0026;
 }
 
 /* ------------------------------------------------------------------

@@ -14,7 +14,7 @@ export const SITIO = {
 
   /** Formato internacional, solo dígitos. Si queda vacío, los botones de
    *  WhatsApp desaparecen y el resto del contacto cae en Instagram. */
-  whatsapp: '5491135813920',
+  whatsapp: '5491139379048',
 } as const;
 
 /** Link de WhatsApp con mensaje prearmado, o Instagram si todavía no hay número. */
