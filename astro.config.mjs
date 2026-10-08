@@ -21,5 +21,9 @@ export default defineConfig({
   server: { port: Number(process.env.PORT) || 4321 },
   vite: {
     plugins: [tailwindcss()],
+    // Astro mete dentro del HTML los scripts chicos. Con 0 van todos como
+    // archivo aparte, y así la Content-Security-Policy de netlify.toml puede
+    // permitir solo scripts del propio sitio, sin 'unsafe-inline'.
+    build: { assetsInlineLimit: 0 },
   },
 });

@@ -134,6 +134,16 @@ import { SITIO } from '../datos/sitio';
             Pedir por WhatsApp
           </a>
 
+          {/* Al agregar algo el cajón se abre solo: sin esto, para volver al
+              catálogo había que descubrir la cruz de arriba. */}
+          <button
+            type="button"
+            data-seguir
+            class="versalitas mt-3 flex w-full items-center justify-center rounded-full border border-borravino/40 px-5 py-3 text-borravino transition-colors hover:border-borravino hover:bg-borravino/5"
+          >
+            Seguir eligiendo
+          </button>
+
           <button
             type="button"
             data-vaciar
@@ -175,6 +185,11 @@ import { SITIO } from '../datos/sitio';
       maximumFractionDigits: 0,
     });
     const precio = (v: number) => plata.format(v).replace(/\s/g, '');
+
+    // El pedido se guarda en localStorage y vuelve a la página como HTML: se
+    // escapa para que un valor alterado ahí no pueda inyectar código.
+    const escapar = (texto: string) =>
+      String(texto).replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 
     // localStorage puede fallar (ventana privada, cookies bloqueadas). Si falla,
     // el sitio tiene que seguir andando sin carrito en vez de romperse.
@@ -244,14 +259,14 @@ import { SITIO } from '../datos/sitio';
         li.className = 'flex items-center gap-3 py-3';
         li.innerHTML = `
           <span class="min-w-0 flex-1">
-            <span class="block truncate text-tinta">${linea.nombre}</span>
+            <span class="block truncate text-tinta">${escapar(linea.nombre)}</span>
             <span class="text-sm text-oliva">${precio(linea.precio)} c/u</span>
           </span>
           <span class="flex shrink-0 items-center gap-1.5">
-            <button type="button" data-menos="${linea.slug}" aria-label="Quitar uno de ${linea.nombre}"
+            <button type="button" data-menos="${escapar(linea.slug)}" aria-label="Quitar uno de ${escapar(linea.nombre)}"
               class="h-8 w-8 rounded-full border border-oliva/40 text-oliva transition-colors hover:border-borravino hover:text-borravino">−</button>
-            <span class="w-6 text-center text-tinta">${linea.cantidad}</span>
-            <button type="button" data-mas="${linea.slug}" aria-label="Agregar otro de ${linea.nombre}"
+            <span class="w-6 text-center text-tinta">${Number(linea.cantidad)}</span>
+            <button type="button" data-mas="${escapar(linea.slug)}" aria-label="Agregar otro de ${escapar(linea.nombre)}"
               class="h-8 w-8 rounded-full border border-oliva/40 text-oliva transition-colors hover:border-borravino hover:text-borravino">+</button>
           </span>
           <span class="font-display w-20 shrink-0 text-right font-semibold text-oliva">${precio(linea.precio * linea.cantidad)}</span>`;
@@ -297,6 +312,7 @@ import { SITIO } from '../datos/sitio';
     for (const d of disparadores) d.addEventListener('click', abrir);
     fondo.addEventListener('click', cerrar);
     carrito.querySelector('[data-cerrar]')!.addEventListener('click', cerrar);
+    carrito.querySelector('[data-seguir]')!.addEventListener('click', cerrar);
 
     document.addEventListener('keydown', (evento) => {
       if (!estaAbierto()) return;
