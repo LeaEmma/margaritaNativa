@@ -14,12 +14,10 @@ const esActiva = (enlace: (typeof NAVEGACION)[number]) =>
 const hayPedido = Boolean(SITIO.whatsapp);
 ---
 
-<header id="encabezado" class="group sticky top-0 z-50 border-b border-oliva/20 bg-papel/95 backdrop-blur-sm">
-  <!-- Arriba de todo no hay logo: en la home el sello grande ya está a la
-       vista. Al bajar (data-desplazado) aparece el sello chico para no perder
-       la referencia: en celulares reemplaza la palabra "Menú"; en pantallas
-       anchas va pegado a la fila de secciones, con su lugar siempre reservado
-       para que el menú no se corra al aparecer. -->
+<header class="sticky top-0 z-50 border-b border-oliva/20 bg-papel/95 backdrop-blur-sm">
+  <!-- El sello está siempre, en todas las páginas, para no perder la
+       referencia de la marca: en celulares va junto al botón del menú, en
+       pantallas anchas pegado a la fila de secciones. -->
   <div class="relative mx-auto flex max-w-6xl items-center justify-between px-4 lg:justify-center lg:px-5">
     <div class="flex items-center gap-1">
     <button
@@ -33,14 +31,13 @@ const hayPedido = Boolean(SITIO.whatsapp);
         <path data-icono-abrir d="M4 7h16M4 12h16M4 17h16" />
         <path data-icono-cerrar class="hidden" d="M6 6l12 12M18 6L6 18" />
       </svg>
-      <span class="group-data-desplazado:hidden">Menú</span>
-      <span class="sr-only hidden group-data-desplazado:inline">Menú</span>
+      <span class="sr-only">Menú</span>
     </button>
 
     <a
       href="/"
       aria-label="Margarita Nativa — inicio"
-      class="hidden opacity-0 transition-opacity duration-300 group-data-desplazado:block group-data-desplazado:opacity-100 lg:invisible lg:mr-8 lg:block lg:group-data-desplazado:visible"
+      class="block lg:mr-8"
     >
       <Image src={sello} alt="" width={96} height={96} class="h-10 w-10" loading="eager" />
     </a>
@@ -116,12 +113,6 @@ const hayPedido = Boolean(SITIO.whatsapp);
 </header>
 
 <script>
-  // Marca el encabezado cuando la página ya no está arriba de todo.
-  const encabezado = document.querySelector<HTMLElement>('#encabezado');
-  const marcar = () => encabezado?.toggleAttribute('data-desplazado', window.scrollY > 120);
-  marcar();
-  window.addEventListener('scroll', marcar, { passive: true });
-
   const boton = document.querySelector<HTMLButtonElement>('#menu-boton');
   const menu = document.querySelector<HTMLElement>('#menu-movil');
 
