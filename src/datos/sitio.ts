@@ -16,6 +16,11 @@ export const SITIO = {
   tiktokUsuario: '@margarita.nativa',
   email: 'soymargaritanativa@gmail.com',
 
+  /** Perfil de Empresa en Google (Maps) y el link que abre directo el
+   *  formulario para dejar una reseña. */
+  perfilGoogle: 'https://g.page/r/CTOf9-882fHzEBM',
+  resenaGoogle: 'https://g.page/r/CTOf9-882fHzEBM/review',
+
   /** Formato internacional, solo dígitos. Si queda vacío, los botones de
    *  WhatsApp desaparecen y el resto del contacto cae en Instagram. */
   whatsapp: '5491139379048',

@@ -63,7 +63,8 @@ const FICHA_NEGOCIO = {
   image: new URL('/og-margarita-nativa.jpg', Astro.site ?? 'https://margaritanativa.com.ar').href,
   telephone: `+${SITIO.whatsapp}`,
   email: SITIO.email,
-  sameAs: [SITIO.instagram, SITIO.tiktok],
+  sameAs: [SITIO.instagram, SITIO.tiktok, SITIO.perfilGoogle],
+  hasMap: SITIO.perfilGoogle,
   address: {
     '@type': 'PostalAddress',
     addressLocality: SITIO.zona,
@@ -365,6 +366,16 @@ const PREGUNTAS = [
           Mandar un mail
         </Boton>
       </div>
+
+      <p class="mt-12 text-crema">¿Ya recibiste tus flores? Contanos qué te parecieron.</p>
+      <Boton
+        href={SITIO.resenaGoogle}
+        variante="contorno"
+        class="mt-5 gap-2.5 border-crema/50 text-crema hover:border-crema hover:bg-crema/10"
+      >
+        <Icono nombre="estrella" class="h-5 w-5" />
+        Dejanos tu opinión en Google
+      </Boton>
     </div>
   </section>
 </Layout>
