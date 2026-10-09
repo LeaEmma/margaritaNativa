@@ -17,8 +17,9 @@ const hayPedido = Boolean(SITIO.whatsapp);
 <header id="encabezado" class="group sticky top-0 z-50 border-b border-oliva/20 bg-papel/95 backdrop-blur-sm">
   <!-- Arriba de todo no hay logo: en la home el sello grande ya está a la
        vista. Al bajar (data-desplazado) aparece el sello chico para no perder
-       la referencia: en celulares reemplaza la palabra "Menú", en pantallas
-       anchas va a la izquierda de la fila de secciones. -->
+       la referencia: en celulares reemplaza la palabra "Menú"; en pantallas
+       anchas va pegado a la fila de secciones, con su lugar siempre reservado
+       para que el menú no se corra al aparecer. -->
   <div class="relative mx-auto flex max-w-6xl items-center justify-between px-4 lg:justify-center lg:px-5">
     <div class="flex items-center gap-1">
     <button
@@ -39,7 +40,7 @@ const hayPedido = Boolean(SITIO.whatsapp);
     <a
       href="/"
       aria-label="Margarita Nativa — inicio"
-      class="hidden opacity-0 transition-opacity duration-300 group-data-desplazado:block group-data-desplazado:opacity-100 lg:absolute lg:top-1/2 lg:left-5 lg:-translate-y-1/2"
+      class="hidden opacity-0 transition-opacity duration-300 group-data-desplazado:block group-data-desplazado:opacity-100 lg:invisible lg:mr-8 lg:block lg:group-data-desplazado:visible"
     >
       <Image src={sello} alt="" width={96} height={96} class="h-10 w-10" loading="eager" />
     </a>
