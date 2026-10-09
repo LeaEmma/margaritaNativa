@@ -4,7 +4,7 @@
  * ilustraciones botánicas de la papelería en lugar de competir con ellas.
  */
 interface Props {
-  nombre: 'whatsapp' | 'instagram' | 'tiktok' | 'sol' | 'gota' | 'maceta' | 'bolsa';
+  nombre: 'whatsapp' | 'instagram' | 'tiktok' | 'sol' | 'gota' | 'maceta' | 'bolsa' | 'estrella';
   class?: string;
 }
 
@@ -77,6 +77,12 @@ const { nombre, class: clase = 'h-6 w-6' } = Astro.props;
         <path d="M3.6 6.6h16.8v3H3.6z" />
         <path d="M12 6.6c0-2.4 1.7-4.2 4.2-4.2 0 2.4-1.7 4.2-4.2 4.2Z" />
       </>
+    )
+  }
+
+  {
+    nombre === 'estrella' && (
+      <path d="m12 3.2 2.7 5.5 6 .9-4.35 4.2 1 6-5.35-2.8-5.35 2.8 1-6L3.3 9.6l6-.9Z" />
     )
   }
 </svg>
