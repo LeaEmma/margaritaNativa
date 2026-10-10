@@ -137,22 +137,45 @@ const PREGUNTAS = [
     <div class="mx-auto max-w-5xl px-5">
       <TituloSeccion titulo="Ramos a tu medida" epigrafe="Cómo funciona" />
 
-      <div class="mt-14 grid gap-8 sm:grid-cols-3">
-        {
-          PASOS.map((paso) => (
-            <div class="text-center">
-              <p class="font-display text-5xl font-semibold text-borravino/50">{paso.n}</p>
-              <h3 class="font-display mt-3 text-xl font-semibold tracking-wide text-borravino uppercase">
-                {paso.titulo}
-              </h3>
-              <p class="mt-3 text-balance text-oliva">{paso.texto}</p>
-            </div>
-          ))
-        }
-      </div>
+      <div class="mt-14 grid items-center gap-12 md:grid-cols-[minmax(0,20rem)_1fr] md:gap-16">
+        {/* Vertical como una historia de Instagram. Se reproduce solo cuando
+            entra en pantalla (ver script al pie) para no bajar 2 MB de entrada. */}
+        <figure class="mx-auto w-full max-w-[18rem] md:max-w-none">
+          <video
+            id="video-ramo"
+            src="/video/ramo.mp4"
+            width="576"
+            height="1024"
+            muted
+            loop
+            playsinline
+            preload="none"
+            aria-label="Un ramo de flores de estación recién armado, envuelto y listo para entregar"
+            class="aspect-[9/16] w-full rounded-2xl border border-oliva/25 bg-borravino/10 object-cover shadow-xl shadow-borravino/15"
+          ></video>
+        </figure>
 
-      <div class="mt-12 text-center">
-        <Boton href="/catalogo#ramos" variante="contorno">Ver ramos</Boton>
+        <div>
+          <div class="space-y-9">
+            {
+              PASOS.map((paso) => (
+                <div class="flex items-start gap-5 text-left">
+                  <p class="font-display w-14 shrink-0 text-5xl leading-none font-semibold text-borravino/50">{paso.n}</p>
+                  <div>
+                    <h3 class="font-display text-xl font-semibold tracking-wide text-borravino uppercase">
+                      {paso.titulo}
+                    </h3>
+                    <p class="mt-2 text-balance text-oliva">{paso.texto}</p>
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+
+          <div class="mt-12 text-center md:text-left">
+            <Boton href="/catalogo#ramos" variante="contorno">Ver ramos</Boton>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -379,3 +402,20 @@ const PREGUNTAS = [
     </div>
   </section>
 </Layout>
+
+<script>
+  // Con "reducir movimiento" no arranca solo: se muestran los controles y se
+  // carga el primer cuadro para que no quede el recuadro vacío.
+  const video = document.querySelector<HTMLVideoElement>('#video-ramo');
+  if (video) {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      video.controls = true;
+      video.preload = 'metadata';
+    } else {
+      new IntersectionObserver(
+        ([entrada]) => (entrada.isIntersecting ? video.play().catch(() => {}) : video.pause()),
+        { rootMargin: '200px 0px' },
+      ).observe(video);
+    }
+  }
+</script>
