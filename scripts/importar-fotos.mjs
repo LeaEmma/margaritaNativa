@@ -46,6 +46,51 @@ const ALIAS = {
   monstera: ['monstera-costilla-de-adan'],
 };
 
+/**
+ * Foto elegida y encuadre por carpeta (clave: slug de la carpeta). Pisa a "la
+ * más reciente" cuando la mejor foto no es la última que se subió.
+ *
+ * `x` e `y` son el centro de lo que interesa, en fracciones de la foto (0 a 1),
+ * y `zoom` achica el cuadrado (1 = el más grande que entra). Importa que la
+ * planta quede en el centro: las fichas de cuidados muestran solo una franja
+ * horizontal del medio, y si ahí cae la maceta se ve la base y no la planta.
+ *
+ * Si el archivo nombrado ya no está, se usa el más reciente con el recorte
+ * automático.
+ */
+const ENCUADRE = {
+  'bambu-de-la-suerte': { foto: 'IMG-20260918-WA0023.jpg', x: 0.42, y: 0.45, zoom: 1.35 },
+  'cala-de-color': { foto: 'IMG-20261008-WA0015.jpg', x: 0.5, y: 0.45 },
+  helecho: { foto: '20260925_055845.jpg', x: 0.5, y: 0.6 },
+  hortensia: { foto: 'IMG-20261005-WA0015.jpg', x: 0.5, y: 0.55 },
+  'jazmin-chino': { foto: '20260925_055413.jpg', x: 0.5, y: 0.3, zoom: 1.3 },
+  lavanda: { foto: 'IMG-20260918-WA0018.jpg', x: 0.5, y: 0.55, zoom: 1.25 },
+  lilium: { foto: 'IMG-20261001-WA0000(1).jpg', x: 0.5, y: 0.45 },
+  monstera: { foto: 'IMG-20260918-WA0020.jpg', x: 0.5, y: 0.45 },
+  // En la carpeta también quedó una foto de lilium: no tomar "la más reciente".
+  orquidea: { foto: 'IMG-20260916-WA0007(1).jpg', x: 0.5, y: 0.45 },
+  'palmera-areca': { foto: '20260925_055819 (1).jpg', x: 0.5, y: 0.3, zoom: 1.15 },
+  'palo-de-agua': { foto: 'IMG-20260918-WA0015.jpg', x: 0.5, y: 0.4 },
+  pandurata: { foto: '20260925_055741 (1).jpg', x: 0.6, y: 0.5 },
+  pino: { foto: '20260921_062734.jpg', x: 0.45, y: 0.45 },
+  'santa-rita': { foto: 'IMG-20260918-WA0009(1) (1).jpg', x: 0.45, y: 0.5 },
+  santuario: { foto: 'IMG-20260918-WA0014.jpg', x: 0.5, y: 0.6 },
+  'stromanthe-tricolor': { foto: '20260925_055546.jpg', x: 0.4, y: 0.5 },
+};
+
+/** Recorte cuadrado centrado en (x, y), sin salirse de la foto. */
+async function recorteEn(fuente, { x, y, zoom = 1 }) {
+  const { data, info } = await sharp(fuente).rotate().toBuffer({ resolveWithObject: true });
+  const lado = Math.round(Math.min(info.width, info.height) / zoom);
+  const limitar = (v, max) => Math.max(0, Math.min(Math.round(v), max));
+  return sharp(data).extract({
+    left: limitar(x * info.width - lado / 2, info.width - lado),
+    top: limitar(y * info.height - lado / 2, info.height - lado),
+    width: lado,
+    height: lado,
+  });
+}
+
 const CATEGORIAS = ['Plantas', 'Ramos'];
 
 async function productosDe(categoria) {
@@ -108,20 +153,25 @@ for (const categoria of CATEGORIAS) {
       continue;
     }
 
-    const fuente = path.join(dirOrigen, carpeta.name, fotos[0]);
+    const encuadre = ENCUADRE[slugCarpeta];
+    const elegida = encuadre && fotos.includes(encuadre.foto) ? encuadre.foto : fotos[0];
+    if (encuadre && elegida !== encuadre.foto) {
+      sinMatch.push(`${carpeta.name} → no está "${encuadre.foto}"; se usa la más reciente`);
+    }
+    const fuente = path.join(dirOrigen, carpeta.name, elegida);
     for (const slug of destinos) {
       if (!esperados.has(slug)) {
         sinMatch.push(`${carpeta.name} → alias apunta a "${slug}", que no está en la planilla`);
         continue;
       }
       const salida = path.join(dirDestino, `${slug}.jpg`);
-      const info = await sharp(fuente)
-        .rotate()
-        .resize(LADO, LADO, { fit: 'cover', position: sharp.strategy.attention })
-        .jpeg({ quality: 82, mozjpeg: true })
-        .toFile(salida);
+      const imagen =
+        elegida === encuadre?.foto
+          ? (await recorteEn(fuente, encuadre)).resize(LADO, LADO)
+          : sharp(fuente).rotate().resize(LADO, LADO, { fit: 'cover', position: sharp.strategy.attention });
+      const info = await imagen.jpeg({ quality: 82, mozjpeg: true }).toFile(salida);
       cubiertos.add(slug);
-      console.log(`  ✓ ${slug.padEnd(28)} ${Math.round(info.size / 1024)} KB   ← ${fotos[0]}`);
+      console.log(`  ✓ ${slug.padEnd(28)} ${Math.round(info.size / 1024)} KB   ← ${elegida}`);
     }
   }
 
