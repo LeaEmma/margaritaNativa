@@ -38,9 +38,16 @@ const FOTOS_PRODUCTO = import.meta.glob<{ default: ImageMetadata }>(
 const fotoDe = (categoria: Categoria, slug: string): ImageMetadata | undefined =>
   FOTOS_PRODUCTO[`../assets/fotos/${categoria}/${slug}.jpg`]?.default;
 
+/**
+ * Las plantas van por nombre: son muchas y se buscan por nombre. Los ramos
+ * conservan el orden de la planilla, que va de menor a mayor.
+ */
+const ordenar = (clave: Categoria, items: ReturnType<typeof porCategoria>) =>
+  clave === 'plantas' ? [...items].sort((a, b) => a.nombre.localeCompare(b.nombre, 'es')) : items;
+
 const secciones = CATEGORIAS_CATALOGO.map((categoria) => ({
   ...categoria,
-  items: porCategoria(categoria.clave),
+  items: ordenar(categoria.clave, porCategoria(categoria.clave)),
   foto: FOTOS[categoria.clave]!,
   notas: NOTAS[categoria.clave],
 }));

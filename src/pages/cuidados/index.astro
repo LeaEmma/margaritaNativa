@@ -39,10 +39,22 @@ const variedades = Object.entries(CUIDADOS)
   <section class="mx-auto max-w-5xl px-5 pt-16 pb-20">
     <TituloSeccion titulo="Cuidados" epigrafe="Para que te duren" />
 
-    <ul class="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+    {/* Sin JavaScript queda oculto y se ven todas las fichas. */}
+    <div id="buscador" hidden class="mx-auto mt-10 max-w-md">
+      <label for="buscar-planta" class="sr-only">Buscá tu planta</label>
+      <input
+        id="buscar-planta"
+        type="search"
+        placeholder="Buscá tu planta"
+        autocomplete="off"
+        class="w-full rounded-full border border-oliva/35 bg-papel-claro px-6 py-3 text-lg text-borravino placeholder:text-oliva/70 focus:border-borravino focus:outline-none"
+      />
+    </div>
+
+    <ul id="fichas" class="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {
         variedades.map((variedad) => (
-          <li>
+          <li data-nombre={variedad.nombre}>
             <a
               href={`/cuidados/${variedad.slug}`}
               class="group flex h-full flex-col overflow-hidden rounded-xl border border-oliva/25 bg-papel-claro transition-colors hover:border-borravino/40"
@@ -68,8 +80,38 @@ const variedades = Object.entries(CUIDADOS)
       }
     </ul>
 
+    <p id="sin-resultados" hidden class="mt-14 text-center text-oliva">
+      No encontramos esa planta.{' '}
+      <a href="/catalogo#plantas" class="text-borravino underline underline-offset-4">Ver todas las plantas</a>
+    </p>
+
     <div class="mt-12 text-center">
       <Boton href="/catalogo#plantas" variante="contorno">Ver precios</Boton>
     </div>
   </section>
 </Layout>
+
+<script>
+  /** Sin tildes ni mayúsculas, para que "orquidea" encuentre "Orquídea". */
+  const normalizar = (texto: string) =>
+    texto.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase().trim();
+
+  const buscador = document.querySelector<HTMLElement>('#buscador');
+  const campo = document.querySelector<HTMLInputElement>('#buscar-planta');
+  const fichas = document.querySelectorAll<HTMLElement>('#fichas > li');
+  const vacio = document.querySelector<HTMLElement>('#sin-resultados');
+
+  if (buscador && campo) {
+    buscador.hidden = false;
+    campo.addEventListener('input', () => {
+      const busqueda = normalizar(campo.value);
+      let visibles = 0;
+      for (const ficha of fichas) {
+        const mostrar = normalizar(ficha.dataset.nombre ?? '').includes(busqueda);
+        ficha.hidden = !mostrar;
+        if (mostrar) visibles++;
+      }
+      if (vacio) vacio.hidden = visibles > 0;
+    });
+  }
+</script>
