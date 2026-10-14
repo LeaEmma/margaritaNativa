@@ -21,7 +21,7 @@ const variedades = Object.entries(CUIDADOS)
     foto:
       cuidado.tipo === 'ramo'
         ? ramoDetalle
-        : FOTOS[`../../assets/fotos/plantas/${cuidado.productos[0]}.jpg`]?.default,
+        : FOTOS[`../../assets/fotos/plantas/${cuidado.foto ?? cuidado.productos[0]}.jpg`]?.default,
   }))
   // Los ramos primero y después las plantas, por orden alfabético.
   .sort(

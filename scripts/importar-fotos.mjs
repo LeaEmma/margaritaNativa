@@ -10,6 +10,8 @@
  * Estructura esperada en el origen:
  *   <origen>/Plantas/<Nombre del producto>/<cualquier foto>
  *   <origen>/Ramos/<Nombre del producto>/<cualquier foto>
+ *   <origen>/Plantas/Plantas/<foto>   → portada de la categoría en /catalogo
+ *                                       (src/assets/fotos/portada-plantas.jpg)
  *
  * Se toma la foto más reciente de cada carpeta (por fecha de modificación): así,
  * para cambiar la foto de un producto alcanza con subir una nueva a su carpeta.
@@ -26,6 +28,23 @@ const ORIGEN =
 
 const DESTINO = 'src/assets/fotos';
 const LADO = 900; // cuadrado: las miniaturas del catálogo son cuadradas
+const PORTADA = { ancho: 1600, alto: 1000 }; // apaisada: va de banda arriba de cada categoría
+
+/**
+ * Lo que va entre paréntesis al final del nombre en la planilla es detalle, no
+ * nombre: "Aromáticas (albahaca, menta, etc.)" se vende como "Aromáticas".
+ * src/datos/catalogo.ts hace lo mismo, así que el slug coincide.
+ */
+const nombreComercial = (t) => t.replace(/\s*\([^)]*\)\s*$/, '');
+
+/**
+ * Un producto con varias variantes es una fila por variante en la planilla,
+ * con el mismo nombre y la columna "Tamaño" cargada (ver conTamanos en
+ * catalogo.ts). Acá alcanza con quedarse con los nombres distintos: las filas
+ * repetidas comparten la foto. Por si alguna fila lleva el tamaño en el nombre
+ * ("Lavanda chica"), se lo saca para que queden juntas.
+ */
+const sinTamano = (t) => t.replace(/\s+(chica|mediana|grande)$/i, '');
 
 /** Mismo normalizador que usa el sitio para los anclas del catálogo. */
 const aSlug = (t) =>
@@ -41,8 +60,6 @@ const aSlug = (t) =>
  * planilla. Clave: slug de la carpeta. Valor: slugs de los productos que cubre.
  */
 const ALIAS = {
-  // Una sola carpeta para los dos tamaños: es la misma planta.
-  lavanda: ['lavanda-chica', 'lavanda-grande'],
   monstera: ['monstera-costilla-de-adan'],
 };
 
@@ -72,9 +89,13 @@ const ENCUADRE = {
   'palmera-areca': { foto: '20260925_055819 (1).jpg', x: 0.5, y: 0.3, zoom: 1.15 },
   'palo-de-agua': { foto: 'IMG-20260918-WA0015.jpg', x: 0.5, y: 0.4 },
   pandurata: { foto: '20260925_055741 (1).jpg', x: 0.6, y: 0.5 },
+  // Cajones de petunias: el recorte toma el del medio, con la mezcla de colores.
+  petunias: { foto: 'IMG-20261013-WA0081.jpg', x: 0.5, y: 0.42, zoom: 1.15 },
   pino: { foto: '20260921_062734.jpg', x: 0.45, y: 0.45 },
+  // Hilera de plantas colgadas: el recorte corta la pared violeta de arriba y la pandurata de abajo.
+  platycerium: { foto: 'file_000000004de8820e832eb7b2d5c0d1b5.png', x: 0.5, y: 0.52, zoom: 1.05 },
   'santa-rita': { foto: 'IMG-20260918-WA0009(1) (1).jpg', x: 0.45, y: 0.5 },
-  santuario: { foto: 'IMG-20260918-WA0014.jpg', x: 0.5, y: 0.6 },
+  anturio: { foto: 'IMG-20260918-WA0014.jpg', x: 0.5, y: 0.6 },
   'stromanthe-tricolor': { foto: '20260925_055546.jpg', x: 0.4, y: 0.5 },
 };
 
@@ -100,12 +121,41 @@ async function productosDe(categoria) {
   const r = await fetch(`${base}?gid=${gid}&single=true&output=csv`);
   if (!r.ok) throw new Error(`No se pudo leer la planilla de ${categoria}: HTTP ${r.status}`);
   const texto = (await r.text()).replace(/^\uFEFF/, '').trim();
-  // La primera columna es el nombre en las dos hojas, aunque el resto difiera.
-  return texto
-    .split(/\r?\n/)
+  // El orden de las columnas cambia entre hojas: se busca la de nombre por su
+  // encabezado ("Nombre" en Plantas, "Categoria" en Ramos).
+  const filas = texto.split(/\r?\n/).map(leerFilaCsv);
+  const encabezados = filas[0].map((h) => h.trim().toLowerCase());
+  const col = encabezados.findIndex((h) => h === 'nombre' || h === 'categoria');
+  if (col < 0) throw new Error(`La planilla de ${categoria} no tiene columna Nombre/Categoria`);
+  return filas
     .slice(1)
-    .map((linea) => (linea.match(/^("([^"]*)"|[^,]*)/)?.[2] ?? linea.split(',')[0]).trim())
+    .map((f) => (f[col] ?? '').trim())
     .filter(Boolean);
+}
+
+/** Separa una fila CSV respetando las comillas ("Lirio, Cala o Pajarito"). */
+function leerFilaCsv(linea) {
+  const celdas = [];
+  let celda = '';
+  let entreComillas = false;
+  for (let i = 0; i < linea.length; i++) {
+    const c = linea[i];
+    if (c === '"') {
+      if (entreComillas && linea[i + 1] === '"') {
+        celda += '"';
+        i++;
+      } else {
+        entreComillas = !entreComillas;
+      }
+    } else if (c === ',' && !entreComillas) {
+      celdas.push(celda);
+      celda = '';
+    } else {
+      celda += c;
+    }
+  }
+  celdas.push(celda);
+  return celdas;
 }
 
 const esImagen = (f) => /\.(jpe?g|png|webp|heic)$/i.test(f);
@@ -121,7 +171,7 @@ for (const categoria of CATEGORIAS) {
   }
 
   const productos = await productosDe(categoria);
-  const esperados = new Map(productos.map((p) => [aSlug(p), p]));
+  const esperados = new Map(productos.map((p) => [aSlug(sinTamano(nombreComercial(p))), p]));
 
   const entradas = await fs.readdir(dirOrigen, { withFileTypes: true });
   const carpetas = entradas.filter((e) => e.isDirectory());
@@ -147,6 +197,19 @@ for (const categoria of CATEGORIAS) {
     }
 
     const slugCarpeta = aSlug(carpeta.name);
+
+    // Una subcarpeta con el nombre de la categoría trae la foto general.
+    if (slugCarpeta === clave) {
+      const salida = path.join(DESTINO, `portada-${clave}.jpg`);
+      const info = await sharp(path.join(dirCarpeta, fotos[0]))
+        .rotate()
+        .resize(PORTADA.ancho, PORTADA.alto, { fit: 'cover', position: sharp.strategy.attention })
+        .jpeg({ quality: 82, mozjpeg: true })
+        .toFile(salida);
+      console.log(`  ✓ ${'(portada)'.padEnd(28)} ${Math.round(info.size / 1024)} KB   ← ${fotos[0]}`);
+      continue;
+    }
+
     const destinos = ALIAS[slugCarpeta] ?? (esperados.has(slugCarpeta) ? [slugCarpeta] : null);
     if (!destinos) {
       sinMatch.push(`${carpeta.name} → no coincide con ningún producto`);

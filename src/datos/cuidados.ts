@@ -9,7 +9,9 @@
  * Una ficha por variedad, no por producto: la lavanda chica y la grande son la
  * misma planta y se cuidan igual, así que comparten página. `productos` lista
  * los slugs del catálogo que cubre cada ficha, y de ahí salen la foto y el
- * precio sin duplicar nada.
+ * precio sin duplicar nada. Al revés también pasa: las aromáticas son un solo
+ * producto con tres variedades que se cuidan distinto, y cada variedad tiene
+ * su ficha, apuntada por el slug de la variante (`aromaticas-albahaca`).
  */
 
 export interface Cuidado {
@@ -17,8 +19,10 @@ export interface Cuidado {
   nombre: string;
   /** Las fichas son de plantas salvo que se indique otra cosa. */
   tipo?: 'planta' | 'ramo';
-  /** Slugs del catálogo que cubre esta ficha. */
+  /** Slugs del catálogo que cubre esta ficha: de un producto o de una variante suya. */
   productos: string[];
+  /** Slug de la foto en src/assets/fotos/plantas, si no es la del primer producto. */
+  foto?: string;
   /** Una línea que ubique la planta antes de los detalles. */
   resumen: string;
   luz: string;
@@ -43,7 +47,7 @@ export const CUIDADOS: Record<string, Cuidado> = {
   },
   lavanda: {
     nombre: 'Lavanda',
-    productos: ['lavanda-chica', 'lavanda-grande'],
+    productos: ['lavanda'],
     resumen: 'Aromática, rústica y de sol. Podala después de la floración y dura años.',
     luz: 'Pleno sol, al menos seis horas directas por día.',
     riego: 'Poco. Regá recién cuando la tierra esté seca al tacto.',
@@ -113,9 +117,9 @@ export const CUIDADOS: Record<string, Cuidado> = {
     ubicacion: 'Interior luminoso. Agradece que le pulverices las hojas.',
     dato: 'Si el ambiente es seco le salen puntas marrones. Un plato con piedras y agua debajo ayuda.',
   },
-  santuario: {
-    nombre: 'Santuario',
-    productos: ['santuario'],
+  anturio: {
+    nombre: 'Anturio',
+    productos: ['anturio'],
     resumen: 'Floración roja que dura semanas enteras.',
     luz: 'Mucha luz indirecta.',
     riego: 'Cuando la capa superior de la tierra esté seca.',
@@ -184,6 +188,64 @@ export const CUIDADOS: Record<string, Cuidado> = {
     riego: 'Tierra siempre húmeda, sin encharcar.',
     ubicacion: 'Interior luminoso con humedad. El baño o la cocina le vienen bien.',
     dato: 'Las hojas secas y crujientes son aire seco: pulverizalo seguido y alejalo de estufas.',
+  },
+  platycerium: {
+    nombre: 'Platycerium',
+    productos: ['platycerium'],
+    resumen: 'Cuerno de ciervo, también llamado cuerno de alce. Un helecho que vive colgado o montado sobre madera, como en la selva.',
+    luz: 'Luz indirecta abundante. Nada de sol directo al mediodía.',
+    riego: 'Una vez por semana sumergí la base en agua diez minutos y dejala escurrir. En verano, un poco más seguido.',
+    ubicacion: 'Colgado en un balcón protegido o en un interior luminoso y con humedad.',
+    dato: 'Las hojas redondas de la base se ponen marrones y parecen secas, pero son las que la sostienen y la alimentan. No las saques.',
+  },
+  'estrella-federal': {
+    nombre: 'Estrella federal',
+    productos: ['estrella-federal'],
+    resumen: 'La planta de fin de año. Sus hojas rojas duran meses si nadie la molesta.',
+    luz: 'Mucha luz indirecta. Un rato de sol suave a la mañana le viene bien.',
+    riego: 'Cuando la tierra esté seca al tacto. Sacá el agua que quede en el plato.',
+    ubicacion: 'Interior luminoso, lejos de estufas y de corrientes de aire frío.',
+    dato: 'Un golpe de aire helado le hace tirar las hojas de un día para otro. Lo rojo no es la flor: las flores son los botoncitos amarillos del centro.',
+  },
+  // Las tres aromáticas comparten la foto del producto hasta que haya una por hierba.
+  albahaca: {
+    nombre: 'Albahaca',
+    productos: ['aromaticas-albahaca'],
+    foto: 'aromaticas',
+    resumen: 'La más pedida para la cocina. Dura una temporada y se renueva con semillas o gajos.',
+    luz: 'Pleno sol, al menos cuatro horas directas por día.',
+    riego: 'Seguido: tierra siempre húmeda, sin encharcar. En verano puede ser todos los días.',
+    ubicacion: 'Exterior o ventana muy luminosa, protegida del viento y del frío.',
+    dato: 'Cortá de arriba, por encima de un par de hojas, y sacale las flores apenas aparecen: si la dejás florecer, deja de dar hojas y se pone amarga.',
+  },
+  romero: {
+    nombre: 'Romero',
+    productos: ['aromaticas-romero'],
+    foto: 'aromaticas',
+    resumen: 'Arbusto de sol y poca agua. Con los años se hace grande y dura muchísimo.',
+    luz: 'Pleno sol. Cuanto más, mejor.',
+    riego: 'Poco. Regá recién cuando la tierra esté seca varios centímetros hacia abajo.',
+    ubicacion: 'Exterior, en maceta con buen drenaje. Aguanta calor, viento y heladas suaves.',
+    dato: 'Se muere casi siempre por exceso de agua, no por falta. Si las puntas se ponen negras, está regado de más.',
+  },
+  petunias: {
+    nombre: 'Petunias',
+    productos: ['petunias'],
+    resumen: 'Flores de todos los colores, de primavera a otoño. Cuanto más sol, más flores.',
+    luz: 'Pleno sol, al menos cinco horas directas por día.',
+    riego: 'Regular: cuando la tierra de arriba se seca. En maceta y con calor, casi todos los días.',
+    ubicacion: 'Exterior: balcón, maceta colgante o cantero, donde no le pegue la lluvia fuerte.',
+    dato: 'Sacá las flores marchitas apenas se secan: si deja semillas, deja de florecer. Y regá la tierra, no las flores, que se manchan.',
+  },
+  menta: {
+    nombre: 'Menta',
+    productos: ['aromaticas-menta'],
+    foto: 'aromaticas',
+    resumen: 'Crece rápido y se expande por las raíces. Mejor en una maceta para ella sola.',
+    luz: 'Media sombra o sol de mañana. El sol fuerte de la tarde la quema.',
+    riego: 'Abundante: le gusta la tierra siempre húmeda.',
+    ubicacion: 'Exterior o balcón, en maceta propia. En un cantero invade todo.',
+    dato: 'Cortala seguido y bien abajo: rebrota con más fuerza. En invierno se seca arriba, pero la raíz vive y vuelve en primavera.',
   },
 };
 

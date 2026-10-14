@@ -1,11 +1,22 @@
 /**
  * Catálogo de Margarita Nativa.
  *
- * Los precios están transcritos de las tarjetas de
- * `_resources/Margarita Nativa/Productos/` (Ramos, Suscripción, Plantas,
- * Exhibidor). Al actualizar precios, actualizar también esas tarjetas para
- * que el impreso y el sitio no se desfasen.
+ * Los precios están transcritos de las planillas publicadas de Google (ver
+ * README). En Plantas se toma la columna "Precio venta"; "Precio compra" es
+ * una referencia interna del dueño y no va al sitio. Al actualizar precios,
+ * actualizar también las tarjetas impresas de
+ * `_resources/Margarita Nativa/Productos/` para que no se desfasen.
  */
+
+export interface Tamano {
+  /**
+   * "Chica", "3 litros", "Albahaca"... Se muestra en el selector y se suma al
+   * nombre en el pedido ("Lavanda chica"). Es la columna "Tamaño" de la
+   * planilla, que también sirve para variedades al mismo precio.
+   */
+  nombre: string;
+  precio: number;
+}
 
 export interface Item {
   nombre: string;
@@ -13,6 +24,26 @@ export interface Item {
   precio: number;
   /** Para precios "desde X" en lugar de un valor cerrado. */
   desde?: boolean;
+  /**
+   * Variantes de un mismo producto (tamaños o variedades), de menor a mayor
+   * precio. Cuando hay, `precio` es el más bajo y la variante se elige en la
+   * fila del catálogo antes de agregar al pedido.
+   */
+  tamanos?: Tamano[];
+}
+
+/**
+ * Un producto que viene en varias variantes. En la planilla es una fila por
+ * variante, con el mismo nombre y la columna "Tamaño" cargada ("Palmera areca /
+ * 3 litros", "Palmera areca / 5 litros"); acá son un solo producto con el
+ * precio "desde" el más bajo, o sin "desde" si todas valen lo mismo.
+ * scripts/importar-fotos.mjs junta esas filas con la misma regla, así que la
+ * foto es una sola: `<slug>.jpg`.
+ */
+function conTamanos(nombre: string, tamanos: [string, number][], detalle?: string): Item {
+  const lista = tamanos.map(([n, precio]) => ({ nombre: n, precio })).sort((a, b) => a.precio - b.precio);
+  const desde = lista[0]!.precio !== lista[lista.length - 1]!.precio;
+  return { nombre, detalle, precio: lista[0]!.precio, desde, tamanos: lista };
 }
 
 export const RAMOS: Item[] = [
@@ -50,23 +81,27 @@ export const SUSCRIPCION: Plan[] = [
 ];
 
 export const PLANTAS: Item[] = [
-  { nombre: 'Lavanda chica', precio: 12000 },
   { nombre: 'Jazmín chino', precio: 15000 },
   { nombre: 'Santa Rita', precio: 15000 },
   { nombre: 'Bambú de la suerte', precio: 16000 },
   { nombre: 'Pino', precio: 18000 },
   { nombre: 'Palo de agua', precio: 20000 },
-  { nombre: 'Lavanda grande', precio: 28000 },
+  conTamanos('Lavanda', [['Chica', 12000], ['Grande', 28000]]),
   { nombre: 'Monstera / Costilla de Adán', precio: 35000 },
   { nombre: 'Cala de color', precio: 40000 },
-  { nombre: 'Santuario', detalle: 'Flor roja', precio: 40000 },
+  { nombre: 'Anturio', detalle: 'Flor de santuario', precio: 40000 },
   { nombre: 'Lilium', precio: 40000 },
   { nombre: 'Orquídea', precio: 60000 },
   { nombre: 'Pandurata', precio: 60000 },
-  { nombre: 'Palmera areca', precio: 75000 },
+  conTamanos('Palmera areca', [['3 litros', 36000], ['5 litros', 75000]]),
   { nombre: 'Stromanthe tricolor', precio: 35000 },
   { nombre: 'Hortensia', precio: 60000 },
   { nombre: 'Helecho', precio: 50000 },
+  { nombre: 'Platycerium', detalle: 'Cuernos de alce', precio: 35000 },
+  { nombre: 'Estrella federal', precio: 30000 },
+  { nombre: 'Petunias', precio: 2500 },
+  // Tres variedades al mismo precio: se elige cuál en la fila, como un tamaño.
+  conTamanos('Aromáticas', [['Albahaca', 2500], ['Romero', 2500], ['Menta', 2500]]),
 ];
 
 /**
@@ -139,7 +174,7 @@ export const CATEGORIAS: {
 /** Solo lo que se muestra en /catalogo. */
 export const CATEGORIAS_CATALOGO = CATEGORIAS.filter((c) => c.enCatalogo);
 
-function aSlug(texto: string): string {
+export function aSlug(texto: string): string {
   return texto
     .normalize('NFD')
     .replace(/\p{Diacritic}/gu, '')

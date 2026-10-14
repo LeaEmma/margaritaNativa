@@ -7,7 +7,7 @@ import Icono from '../../components/Icono.astro';
 import Boton from '../../components/Boton.astro';
 
 import { type Cuidado } from '../../datos/cuidados';
-import { precio, type ItemCatalogo } from '../../datos/catalogo';
+import { aSlug, precio } from '../../datos/catalogo';
 import { enlaceContacto } from '../../datos/sitio';
 
 import ramoDetalle from '../../assets/fotos/ramo-detalle.jpg';
@@ -21,29 +21,38 @@ export async function getStaticPaths() {
   const { porCategoria } = await import('../../datos/catalogo');
   const plantas = porCategoria('plantas');
 
+  /**
+   * Precios de lo que cubre la ficha: los de un producto (todas sus variantes)
+   * o el de una variante puntual ("aromaticas-albahaca").
+   */
+  const preciosDe = (slug: string): number[] => {
+    for (const planta of plantas) {
+      if (planta.slug === slug) return planta.tamanos?.map((t) => t.precio) ?? [planta.precio];
+      const variante = planta.tamanos?.find((t) => `${planta.slug}-${aSlug(t.nombre)}` === slug);
+      if (variante) return [variante.precio];
+    }
+    return [];
+  };
+
   return Object.entries(CUIDADOS).map(([slug, cuidado]) => ({
     params: { slug },
-    props: {
-      cuidado,
-      // Los productos del catálogo que cubre esta ficha, para foto y precio.
-      productos: cuidado.productos
-        .map((p) => plantas.find((planta) => planta.slug === p))
-        .filter((p): p is ItemCatalogo => Boolean(p)),
-    },
+    props: { cuidado, precios: cuidado.productos.flatMap(preciosDe) },
   }));
 }
 
 interface Props {
   cuidado: Cuidado;
-  productos: ItemCatalogo[];
+  precios: number[];
 }
 
-const { cuidado, productos } = Astro.props;
+const { cuidado, precios } = Astro.props;
 
 const esRamo = cuidado.tipo === 'ramo';
-const foto = esRamo ? ramoDetalle : FOTOS[`../../assets/fotos/plantas/${cuidado.productos[0]}.jpg`]?.default;
-const desde = productos.length ? Math.min(...productos.map((p) => p.precio)) : null;
-const variosTamanos = productos.length > 1;
+const foto = esRamo
+  ? ramoDetalle
+  : FOTOS[`../../assets/fotos/plantas/${cuidado.foto ?? cuidado.productos[0]}.jpg`]?.default;
+const desde = precios.length ? Math.min(...precios) : null;
+const variosTamanos = new Set(precios).size > 1;
 
 /** Mismo mensaje para el botón de la ficha y para el flotante. */
 const consulta = `¡Hola! Tengo una consulta sobre ${cuidado.nombre}.`;
