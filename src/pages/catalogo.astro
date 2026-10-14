@@ -13,11 +13,11 @@ import { variedadDe } from '../datos/cuidados';
 import { enlaceContacto } from '../datos/sitio';
 
 import ramoDetalle from '../assets/fotos/ramo-detalle.jpg';
-import plantasVerde from '../assets/fotos/plantas-verde.jpg';
+import portadaPlantas from '../assets/fotos/portada-plantas.jpg';
 
 const FOTOS: Partial<Record<Categoria, ImageMetadata>> = {
   ramos: ramoDetalle,
-  plantas: plantasVerde,
+  plantas: portadaPlantas,
 };
 
 /** Nota al pie de cada categoría, tomada de las tarjetas impresas. */
@@ -37,6 +37,12 @@ const FOTOS_PRODUCTO = import.meta.glob<{ default: ImageMetadata }>(
 
 const fotoDe = (categoria: Categoria, slug: string): ImageMetadata | undefined =>
   FOTOS_PRODUCTO[`../assets/fotos/${categoria}/${slug}.jpg`]?.default;
+
+/** Ficha de cuidados de un producto o de una variante suya, si la hay. */
+const enlaceCuidados = (slug: string): string | undefined => {
+  const variedad = variedadDe(slug);
+  return variedad && `/cuidados/${variedad}`;
+};
 
 /**
  * Las plantas van por nombre: son muchas y se buscan por nombre. Los ramos
@@ -114,7 +120,7 @@ const secciones = CATEGORIAS_CATALOGO.map((categoria) => ({
                 item={item}
                 sufijo={item.sufijo}
                 foto={fotoDe(seccion.clave, item.slug)}
-                cuidados={variedadDe(item.slug) && `/cuidados/${variedadDe(item.slug)}`}
+                enlaceCuidados={enlaceCuidados}
                 agregable
               />
             ))}

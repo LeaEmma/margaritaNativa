@@ -1,6 +1,6 @@
 ---
 import { Image } from 'astro:assets';
-import { precio as formatear, type ItemCatalogo } from '../datos/catalogo';
+import { aSlug, precio as formatear, type ItemCatalogo } from '../datos/catalogo';
 
 /**
  * Fila de precio: el nombre a la izquierda y el precio a la derecha.
@@ -14,24 +14,47 @@ import { precio as formatear, type ItemCatalogo } from '../datos/catalogo';
  *
  * La miniatura es opcional: si el producto todavía no tiene foto, la fila se
  * muestra igual, sin hueco. Así se pueden ir sumando fotos de a poco.
+ *
+ * Si el producto viene en varias variantes (tamaños o variedades), debajo del
+ * nombre hay un selector y el precio es el de la elegida (de entrada, la más
+ * barata, con "desde" si no valen todas lo mismo). Al pedido va la variante
+ * como un producto propio ("Lavanda chica"), así el carrito y el mensaje de
+ * WhatsApp no cambian. El enlace a cuidados también sigue a la variante, para
+ * las que tienen ficha propia (albahaca, romero, menta).
  */
 interface Props {
   item: ItemCatalogo;
   /** Texto chico después del precio, p. ej. "c/u". */
   sufijo?: string;
   foto?: ImageMetadata;
-  /** Si el producto tiene ficha de cuidados, el enlace a esa página.
-   *  El texto del enlace va sin género: hay plantas masculinas (jazmín,
-   *  lilium, pino) y femeninas (lavanda, monstera) en la misma lista. */
-  cuidados?: string;
+  /** Dado el slug de un producto o de una variante, el enlace a su ficha de
+   *  cuidados, si existe. El texto del enlace va sin género: hay plantas
+   *  masculinas (jazmín, lilium, pino) y femeninas (lavanda, monstera) en la
+   *  misma lista. */
+  enlaceCuidados?: (slug: string) => string | undefined;
   /** Muestra el botón de agregar al pedido. */
   agregable?: boolean;
 }
 
-const { item, sufijo, foto, cuidados, agregable = false } = Astro.props;
+const { item, sufijo, foto, enlaceCuidados, agregable = false } = Astro.props;
+
+/** La ficha de la variante si tiene una propia; si no, la del producto. */
+const cuidadosDe = (slug: string) => enlaceCuidados?.(slug) ?? enlaceCuidados?.(item.slug);
+
+/** Lo que se agrega al pedido: el producto, o su variante más barata. */
+const variantes = (item.tamanos ?? []).map((t) => {
+  const slug = `${item.slug}-${aSlug(t.nombre)}`;
+  return { ...t, slug, nombreCompleto: `${item.nombre} ${t.nombre.toLowerCase()}`, cuidados: cuidadosDe(slug) };
+});
+const elegido = variantes[0] ?? {
+  slug: item.slug,
+  nombreCompleto: item.nombre,
+  precio: item.precio,
+  cuidados: cuidadosDe(item.slug),
+};
 ---
 
-<div class="flex items-center gap-3 py-4 sm:gap-4">
+<div class="flex items-center gap-3 py-4 sm:gap-4" data-fila data-precio-minimo={item.precio}>
   {
     foto && (
       <Image
@@ -58,8 +81,8 @@ const { item, sufijo, foto, cuidados, agregable = false } = Astro.props;
         <svg viewBox="0 0 10 14" class="h-3 w-2 self-center fill-oliva-medio" aria-hidden="true">
           <path d="M5 0 9.5 7 5 14 .5 7Z" />
         </svg>
-        {item.desde && <span class="text-sm text-oliva">desde</span>}
-        <span class="font-display text-xl font-semibold text-oliva sm:text-3xl">
+        {item.desde && <span data-desde class="text-sm text-oliva">desde</span>}
+        <span data-precio class="font-display text-xl font-semibold text-oliva sm:text-3xl">
           {formatear(item.precio)}
         </span>
         {sufijo && <span class="text-sm text-oliva">{sufijo}</span>}
@@ -67,10 +90,39 @@ const { item, sufijo, foto, cuidados, agregable = false } = Astro.props;
     </div>
 
     {item.detalle && <p class="mt-1.5 text-balance text-oliva">{item.detalle}</p>}
+
     {
-      cuidados && (
+      variantes.length > 0 && (
+        <fieldset class="mt-2.5 flex flex-wrap items-center gap-2">
+          <legend class="sr-only">Opciones de {item.nombre}</legend>
+          {variantes.map((v, i) => (
+            <label class="cursor-pointer">
+              <input
+                type="radio"
+                name={`variante-${item.slug}`}
+                value={v.slug}
+                checked={i === 0}
+                data-variante
+                data-slug={v.slug}
+                data-nombre={v.nombreCompleto}
+                data-precio={v.precio}
+                data-ficha={v.cuidados}
+                class="peer sr-only"
+              />
+              <span class="block rounded-full border border-oliva/35 px-3.5 py-1 text-xs font-medium tracking-[0.18em] text-oliva uppercase transition-colors peer-checked:border-borravino peer-checked:bg-borravino peer-checked:text-crema peer-focus-visible:ring-2 peer-focus-visible:ring-borravino/40 hover:border-borravino hover:text-borravino peer-checked:hover:text-crema">
+                {v.nombre}
+              </span>
+            </label>
+          ))}
+        </fieldset>
+      )
+    }
+
+    {
+      elegido.cuidados && (
         <a
-          href={cuidados}
+          href={elegido.cuidados}
+          data-cuidados
           class="mt-1.5 inline-block text-sm text-borravino underline underline-offset-4 transition-colors hover:text-borravino-medio"
         >
           Ver cuidados →
@@ -84,10 +136,10 @@ const { item, sufijo, foto, cuidados, agregable = false } = Astro.props;
       <button
         type="button"
         data-agregar
-        data-slug={item.slug}
-        data-nombre={item.nombre}
-        data-precio={item.precio}
-        aria-label={`Agregar ${item.nombre} al pedido`}
+        data-slug={elegido.slug}
+        data-nombre={elegido.nombreCompleto}
+        data-precio={elegido.precio}
+        aria-label={`Agregar ${elegido.nombreCompleto} al pedido`}
         class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-borravino/40 text-xl leading-none text-borravino transition-colors hover:border-borravino hover:bg-borravino hover:text-crema"
       >
         +
@@ -95,3 +147,49 @@ const { item, sufijo, foto, cuidados, agregable = false } = Astro.props;
     )
   }
 </div>
+
+<script>
+  /**
+   * Al elegir una variante, la fila pasa a mostrar su precio, el enlace de
+   * cuidados apunta a su ficha y el botón de agregar pasa a cargarla. "desde"
+   * queda solo mientras la elegida es la más barata. Sin JavaScript la fila
+   * muestra y agrega la primera.
+   */
+  const plata = new Intl.NumberFormat('es-AR', {
+    style: 'currency',
+    currency: 'ARS',
+    maximumFractionDigits: 0,
+  });
+  const precio = (v: number) => plata.format(v).replace(/\s/g, '');
+
+  function aplicar(radio: HTMLInputElement) {
+    const fila = radio.closest<HTMLElement>('[data-fila]');
+    if (!fila) return;
+    const valor = Number(radio.dataset.precio);
+
+    fila.querySelector<HTMLElement>('[data-precio]')!.textContent = precio(valor);
+    const desde = fila.querySelector<HTMLElement>('[data-desde]');
+    if (desde) desde.hidden = valor !== Number(fila.dataset.precioMinimo);
+
+    const cuidados = fila.querySelector<HTMLAnchorElement>('a[data-cuidados]');
+    if (cuidados && radio.dataset.ficha) cuidados.href = radio.dataset.ficha;
+
+    const boton = fila.querySelector<HTMLButtonElement>('[data-agregar]');
+    if (boton) {
+      boton.dataset.slug = radio.dataset.slug;
+      boton.dataset.nombre = radio.dataset.nombre;
+      boton.dataset.precio = radio.dataset.precio;
+      boton.setAttribute('aria-label', `Agregar ${radio.dataset.nombre} al pedido`);
+    }
+  }
+
+  document.addEventListener('change', (evento) => {
+    const radio = evento.target;
+    if (radio instanceof HTMLInputElement && radio.matches('input[data-variante]')) aplicar(radio);
+  });
+
+  // Al volver con "atrás", el navegador restaura los radios pero no el texto.
+  window.addEventListener('pageshow', () => {
+    for (const radio of document.querySelectorAll<HTMLInputElement>('input[data-variante]:checked')) aplicar(radio);
+  });
+</script>
