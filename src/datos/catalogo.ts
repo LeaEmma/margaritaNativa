@@ -48,7 +48,7 @@ function conTamanos(nombre: string, tamanos: [string, number][], detalle?: strin
 
 export const RAMOS: Item[] = [
   { nombre: 'Mini', detalle: 'Flores de temporada.', precio: 15000 },
-  { nombre: 'Lirio, cala o pajarito', detalle: 'Cada uno.', precio: 20000 },
+  { nombre: 'Lirio, cala o pajarito', detalle: 'Cada uno.', precio: 10000 },
   {
     nombre: 'Clásico',
     detalle: 'Variedad de flores de temporada, con follaje y verde.',
@@ -87,8 +87,8 @@ export const PLANTAS: Item[] = [
   { nombre: 'Pino', precio: 18000 },
   { nombre: 'Palo de agua', precio: 20000 },
   conTamanos('Lavanda', [['Chica', 12000], ['Grande', 28000]]),
-  { nombre: 'Monstera / Costilla de Adán', precio: 35000 },
-  { nombre: 'Cala de color', precio: 40000 },
+  { nombre: 'Monstera / Costilla de Adán', precio: 40000 },
+  { nombre: 'Cala de color', precio: 30000 },
   { nombre: 'Anturio', detalle: 'Flor de santuario', precio: 40000 },
   { nombre: 'Lilium', precio: 40000 },
   { nombre: 'Orquídea', precio: 60000 },
@@ -102,6 +102,12 @@ export const PLANTAS: Item[] = [
   { nombre: 'Petunias', precio: 2500 },
   // Tres variedades al mismo precio: se elige cuál en la fila, como un tamaño.
   conTamanos('Aromáticas', [['Albahaca', 2500], ['Romero', 2500], ['Menta', 2500]]),
+  { nombre: 'Rafis', precio: 50000 },
+  { nombre: 'Monstera de agujeros', precio: 75000 },
+  { nombre: 'Cheflera', precio: 20000 },
+  { nombre: 'Gomero', precio: 55000 },
+  { nombre: 'Jazmín del Cabo', precio: 60000 },
+  { nombre: 'Bromelia', precio: 40000 },
 ];
 
 /**

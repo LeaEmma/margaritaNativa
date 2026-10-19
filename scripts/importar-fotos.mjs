@@ -92,6 +92,8 @@ const ENCUADRE = {
   // Cajones de petunias: el recorte toma el del medio, con la mezcla de colores.
   petunias: { foto: 'IMG-20261013-WA0081.jpg', x: 0.5, y: 0.42, zoom: 1.15 },
   pino: { foto: '20260921_062734.jpg', x: 0.45, y: 0.45 },
+  // Foto apaisada tomada desde abajo: el recorte se corre a la derecha y hacia abajo para sacar el techo del vivero.
+  rafis: { foto: 'IMG-20261019-WA0017.jpg', x: 0.62, y: 0.58, zoom: 1.12 },
   // Hilera de plantas colgadas: el recorte corta la pared violeta de arriba y la pandurata de abajo.
   platycerium: { foto: 'file_000000004de8820e832eb7b2d5c0d1b5.png', x: 0.5, y: 0.52, zoom: 1.05 },
   'santa-rita': { foto: 'IMG-20260918-WA0009(1) (1).jpg', x: 0.45, y: 0.5 },
