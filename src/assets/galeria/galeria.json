@@ -103,6 +103,27 @@
           "ancho": 900,
           "alto": 1600
         }
+      ],
+      "lirio-cala-o-pajarito": [
+        {
+          "tipo": "video",
+          "archivo": "ramos/lirio-cala-o-pajarito/vid-20260919-wa0004.poster.jpg",
+          "video": "/video/ramos/lirio-cala-o-pajarito/vid-20260919-wa0004.mp4",
+          "ancho": 720,
+          "alto": 1280
+        },
+        {
+          "tipo": "foto",
+          "archivo": "ramos/lirio-cala-o-pajarito/img-20260920-wa0007-1.jpg",
+          "ancho": 1200,
+          "alto": 1600
+        },
+        {
+          "tipo": "foto",
+          "archivo": "ramos/lirio-cala-o-pajarito/img-20260920-wa0005-1.jpg",
+          "ancho": 1200,
+          "alto": 1600
+        }
       ]
     }
   }
