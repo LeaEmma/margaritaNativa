@@ -124,6 +124,39 @@ mapa `ALIAS` del script, no renombrando en Drive: `Monstera` no puede llamarse
 `Monstera / Costilla de Adán` porque la barra no es válida en un nombre de
 archivo.
 
+## Fotos y videos por tipo de ramo
+
+Cada tipo de ramo tiene una carpeta dentro de `Ramos/` en el Drive, nombrada
+por el precio en miles (`15` es el Mini de $15.000, `25` el Clásico) o por el
+nombre del producto cuando no tiene precio cerrado (`Premium`). Lo que hay
+adentro se ve al tocar "Ver fotos y video" en la fila del catálogo: se abre
+una galería sobre la página ([`src/components/GaleriaProducto.astro`](src/components/GaleriaProducto.astro))
+con un carrusel ([`src/components/Carrusel.astro`](src/components/Carrusel.astro))
+que tiene solo el material de ese ramo. La lista de precios no cambia de tamaño.
+Si el producto no tiene foto propia, la primera pieza de su galería hace de
+miniatura.
+
+Las fotos y videos **sueltos** de `Suscripción/` alimentan el carrusel del
+exhibidor en la home; los de `Eventos/`, la sección de eventos cuando haya
+material. Los sueltos de `Ramos/` no se publican: hay que moverlos a la
+carpeta del tipo de ramo que corresponda, y el script los lista.
+
+```bash
+node scripts/importar-galeria.mjs          # lee la carpeta de Drive en G:
+node scripts/importar-galeria.mjs <ruta>   # o cualquier otro origen
+```
+
+Las fotos quedan en `src/assets/galeria/` (lado mayor 1600 px) y los videos,
+convertidos con el ffmpeg que trae `ffmpeg-static`, en `public/video/`
+(720×1280, H.264, sin audio) con su póster al lado de las fotos. La conversión
+es lenta y se repite solo si el original cambió. El script escribe
+`src/assets/galeria/galeria.json` con el orden y el tamaño de cada pieza;
+`src/datos/galeria.ts` lo lee y agrega los textos alternativos.
+
+Lo que no debe publicarse (capturas de historias de clientes con su avatar,
+flyers) va en `OMITIR`; el orden de apertura, en `ORDEN`; y un recorte previo
+por archivo, en `RECORTE`.
+
 ## Pedido por WhatsApp
 
 El carrito ([`src/components/Carrito.astro`](src/components/Carrito.astro)) arma

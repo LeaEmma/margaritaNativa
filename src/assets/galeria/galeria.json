@@ -1,0 +1,109 @@
+{
+  "secciones": {
+    "suscripcion": [
+      {
+        "tipo": "foto",
+        "archivo": "suscripcion/img-20261005-wa0034-1.jpg",
+        "ancho": 960,
+        "alto": 1280
+      },
+      {
+        "tipo": "foto",
+        "archivo": "suscripcion/img-20260921-wa0064.jpg",
+        "ancho": 900,
+        "alto": 1600
+      },
+      {
+        "tipo": "foto",
+        "archivo": "suscripcion/img-20260921-wa0061.jpg",
+        "ancho": 900,
+        "alto": 1600
+      }
+    ],
+    "eventos": []
+  },
+  "productos": {
+    "ramos": {
+      "clasico": [
+        {
+          "tipo": "video",
+          "archivo": "ramos/clasico/vid-20261017-wa0022.poster.jpg",
+          "video": "/video/ramos/clasico/vid-20261017-wa0022.mp4",
+          "ancho": 714,
+          "alto": 1280
+        },
+        {
+          "tipo": "video",
+          "archivo": "ramos/clasico/img-1408.poster.jpg",
+          "video": "/video/ramos/clasico/img-1408.mp4",
+          "ancho": 720,
+          "alto": 1280
+        }
+      ],
+      "grande": [
+        {
+          "tipo": "foto",
+          "archivo": "ramos/grande/img-20260920-wa0023.jpg",
+          "ancho": 900,
+          "alto": 1600
+        },
+        {
+          "tipo": "video",
+          "archivo": "ramos/grande/vid-20261009-wa0055.poster.jpg",
+          "video": "/video/ramos/grande/vid-20261009-wa0055.mp4",
+          "ancho": 720,
+          "alto": 1280
+        },
+        {
+          "tipo": "video",
+          "archivo": "ramos/grande/vid-20261009-wa0037.poster.jpg",
+          "video": "/video/ramos/grande/vid-20261009-wa0037.mp4",
+          "ancho": 720,
+          "alto": 1280
+        }
+      ],
+      "personalizado": [
+        {
+          "tipo": "video",
+          "archivo": "ramos/personalizado/vid-20261017-wa0070.poster.jpg",
+          "video": "/video/ramos/personalizado/vid-20261017-wa0070.mp4",
+          "ancho": 714,
+          "alto": 1280
+        },
+        {
+          "tipo": "foto",
+          "archivo": "ramos/personalizado/20260930-075320.jpg",
+          "ancho": 900,
+          "alto": 1600
+        },
+        {
+          "tipo": "foto",
+          "archivo": "ramos/personalizado/img-20260929-wa0034.jpg",
+          "ancho": 960,
+          "alto": 1280
+        },
+        {
+          "tipo": "video",
+          "archivo": "ramos/personalizado/vid-20261009-wa0032-1.poster.jpg",
+          "video": "/video/ramos/personalizado/vid-20261009-wa0032-1.mp4",
+          "ancho": 720,
+          "alto": 1280
+        }
+      ],
+      "mini": [
+        {
+          "tipo": "foto",
+          "archivo": "ramos/mini/file-000000000ea4820eb9c6ae13d0d5256f.jpg",
+          "ancho": 1086,
+          "alto": 1448
+        },
+        {
+          "tipo": "foto",
+          "archivo": "ramos/mini/file-00000000f2a8820e9707e907d02e05bc.jpg",
+          "ancho": 900,
+          "alto": 1600
+        }
+      ]
+    }
+  }
+}

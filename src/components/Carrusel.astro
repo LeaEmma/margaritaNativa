@@ -1,0 +1,343 @@
+---
+import { Image, getImage } from 'astro:assets';
+import type { Diapositiva } from '../datos/galeria';
+
+/**
+ * Carrusel de fotos y videos de una sección. La pista es una lista con
+ * desplazamiento horizontal y "scroll snap": sin JavaScript ya se puede
+ * deslizar con el dedo o con la rueda. El script agrega las flechas, los
+ * puntos, el pase automático y la reproducción de los videos: cada video
+ * arranca cuando su diapositiva queda a la vista y, al terminar, pasa a la
+ * siguiente. Con "reducir movimiento" no hay pase automático y los videos
+ * muestran sus controles.
+ */
+interface Props {
+  diapositivas: Diapositiva[];
+  /** Clases del marco de cada diapositiva: la proporción ("aspect-[9/16]") o un alto fijo ("h-64"). */
+  marco: string;
+  /** Cada diapositiva ocupa toda la pista o es una tarjeta, y se ven varias a la vez. */
+  ancho?: 'completo' | 'tarjeta';
+  /** Descripción del carrusel para lectores de pantalla. */
+  etiqueta: string;
+  /** Flechas y puntos claros, para fondos oscuros. */
+  claro?: boolean;
+  sizes?: string;
+  widths?: number[];
+  /** Segundos que se queda en cada foto antes de pasar sola; 0 lo desactiva. */
+  intervalo?: number;
+  /** Cómo entra cada pieza en el marco: recortada para llenarlo, o entera sobre fondo oscuro. */
+  ajuste?: 'cubrir' | 'contener';
+  /** Sin borde ni fondo en el marco, para cuando el carrusel va sobre un fondo propio. */
+  limpio?: boolean;
+  /** Ninguna foto carga hasta que se la necesita (galerías que empiezan cerradas). */
+  cargaDiferida?: boolean;
+  class?: string;
+}
+
+const {
+  diapositivas,
+  marco,
+  ancho = 'completo',
+  etiqueta,
+  claro = false,
+  sizes = '(min-width: 1024px) 64rem, 100vw',
+  widths = [640, 1024, 1600],
+  intervalo = 5,
+  ajuste = 'cubrir',
+  limpio = false,
+  cargaDiferida = false,
+  class: clase = '',
+} = Astro.props;
+
+const total = diapositivas.length;
+
+/** Cuántas diapositivas cargan de entrada: en tarjetas se ven varias a la vez. */
+const eager = cargaDiferida ? 0 : ancho === 'tarjeta' ? 3 : 1;
+const encaje = ajuste === 'contener' ? 'h-full w-full object-contain' : 'h-full w-full object-cover';
+
+/** El póster de cada video como imagen ya optimizada, porque <video> no acepta un <Image>. */
+const posters = await Promise.all(
+  diapositivas.map((d) =>
+    d.tipo === 'video' ? getImage({ src: d.poster, width: Math.min(d.ancho, 900), format: 'jpg' }) : null,
+  ),
+);
+
+const flecha = [
+  'absolute top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full shadow-md transition-colors',
+  claro ? 'bg-tinta/60 text-crema hover:bg-tinta/80' : 'bg-papel/90 text-borravino hover:bg-papel',
+];
+---
+
+{
+  total > 0 && (
+    <div
+      class:list={['carrusel', claro && 'claro', clase]}
+      data-carrusel
+      data-intervalo={intervalo}
+      data-alinear={ancho === 'completo' ? 'centro' : 'inicio'}
+      role="region"
+      aria-roledescription="carrusel"
+      aria-label={etiqueta}
+    >
+      <div class="relative">
+        <ul
+          class:list={[
+            'pista relative flex snap-x snap-mandatory overflow-x-auto',
+            ancho === 'tarjeta' ? 'gap-4 px-5 scroll-pl-5 sm:px-0 sm:scroll-pl-0' : '',
+          ]}
+          data-pista
+          tabindex="0"
+        >
+          {diapositivas.map((d, i) => (
+            <li
+              class:list={['shrink-0', ancho === 'completo' ? 'w-full snap-center' : 'w-56 snap-start sm:w-64']}
+              aria-label={`${i + 1} de ${total}`}
+              data-diapositiva
+            >
+              <figure
+                class:list={[
+                  'relative w-full overflow-hidden rounded-2xl',
+                  marco,
+                  !limpio && 'border bg-borravino/10',
+                  !limpio && (claro ? 'border-crema/25' : 'border-oliva/25'),
+                ]}
+              >
+                {d.tipo === 'foto' ? (
+                  <Image
+                    src={d.imagen}
+                    alt={d.alt}
+                    class={encaje}
+                    widths={widths}
+                    sizes={sizes}
+                    loading={i < eager ? 'eager' : 'lazy'}
+                  />
+                ) : (
+                  <video
+                    src={d.src}
+                    poster={posters[i]?.src}
+                    width={d.ancho}
+                    height={d.alto}
+                    muted
+                    playsinline
+                    preload="none"
+                    aria-label={d.alt}
+                    class={encaje}
+                  />
+                )}
+                {d.titulo && (
+                  <figcaption class="versalitas absolute bottom-3 left-3 rounded-full bg-tinta/70 px-3 py-1 text-xs text-crema">
+                    {d.titulo}
+                  </figcaption>
+                )}
+              </figure>
+            </li>
+          ))}
+        </ul>
+
+        {total > 1 && (
+          <>
+            <button type="button" class:list={['left-2', ...flecha]} data-anterior aria-label="Anterior">
+              <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="m15 5-7 7 7 7" />
+              </svg>
+            </button>
+            <button type="button" class:list={['right-2', ...flecha]} data-siguiente aria-label="Siguiente">
+              <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="m9 5 7 7-7 7" />
+              </svg>
+            </button>
+          </>
+        )}
+      </div>
+
+      {/* Los puntos solo cuando se ve una diapositiva por vez: en tarjetas no dicen nada. */}
+      {total > 1 && ancho === 'completo' && (
+        <div class="mt-4 flex justify-center gap-2" data-puntos>
+          {diapositivas.map((_, i) => (
+            <button
+              type="button"
+              aria-label={`Ir a la ${i + 1}`}
+              aria-current={i === 0 ? 'true' : undefined}
+              class:list={[
+                'punto h-2.5 w-2.5 rounded-full border transition-colors',
+                claro ? 'border-crema/70' : 'border-borravino/60',
+              ]}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+<style>
+  .pista {
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .pista::-webkit-scrollbar {
+    display: none;
+  }
+
+  .pista:focus-visible {
+    outline: 2px solid var(--color-borravino);
+    outline-offset: 4px;
+  }
+
+  /* Las flechas aparecen con el script: sin él, se desliza con el dedo. */
+  [data-anterior],
+  [data-siguiente] {
+    display: none;
+  }
+
+  .carrusel.listo [data-anterior],
+  .carrusel.listo [data-siguiente] {
+    display: flex;
+  }
+
+  .punto[aria-current='true'] {
+    background-color: currentColor;
+  }
+
+  [data-puntos] {
+    color: var(--color-borravino);
+  }
+
+  .carrusel.claro [data-puntos] {
+    color: var(--color-crema);
+  }
+</style>
+
+<script>
+  const reducido = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  for (const raiz of document.querySelectorAll<HTMLElement>('[data-carrusel]')) iniciar(raiz);
+
+  function iniciar(raiz: HTMLElement) {
+    const pista = raiz.querySelector<HTMLElement>('[data-pista]')!;
+    const diapositivas = [...pista.querySelectorAll<HTMLElement>('[data-diapositiva]')];
+    const puntos = [...raiz.querySelectorAll<HTMLButtonElement>('[data-puntos] button')];
+    const videos = diapositivas.map((d) => d.querySelector<HTMLVideoElement>('video'));
+    const total = diapositivas.length;
+    const intervalo = reducido ? 0 : Number(raiz.dataset.intervalo ?? 0) * 1000;
+    // Modo completo: la activa es la que está centrada. Tarjetas: la de la izquierda.
+    const alCentro = raiz.dataset.alinear === 'centro';
+
+    let activa = -1;
+    let temporizador: ReturnType<typeof setTimeout> | undefined;
+    let enPantalla = false;
+    let retenido = false; // mouse encima, foco adentro o dedo apoyado
+
+    const margen = () => parseFloat(getComputedStyle(pista).paddingLeft) || 0;
+    const maximo = () => pista.scrollWidth - pista.clientWidth;
+    const posicionDe = (d: HTMLElement) =>
+      alCentro ? d.offsetLeft - (pista.clientWidth - d.clientWidth) / 2 : d.offsetLeft - margen();
+
+    const irA = (i: number) => {
+      if (i >= total) i = 0;
+      if (i < 0) i = total - 1;
+      let destino = Math.max(0, Math.min(posicionDe(diapositivas[i]!), maximo()));
+      // Si hacia ese lado ya no hay más recorrido, da la vuelta.
+      if (Math.abs(destino - pista.scrollLeft) < 2) destino = i > activa ? 0 : maximo();
+      // Un salto de varias diapositivas (la vuelta, un punto lejano) va directo:
+      // el desplazamiento suave por toda la pista tarda demasiado.
+      const suave = !reducido && Math.abs(i - activa) === 1;
+      pista.scrollTo({ left: destino, behavior: suave ? 'smooth' : 'auto' });
+    };
+
+    const calcularActiva = () => {
+      const referencia = alCentro ? pista.scrollLeft + pista.clientWidth / 2 : pista.scrollLeft + margen();
+      let mejor = 0;
+      let distancia = Infinity;
+      diapositivas.forEach((d, i) => {
+        const punto = alCentro ? d.offsetLeft + d.clientWidth / 2 : d.offsetLeft;
+        const actual = Math.abs(punto - referencia);
+        if (actual < distancia) {
+          distancia = actual;
+          mejor = i;
+        }
+      });
+      return mejor;
+    };
+
+    /** Una diapositiva hacia adelante o atrás desde la que está a la vista ahora. */
+    const pasar = (delta: number) => {
+      actualizar();
+      irA(activa + delta);
+    };
+
+    const programar = () => {
+      clearTimeout(temporizador);
+      if (!intervalo || total < 2 || !enPantalla || retenido) return;
+      // En un video no se pasa por tiempo: se pasa cuando termina.
+      if (videos[activa]) return;
+      temporizador = setTimeout(() => pasar(1), intervalo);
+    };
+
+    const reproducir = () => {
+      videos.forEach((video, i) => {
+        if (!video) return;
+        if (i === activa && enPantalla && !reducido) video.play().catch(() => {});
+        else video.pause();
+      });
+    };
+
+    const actualizar = () => {
+      const nueva = calcularActiva();
+      if (nueva === activa) return;
+      activa = nueva;
+      puntos.forEach((p, i) => (i === activa ? p.setAttribute('aria-current', 'true') : p.removeAttribute('aria-current')));
+      reproducir();
+      programar();
+    };
+
+    videos.forEach((video) => {
+      if (!video) return;
+      if (reducido) {
+        video.controls = true;
+        video.preload = 'metadata';
+      }
+      if (total === 1) video.loop = true;
+      else video.addEventListener('ended', () => pasar(1));
+    });
+
+    // Directo, sin requestAnimationFrame: son pocas diapositivas y así la
+    // activa está al día aunque la pestaña esté en segundo plano.
+    pista.addEventListener('scroll', actualizar, { passive: true });
+
+    // Fuera de pantalla no se pasa ni se reproduce nada.
+    new IntersectionObserver(
+      ([entrada]) => {
+        enPantalla = entrada!.isIntersecting;
+        reproducir();
+        programar();
+      },
+      { rootMargin: '100px 0px' },
+    ).observe(raiz);
+
+    const retener = (si: boolean) => {
+      retenido = si;
+      programar();
+    };
+    raiz.addEventListener('mouseenter', () => retener(true));
+    raiz.addEventListener('mouseleave', () => retener(false));
+    raiz.addEventListener('focusin', () => retener(true));
+    raiz.addEventListener('focusout', () => retener(false));
+    pista.addEventListener('touchstart', () => retener(true), { passive: true });
+    pista.addEventListener('touchend', () => retener(false), { passive: true });
+
+    raiz.querySelector('[data-anterior]')?.addEventListener('click', () => pasar(-1));
+    raiz.querySelector('[data-siguiente]')?.addEventListener('click', () => pasar(1));
+    puntos.forEach((p, i) => p.addEventListener('click', () => irA(i)));
+    pista.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') pasar(-1);
+      else if (e.key === 'ArrowRight') pasar(1);
+      else return;
+      e.preventDefault();
+    });
+
+    raiz.classList.add('listo');
+    actualizar();
+  }
+</script>

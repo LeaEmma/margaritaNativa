@@ -1,0 +1,118 @@
+---
+import Carrusel from './Carrusel.astro';
+import type { Diapositiva } from '../datos/galeria';
+
+/**
+ * "Ver fotos y video" de un producto del catálogo: un enlace en la fila que
+ * abre, sobre la página, un carrusel con las fotos y videos de ese producto
+ * solamente. La lista de precios no cambia de tamaño: la galería vive en un
+ * <dialog> que se abre con el enlace y se cierra con la cruz, con Escape o
+ * tocando fuera. Sin JavaScript el enlace no hace nada visible: la galería es
+ * un extra, no un requisito para pedir.
+ */
+interface Props {
+  nombre: string;
+  slug: string;
+  diapositivas: Diapositiva[];
+}
+
+const { nombre, slug, diapositivas } = Astro.props;
+const videos = diapositivas.filter((d) => d.tipo === 'video').length;
+const fotos = diapositivas.length - videos;
+const texto = [fotos && (fotos === 1 ? '1 foto' : `${fotos} fotos`), videos && (videos === 1 ? '1 video' : `${videos} videos`)]
+  .filter(Boolean)
+  .join(' y ');
+---
+
+{
+  diapositivas.length > 0 && (
+    <div data-galeria-producto>
+      <button
+        type="button"
+        data-abrir
+        class="inline-block text-sm text-borravino underline underline-offset-4 transition-colors hover:text-borravino-medio"
+      >
+        Ver {texto} →
+      </button>
+
+      <dialog
+        class="galeria-dialogo m-auto w-[calc(100vw-2rem)] max-w-3xl bg-transparent p-0 text-crema"
+        aria-label={`Fotos y video de ${nombre}`}
+      >
+        <div class="flex items-center justify-between gap-4 px-1 pb-3">
+          <p class="versalitas text-crema">{nombre}</p>
+          <button
+            type="button"
+            data-cerrar
+            class="flex h-10 w-10 items-center justify-center rounded-full border border-crema/40 text-crema transition-colors hover:bg-crema/10"
+            aria-label="Cerrar"
+          >
+            <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <path d="m6 6 12 12M18 6 6 18" />
+            </svg>
+          </button>
+        </div>
+        <Carrusel
+          diapositivas={diapositivas}
+          marco="h-[70vh] sm:h-[78vh]"
+          ajuste="contener"
+          etiqueta={`Fotos y video de ${nombre}`}
+          claro
+          limpio
+          cargaDiferida
+          sizes="(min-width: 800px) 48rem, calc(100vw - 2rem)"
+          widths={[640, 1024, 1600]}
+          intervalo={0}
+        />
+      </dialog>
+    </div>
+  )
+}
+
+<style is:global>
+  /* Con una galería abierta la página de atrás no se desplaza. */
+  body:has(.galeria-dialogo[open]) {
+    overflow: hidden;
+  }
+</style>
+
+<style>
+  .galeria-dialogo {
+    position: fixed;
+  }
+
+  .galeria-dialogo::backdrop {
+    background-color: rgb(63 68 32 / 0.95); /* tinta */
+  }
+
+  .galeria-dialogo[open] {
+    animation: aparecer 0.2s ease-out;
+  }
+
+  @keyframes aparecer {
+    from {
+      opacity: 0;
+      transform: scale(0.98);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .galeria-dialogo[open] {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  for (const raiz of document.querySelectorAll<HTMLElement>('[data-galeria-producto]')) {
+    const dialogo = raiz.querySelector('dialog');
+    if (!dialogo) continue;
+    raiz.querySelector('[data-abrir]')?.addEventListener('click', () => dialogo.showModal());
+    dialogo.querySelector('[data-cerrar]')?.addEventListener('click', () => dialogo.close());
+    // Tocar el fondo (el propio <dialog>, fuera de su contenido) también cierra.
+    dialogo.addEventListener('click', (e) => {
+      if (e.target === dialogo) dialogo.close();
+    });
+    dialogo.addEventListener('close', () => dialogo.querySelectorAll('video').forEach((v) => v.pause()));
+  }
+</script>
