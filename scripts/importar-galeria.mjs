@@ -36,6 +36,7 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
+import { createHash } from 'node:crypto';
 import sharp from 'sharp';
 import ffmpeg from 'ffmpeg-static';
 import { leerHoja, aSlug, nombreComercial, ORIGEN_DRIVE } from './planilla.mjs';
@@ -103,13 +104,25 @@ function productoDeCarpeta(nombre, productos) {
   return productos.find((p) => p.slug === slug);
 }
 
-/** Fotos y videos directamente dentro de una carpeta, con su fecha. */
+/**
+ * Fotos y videos directamente dentro de una carpeta, con su fecha. Un mismo
+ * archivo subido dos veces con otro nombre ("foto (1).jpg") se toma una sola
+ * vez: se comparan por contenido.
+ */
 async function piezasDe(dir) {
   if (!existsSync(dir)) return [];
   const piezas = [];
+  const vistos = new Map();
   for (const entrada of await fs.readdir(dir, { withFileTypes: true })) {
     if (!entrada.isFile() || !(esImagen(entrada.name) || esVideo(entrada.name)) || OMITIR.has(entrada.name)) continue;
     const ruta = path.join(dir, entrada.name);
+    const huella = createHash('sha1').update(await fs.readFile(ruta)).digest('hex');
+    const repetido = vistos.get(huella);
+    if (repetido) {
+      console.log(`  = ${entrada.name} es igual a ${repetido}: se toma una sola vez`);
+      continue;
+    }
+    vistos.set(huella, entrada.name);
     piezas.push({ archivo: entrada.name, ruta, mtime: (await fs.stat(ruta)).mtimeMs });
   }
   return piezas;
