@@ -1,6 +1,8 @@
 ---
 import { Image } from 'astro:assets';
+import GaleriaProducto from './GaleriaProducto.astro';
 import { aSlug, precio as formatear, type ItemCatalogo } from '../datos/catalogo';
+import { miniaturaDe, type Diapositiva } from '../datos/galeria';
 
 /**
  * Fila de precio: el nombre a la izquierda y el precio a la derecha.
@@ -34,9 +36,14 @@ interface Props {
   enlaceCuidados?: (slug: string) => string | undefined;
   /** Muestra el botón de agregar al pedido. */
   agregable?: boolean;
+  /** Fotos y videos del producto, que se abren desde la fila sin agrandarla. */
+  galeria?: Diapositiva[];
 }
 
-const { item, sufijo, foto, enlaceCuidados, agregable = false } = Astro.props;
+const { item, sufijo, foto, enlaceCuidados, agregable = false, galeria = [] } = Astro.props;
+
+/** Sin foto propia, la miniatura es la primera pieza de la galería. */
+const miniatura = foto ?? miniaturaDe(galeria);
 
 /** La ficha de la variante si tiene una propia; si no, la del producto. */
 const cuidadosDe = (slug: string) => enlaceCuidados?.(slug) ?? enlaceCuidados?.(item.slug);
@@ -56,9 +63,9 @@ const elegido = variantes[0] ?? {
 
 <div class="flex items-center gap-3 py-4 sm:gap-4" data-fila data-precio-minimo={item.precio}>
   {
-    foto && (
+    miniatura && (
       <Image
-        src={foto}
+        src={miniatura}
         alt={item.nombre}
         width={176}
         height={176}
@@ -119,14 +126,19 @@ const elegido = variantes[0] ?? {
     }
 
     {
-      elegido.cuidados && (
-        <a
-          href={elegido.cuidados}
-          data-cuidados
-          class="mt-1.5 inline-block text-sm text-borravino underline underline-offset-4 transition-colors hover:text-borravino-medio"
-        >
-          Ver cuidados →
-        </a>
+      (elegido.cuidados || galeria.length > 0) && (
+        <div class="mt-1.5 flex flex-wrap gap-x-5 gap-y-1">
+          {elegido.cuidados && (
+            <a
+              href={elegido.cuidados}
+              data-cuidados
+              class="inline-block text-sm text-borravino underline underline-offset-4 transition-colors hover:text-borravino-medio"
+            >
+              Ver cuidados →
+            </a>
+          )}
+          <GaleriaProducto nombre={item.nombre} slug={item.slug} diapositivas={galeria} />
+        </div>
       )
     }
   </div>

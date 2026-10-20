@@ -7,10 +7,12 @@ import Boton from '../components/Boton.astro';
 import Ornamento from '../components/Ornamento.astro';
 import Icono from '../components/Icono.astro';
 import CarruselResenas from '../components/CarruselResenas.astro';
+import Carrusel from '../components/Carrusel.astro';
 
 import { SUSCRIPCION, EXHIBIDOR, CUIDADOS, precio } from '../datos/catalogo';
 import { SITIO, enlaceContacto } from '../datos/sitio';
 import { RESENAS, RESUMEN_GOOGLE } from '../datos/resenas';
+import { galeria } from '../datos/galeria';
 
 import sello from '../assets/sello-margarita-nativa.png';
 import orquideaFucsia from '../assets/fotos/orquidea-fucsia.jpg';
@@ -85,7 +87,7 @@ const PREGUNTAS = [
   },
   {
     p: '¿Puedo pedir flores o colores puntuales?',
-    r: 'Sí. El ramo personalizado se arma a medida: nos decís la paleta, la flor o la ocasión y lo preparamos. Arranca en ' + precio(50000) + '.',
+    r: 'Sí. El ramo premium se arma a medida: nos decís la paleta, la flor, el estilo y el tamaño y lo preparamos. Arranca en ' + precio(50000) + '.',
   },
   {
     p: '¿Cómo cuido las flores para que duren?',
@@ -239,6 +241,17 @@ const PREGUNTAS = [
           La misma idea, para tu negocio: te dejamos un exhibidor con ramos de estación
           y nos ocupamos de reponerlos.
         </p>
+
+        <Carrusel
+          diapositivas={galeria('suscripcion')}
+          marco="aspect-[4/5]"
+          ancho="tarjeta"
+          etiqueta="Exhibidores en locales"
+          claro
+          sizes="16rem"
+          widths={[320, 640]}
+          class="mt-10"
+        />
 
         <div class="mt-12 grid gap-5 sm:grid-cols-3">
           {

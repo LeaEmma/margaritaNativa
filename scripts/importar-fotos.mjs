@@ -20,22 +20,13 @@ import fs from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
+import { leerHoja, aSlug, nombreComercial, ORIGEN_DRIVE } from './planilla.mjs';
 
-const ORIGEN =
-  process.argv[2] ??
-  process.env.FOTOS_ORIGEN ??
-  'G:/.shortcut-targets-by-id/1KCYjd2lqvUWSub4-1J536Gx0fqWMv8xz/Web';
+const ORIGEN = process.argv[2] ?? process.env.FOTOS_ORIGEN ?? ORIGEN_DRIVE;
 
 const DESTINO = 'src/assets/fotos';
 const LADO = 900; // cuadrado: las miniaturas del catálogo son cuadradas
 const PORTADA = { ancho: 1600, alto: 1000 }; // apaisada: va de banda arriba de cada categoría
-
-/**
- * Lo que va entre paréntesis al final del nombre en la planilla es detalle, no
- * nombre: "Aromáticas (albahaca, menta, etc.)" se vende como "Aromáticas".
- * src/datos/catalogo.ts hace lo mismo, así que el slug coincide.
- */
-const nombreComercial = (t) => t.replace(/\s*\([^)]*\)\s*$/, '');
 
 /**
  * Un producto con varias variantes es una fila por variante en la planilla,
@@ -45,15 +36,6 @@ const nombreComercial = (t) => t.replace(/\s*\([^)]*\)\s*$/, '');
  * ("Lavanda chica"), se lo saca para que queden juntas.
  */
 const sinTamano = (t) => t.replace(/\s+(chica|mediana|grande)$/i, '');
-
-/** Mismo normalizador que usa el sitio para los anclas del catálogo. */
-const aSlug = (t) =>
-  t
-    .normalize('NFD')
-    .replace(/\p{Diacritic}/gu, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
 
 /**
  * Carpetas del origen cuyo nombre no coincide con el del producto en la
@@ -116,48 +98,16 @@ async function recorteEn(fuente, { x, y, zoom = 1 }) {
 
 const CATEGORIAS = ['Plantas', 'Ramos'];
 
+/**
+ * Productos de una categoría según la planilla: nombre y precio. En Ramos la
+ * columna de nombre se llama "Categoria"; el precio sirve para las carpetas
+ * del Drive nombradas por precio en miles ("25" → Clásico).
+ */
 async function productosDe(categoria) {
-  const gid = { Plantas: 0, Ramos: 1890629704 }[categoria];
-  const base =
-    'https://docs.google.com/spreadsheets/d/e/2PACX-1vS__amWSUeQEEM1OzYvmy98Ig0TjVJHBYxWy0djUelAw9VZE4fMFpsePPsOtQqy58WlLjDSK9wWW3x3/pub';
-  const r = await fetch(`${base}?gid=${gid}&single=true&output=csv`);
-  if (!r.ok) throw new Error(`No se pudo leer la planilla de ${categoria}: HTTP ${r.status}`);
-  const texto = (await r.text()).replace(/^\uFEFF/, '').trim();
-  // El orden de las columnas cambia entre hojas: se busca la de nombre por su
-  // encabezado ("Nombre" en Plantas, "Categoria" en Ramos).
-  const filas = texto.split(/\r?\n/).map(leerFilaCsv);
-  const encabezados = filas[0].map((h) => h.trim().toLowerCase());
-  const col = encabezados.findIndex((h) => h === 'nombre' || h === 'categoria');
-  if (col < 0) throw new Error(`La planilla de ${categoria} no tiene columna Nombre/Categoria`);
+  const filas = await leerHoja(categoria);
   return filas
-    .slice(1)
-    .map((f) => (f[col] ?? '').trim())
-    .filter(Boolean);
-}
-
-/** Separa una fila CSV respetando las comillas ("Lirio, Cala o Pajarito"). */
-function leerFilaCsv(linea) {
-  const celdas = [];
-  let celda = '';
-  let entreComillas = false;
-  for (let i = 0; i < linea.length; i++) {
-    const c = linea[i];
-    if (c === '"') {
-      if (entreComillas && linea[i + 1] === '"') {
-        celda += '"';
-        i++;
-      } else {
-        entreComillas = !entreComillas;
-      }
-    } else if (c === ',' && !entreComillas) {
-      celdas.push(celda);
-      celda = '';
-    } else {
-      celda += c;
-    }
-  }
-  celdas.push(celda);
-  return celdas;
+    .map((f) => ({ nombre: (f.Nombre ?? f.Categoria ?? '').trim(), precio: Number(f['Precio venta'] ?? f.Precio) }))
+    .filter((p) => p.nombre);
 }
 
 const esImagen = (f) => /\.(jpe?g|png|webp|heic)$/i.test(f);
@@ -173,7 +123,10 @@ for (const categoria of CATEGORIAS) {
   }
 
   const productos = await productosDe(categoria);
-  const esperados = new Map(productos.map((p) => [aSlug(sinTamano(nombreComercial(p))), p]));
+  const slugDe = (p) => aSlug(sinTamano(nombreComercial(p.nombre)));
+  const esperados = new Map(productos.map((p) => [slugDe(p), p.nombre]));
+  // Carpetas nombradas por precio en miles: "25" es el producto de $25.000.
+  const porPrecio = new Map(productos.filter((p) => p.precio > 0).map((p) => [p.precio, slugDe(p)]));
 
   const entradas = await fs.readdir(dirOrigen, { withFileTypes: true });
   const carpetas = entradas.filter((e) => e.isDirectory());
@@ -198,7 +151,9 @@ for (const categoria of CATEGORIAS) {
       continue;
     }
 
-    const slugCarpeta = aSlug(carpeta.name);
+    const slugCarpeta = /^\d+$/.test(carpeta.name)
+      ? (porPrecio.get(Number(carpeta.name) * 1000) ?? carpeta.name)
+      : aSlug(carpeta.name);
 
     // Una subcarpeta con el nombre de la categoría trae la foto general.
     if (slugCarpeta === clave) {

@@ -47,23 +47,29 @@ function conTamanos(nombre: string, tamanos: [string, number][], detalle?: strin
 }
 
 export const RAMOS: Item[] = [
-  { nombre: 'Mini', detalle: 'Flores de temporada.', precio: 15000 },
+  { nombre: 'Mini', detalle: 'Una sola variedad de flores a elección.', precio: 15000 },
   { nombre: 'Lirio, cala o pajarito', detalle: 'Cada uno.', precio: 10000 },
   {
     nombre: 'Clásico',
-    detalle: 'Variedad de flores de temporada, con follaje y verde.',
+    detalle: 'Variedad de flores de temporada con follaje y verde. Sin lirio, cala o pajarito.',
     precio: 25000,
   },
   {
     nombre: 'Grande',
-    detalle: 'Variedad de flores de temporada, con follaje y verde. Con lirio, cala o pajarito.',
+    detalle: 'Variedad de flores de temporada con follaje y verde. Con lirio, cala o pajarito.',
     precio: 35000,
   },
   {
     nombre: 'Personalizado',
-    detalle: 'Ramos únicos pensados para cada ocasión.',
+    detalle:
+      'Variedad de flores de temporada con follaje y verde. Con lirio, cala o pajarito y presentación especial en bolsa de papel kraft.',
     precio: 50000,
-    // La planilla no tiene columna para esto: el "desde" viene de la tarjeta impresa.
+  },
+  {
+    nombre: 'Premium',
+    detalle: 'Ramos únicos diseñados especialmente para vos. Elegís las flores, el estilo y el tamaño.',
+    // En la planilla el precio es "más de 50000": no tiene valor cerrado.
+    precio: 50000,
     desde: true,
   },
 ];
