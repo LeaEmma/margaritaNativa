@@ -6,9 +6,11 @@ import TituloSeccion from '../components/TituloSeccion.astro';
 import Boton from '../components/Boton.astro';
 import Ornamento from '../components/Ornamento.astro';
 import Icono from '../components/Icono.astro';
+import CarruselResenas from '../components/CarruselResenas.astro';
 
 import { SUSCRIPCION, EXHIBIDOR, CUIDADOS, precio } from '../datos/catalogo';
 import { SITIO, enlaceContacto } from '../datos/sitio';
+import { RESENAS, RESUMEN_GOOGLE } from '../datos/resenas';
 
 import sello from '../assets/sello-margarita-nativa.png';
 import orquideaFucsia from '../assets/fotos/orquidea-fucsia.jpg';
@@ -20,7 +22,8 @@ import liriosArreglo from '../assets/fotos/lirios-arreglo.jpg';
 /*
  * Orden de secciones pensado para que no haya dos fondos oscuros seguidos:
  * hero (borravino) · cómo funciona (papel claro) · suscripción (tinta) ·
- * eventos (papel) · preguntas (papel claro) · contacto (borravino).
+ * eventos (papel) · preguntas (papel claro) · opiniones (papel) ·
+ * contacto (borravino).
  */
 
 const PASOS = [
@@ -345,6 +348,30 @@ const PREGUNTAS = [
             </details>
           ))
         }
+      </div>
+    </div>
+  </section>
+
+  {/* ---------------------------------------------------------- Opiniones */}
+  <section id="opiniones" class="scroll-mt-32 py-20">
+    <div class="mx-auto max-w-6xl sm:px-5">
+      <div class="px-5 sm:px-0">
+        <TituloSeccion titulo="Opiniones" epigrafe="Lo que dicen nuestros clientes" />
+        <a
+          href={SITIO.perfilGoogle}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="mx-auto mt-6 flex w-fit items-center gap-2 text-oliva transition-colors hover:text-borravino"
+        >
+          <span class="flex gap-0.5 text-borravino" aria-hidden="true">
+            {[1, 2, 3, 4, 5].map(() => <Icono nombre="estrella" class="h-4 w-4 fill-current" />)}
+          </span>
+          <span class="font-semibold text-borravino">{RESUMEN_GOOGLE.promedio}</span>
+          <span>· {RESUMEN_GOOGLE.cantidad} opiniones en Google</span>
+        </a>
+      </div>
+      <div class="mt-12">
+        <CarruselResenas resenas={RESENAS} />
       </div>
     </div>
   </section>
