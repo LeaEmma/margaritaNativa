@@ -171,7 +171,9 @@ node scripts/importar-macetas.mjs --ejemplo        # datos de prueba: el build d
 
 Solo van al sitio las filas con **Publicar = Si** y precio de venta. Como en
 Plantas, un modelo con varias medidas es una fila por medida con el mismo
-Nombre y la columna Tamaño cargada. "Precio compra" y "Nota" son internas. El
+Nombre y la columna Tamaño cargada. Alto (cm), Diámetro (cm) o Boca (cm),
+Capacidad (L) y Peso (kg) arman la línea de medidas. "Precio compra" y "Nota" son
+internas. El
 script escribe `src/datos/macetas.json`; si una categoría queda sin productos,
 no aparece en el catálogo.
 

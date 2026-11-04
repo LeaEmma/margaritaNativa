@@ -97,8 +97,8 @@
       "tamanos": [
         {
           "nombre": "Chica",
-          "precio": 45000,
-          "medidas": "34 cm de alto",
+          "precio": 50000,
+          "medidas": "34 cm de alto · 31 cm de diámetro · 10 litros · 1,062 kg",
           "ideal": "Ideal para: Anturio, Helecho o Stromanthe tricolor",
           "colores": [
             "Negro",
@@ -108,8 +108,8 @@
         },
         {
           "nombre": "Mediana",
-          "precio": 60000,
-          "medidas": "42 cm de alto",
+          "precio": 70000,
+          "medidas": "42,3 cm de alto · 38,5 cm de diámetro · 15 litros · 1,737 kg",
           "ideal": "Ideal para: Hortensia, Helecho o Cala de color",
           "colores": [
             "Negro",
@@ -119,8 +119,8 @@
         },
         {
           "nombre": "Grande",
-          "precio": 80000,
-          "medidas": "50 cm de alto",
+          "precio": 90000,
+          "medidas": "50 cm de alto · 44 cm de diámetro · 30 litros · 2,6 kg",
           "ideal": "Ideal para: Monstera, Palmera areca o Pandurata",
           "colores": [
             "Negro",

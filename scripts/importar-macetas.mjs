@@ -10,8 +10,8 @@
  *   node scripts/importar-macetas.mjs --ejemplo       # marca los datos como de prueba
  *
  * Columnas que se usan (por nombre de encabezado, no por posición): Nombre,
- * Tipo, Tamaño, Detalle, Alto (cm), Boca (cm), Capacidad (L), Planta ideal,
- * Precio venta y Publicar. "Precio compra" y "Nota" son internas y no salen
+ * Tipo, Tamaño, Detalle, Alto (cm), Boca (cm), Diámetro (cm), Capacidad (L),
+ * Peso (kg), Colores, Planta ideal, Precio venta y Publicar. "Precio compra" y "Nota" son internas y no salen
  * de acá.
  *
  * Igual que en Plantas, un modelo con varias medidas es una fila por medida,
@@ -130,9 +130,9 @@ async function leerFilas() {
 /** "$ 12.500" o "12500" → 12500. Vacío o inválido → 0. */
 const pesos = (v) => Number(String(v ?? '').replace(/[^\d,.-]/g, '').replace(/\./g, '').replace(',', '.')) || 0;
 /** "27,5" o "27.5" → "27,5"; vacío → undefined. */
-const medida = (v) => {
+const medida = (v, decimales = 1) => {
   const n = Number(String(v ?? '').replace(',', '.'));
-  return n > 0 ? n.toLocaleString('es-AR', { maximumFractionDigits: 1 }) : undefined;
+  return n > 0 ? n.toLocaleString('es-AR', { maximumFractionDigits: decimales }) : undefined;
 };
 const siNo = (v) => /^s[ií]$/i.test(String(v ?? '').trim());
 const esAutorriego = (f) => /autor+iego/i.test(`${f.Nombre ?? ''} ${f.Detalle ?? ''}`);
@@ -152,10 +152,14 @@ function medidasDe(f) {
   const partes = [];
   const alto = medida(f['Alto (cm)']);
   const boca = medida(f['Boca (cm)']);
+  const diametro = medida(f['Diámetro (cm)']);
   const litros = medida(f['Capacidad (L)']);
+  const peso = medida(f['Peso (kg)'], 3);
   if (alto) partes.push(`${alto} cm de alto`);
-  if (boca) partes.push(`${boca} cm de boca`);
+  if (diametro) partes.push(`${diametro} cm de diámetro`);
+  else if (boca) partes.push(`${boca} cm de boca`);
   if (litros) partes.push(`${litros} litros`);
+  if (peso) partes.push(`${peso} kg`);
   return partes.join(' · ') || undefined;
 }
 
