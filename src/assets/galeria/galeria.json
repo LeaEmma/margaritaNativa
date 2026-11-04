@@ -125,6 +125,127 @@
           "alto": 1600
         }
       ]
+    },
+    "macetas": {
+      "andina": [
+        {
+          "tipo": "foto",
+          "archivo": "macetas/andina/gris-claro.jpg",
+          "ancho": 900,
+          "alto": 900,
+          "titulo": "Gris claro"
+        },
+        {
+          "tipo": "foto",
+          "archivo": "macetas/andina/arena.jpg",
+          "ancho": 900,
+          "alto": 900,
+          "titulo": "Arena"
+        },
+        {
+          "tipo": "foto",
+          "archivo": "macetas/andina/chocolate.jpg",
+          "ancho": 900,
+          "alto": 900,
+          "titulo": "Chocolate"
+        }
+      ],
+      "mate": [
+        {
+          "tipo": "foto",
+          "archivo": "macetas/mate/gris-claro.jpg",
+          "ancho": 900,
+          "alto": 900,
+          "titulo": "Gris claro"
+        },
+        {
+          "tipo": "foto",
+          "archivo": "macetas/mate/arena.jpg",
+          "ancho": 900,
+          "alto": 900,
+          "titulo": "Arena"
+        },
+        {
+          "tipo": "foto",
+          "archivo": "macetas/mate/chocolate.jpg",
+          "ancho": 900,
+          "alto": 900,
+          "titulo": "Chocolate"
+        }
+      ],
+      "autorriego-con-pie": [
+        {
+          "tipo": "foto",
+          "archivo": "macetas/autorriego-con-pie/file-000000007824820eb40ea7433cd2af87.jpg",
+          "ancho": 1086,
+          "alto": 1448
+        },
+        {
+          "tipo": "foto",
+          "archivo": "macetas/autorriego-con-pie/img-20261028-wa0004.jpg",
+          "ancho": 1027,
+          "alto": 1280
+        },
+        {
+          "tipo": "foto",
+          "archivo": "macetas/autorriego-con-pie/img-20261028-wa0005.jpg",
+          "ancho": 795,
+          "alto": 1280
+        },
+        {
+          "tipo": "foto",
+          "archivo": "macetas/autorriego-con-pie/img-20261028-wa0015.jpg",
+          "ancho": 853,
+          "alto": 1280
+        },
+        {
+          "tipo": "foto",
+          "archivo": "macetas/autorriego-con-pie/img-20261028-wa0020.jpg",
+          "ancho": 853,
+          "alto": 1280
+        },
+        {
+          "tipo": "foto",
+          "archivo": "macetas/autorriego-con-pie/img-20261028-wa0021.jpg",
+          "ancho": 853,
+          "alto": 1280
+        },
+        {
+          "tipo": "foto",
+          "archivo": "macetas/autorriego-con-pie/file-0000000028c0820e8572cd3712f432cb.jpg",
+          "ancho": 1086,
+          "alto": 1448
+        }
+      ],
+      "uovo": [
+        {
+          "tipo": "foto",
+          "archivo": "macetas/uovo/vista-general.jpg",
+          "ancho": 1448,
+          "alto": 1086
+        },
+        {
+          "tipo": "foto",
+          "archivo": "macetas/uovo/negro.jpg",
+          "ancho": 446,
+          "alto": 580,
+          "titulo": "Negro"
+        },
+        {
+          "tipo": "foto",
+          "archivo": "macetas/uovo/blanco.jpg",
+          "ancho": 478,
+          "alto": 580,
+          "titulo": "Blanco"
+        },
+        {
+          "tipo": "foto",
+          "archivo": "macetas/uovo/beige.jpg",
+          "ancho": 485,
+          "alto": 580,
+          "titulo": "Beige"
+        }
+      ]
     }
   }
 }

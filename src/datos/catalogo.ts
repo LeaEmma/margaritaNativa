@@ -16,6 +16,18 @@ export interface Tamano {
    */
   nombre: string;
   precio: number;
+  /** Medidas de la variante, en texto ("40 cm de alto · 28 cm de boca"). Macetas. */
+  medidas?: string;
+  /** Para qué planta conviene ("Ideal para hortensia"). Macetas. */
+  ideal?: string;
+  /** Colores en que viene esta medida; sin esto, todos los del producto. */
+  colores?: string[];
+}
+
+export interface Color {
+  nombre: string;
+  /** Nombre de la foto en src/assets/fotos/<categoria>/, sin extensión. */
+  foto?: string;
 }
 
 export interface Item {
@@ -30,6 +42,17 @@ export interface Item {
    * fila del catálogo antes de agregar al pedido.
    */
   tamanos?: Tamano[];
+  /** Como en Tamano, para un producto de una sola medida. */
+  medidas?: string;
+  ideal?: string;
+  /** Marca chica al lado del nombre: "Autorriego". */
+  etiqueta?: string;
+  /** Lista dentro de la categoría, con subtítulo: "Rotomoldeadas rústicas". */
+  lista?: string;
+  /** Colores para elegir en la fila, además de la medida. */
+  colores?: Color[];
+  /** La foto muestra todos los colores: la fila arranca así, sin color elegido. */
+  vistaGeneral?: boolean;
 }
 
 /**
@@ -117,6 +140,36 @@ export const PLANTAS: Item[] = [
 ];
 
 /**
+ * Macetas, platos, colgantes y floreros. No se transcriben a mano: los genera
+ * scripts/importar-macetas.mjs desde la pestaña "Macetas" de la planilla, solo
+ * con las filas que tienen Publicar = Si y precio de venta.
+ */
+import datosMacetas from './macetas.json';
+
+interface Maceta extends Partial<Item> {
+  nombre: string;
+  tipo: string;
+}
+
+// Con --ejemplo el importador deja precios de prueba para ver el diseño en
+// local. Que nunca lleguen al sitio publicado.
+if ((datosMacetas as { ejemplo?: boolean }).ejemplo && import.meta.env.PROD) {
+  throw new Error('src/datos/macetas.json tiene datos de ejemplo: correr node scripts/importar-macetas.mjs antes de publicar.');
+}
+
+/** Modelos con varias medidas que muestran el precio de la elegida, sin "desde". */
+const SIN_DESDE = new Set(['Uovo']);
+
+function aItem({ tipo, ...m }: Maceta): Item {
+  if (!m.tamanos?.length) return { ...m, precio: m.precio ?? 0 } as Item;
+  const precios = m.tamanos.map((t) => t.precio);
+  const minimo = Math.min(...precios);
+  return { ...m, precio: minimo, desde: minimo !== Math.max(...precios) && !SIN_DESDE.has(m.nombre) } as Item;
+}
+
+export const MACETAS = (datosMacetas.macetas as unknown as Maceta[]).map(aItem);
+
+/**
  * El exhibidor se presta sin costo: lo que se cobra es el servicio mensual de
  * ramos, que se reponen según lo que venda el local.
  */
@@ -156,7 +209,7 @@ export function precio(valor: number): string {
    Vista unificada para la página de catálogo
    ------------------------------------------------------------------ */
 
-export type Categoria = 'ramos' | 'suscripcion' | 'plantas' | 'exhibidor';
+export type Categoria = 'ramos' | 'suscripcion' | 'plantas' | 'macetas' | 'exhibidor';
 
 export interface ItemCatalogo extends Item {
   categoria: Categoria;
@@ -179,6 +232,8 @@ export const CATEGORIAS: {
 }[] = [
   { clave: 'ramos', nombre: 'Ramos', epigrafe: 'Para todas las ocasiones', enCatalogo: true },
   { clave: 'plantas', nombre: 'Plantas', enCatalogo: true },
+  // Se lista solo cuando hay alguna maceta con Publicar = Si en la planilla.
+  { clave: 'macetas', nombre: 'Macetas', enCatalogo: MACETAS.length > 0 },
   { clave: 'suscripcion', nombre: 'Suscripción', epigrafe: 'Flores frescas, siempre', enCatalogo: false },
   { clave: 'exhibidor', nombre: 'Exhibidor', epigrafe: 'Para locales y comercios', enCatalogo: false },
 ];
@@ -204,6 +259,7 @@ export const CATALOGO: ItemCatalogo[] = [
   ...marcar(RAMOS, 'ramos'),
   ...marcar(SUSCRIPCION, 'suscripcion', 'por ramo'),
   ...marcar(PLANTAS, 'plantas'),
+  ...marcar(MACETAS, 'macetas'),
   ...marcar([EXHIBIDOR.exhibidor], 'exhibidor'),
   ...marcar([EXHIBIDOR.ramos], 'exhibidor', 'c/u'),
 ];

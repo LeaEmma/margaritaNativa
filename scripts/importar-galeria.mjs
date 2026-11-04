@@ -53,6 +53,9 @@ const PRODUCTOS = {
   ramos: { carpeta: 'Ramos', hoja: 'Ramos' },
 };
 
+/** Galerías por producto que deja scripts/importar-macetas.mjs: acá se conservan. */
+const AJENAS = ['macetas'];
+
 /** Bloques de la home con las fotos sueltas de una carpeta. */
 const SECCIONES = {
   suscripcion: { carpeta: 'Suscripción' },
@@ -246,7 +249,11 @@ async function importarGaleria(clave, dirOrigen, rutaFotos, rutaVideos) {
   return lista;
 }
 
-const manifiesto = { secciones: {}, productos: {} };
+const anterior = existsSync(MANIFIESTO) ? JSON.parse(await fs.readFile(MANIFIESTO, 'utf8')) : { productos: {} };
+const manifiesto = {
+  secciones: {},
+  productos: Object.fromEntries(AJENAS.flatMap((c) => (anterior.productos[c] ? [[c, anterior.productos[c]]] : []))),
+};
 
 for (const [categoria, config] of Object.entries(PRODUCTOS)) {
   const dirCategoria = path.join(ORIGEN, config.carpeta);
@@ -300,7 +307,7 @@ for (const [seccion, config] of Object.entries(SECCIONES)) {
 }
 
 // Galerías que dejaron de existir en la configuración: fuera.
-const vigentes = new Set([...Object.keys(PRODUCTOS), ...Object.keys(SECCIONES), path.basename(MANIFIESTO)]);
+const vigentes = new Set([...Object.keys(PRODUCTOS), ...Object.keys(SECCIONES), ...AJENAS, path.basename(MANIFIESTO)]);
 await limpiar(DESTINO_FOTOS, vigentes);
 await limpiar(DESTINO_VIDEOS, new Set([...vigentes, 'ramo.mp4']));
 

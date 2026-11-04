@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
 import GaleriaProducto from './GaleriaProducto.astro';
 import { aSlug, precio as formatear, type ItemCatalogo } from '../datos/catalogo';
 import { miniaturaDe, type Diapositiva } from '../datos/galeria';
@@ -23,6 +23,9 @@ import { miniaturaDe, type Diapositiva } from '../datos/galeria';
  * como un producto propio ("Lavanda chica"), así el carrito y el mensaje de
  * WhatsApp no cambian. El enlace a cuidados también sigue a la variante, para
  * las que tienen ficha propia (albahaca, romero, menta).
+ *
+ * Las macetas pueden tener además una etiqueta ("Autorriego") y colores para
+ * elegir: el color cambia la miniatura y se suma al pedido ("Mate N°30 arena").
  */
 interface Props {
   item: ItemCatalogo;
@@ -38,9 +41,11 @@ interface Props {
   agregable?: boolean;
   /** Fotos y videos del producto, que se abren desde la fila sin agrandarla. */
   galeria?: Diapositiva[];
+  /** Colores para elegir, cada uno con su foto si la tiene. */
+  colores?: { nombre: string; foto?: ImageMetadata }[];
 }
 
-const { item, sufijo, foto, enlaceCuidados, agregable = false, galeria = [] } = Astro.props;
+const { item, sufijo, foto, enlaceCuidados, agregable = false, galeria = [], colores = [] } = Astro.props;
 
 /** Sin foto propia, la miniatura es la primera pieza de la galería. */
 const miniatura = foto ?? miniaturaDe(galeria);
@@ -51,7 +56,9 @@ const cuidadosDe = (slug: string) => enlaceCuidados?.(slug) ?? enlaceCuidados?.(
 /** Lo que se agrega al pedido: el producto, o su variante más barata. */
 const variantes = (item.tamanos ?? []).map((t) => {
   const slug = `${item.slug}-${aSlug(t.nombre)}`;
-  return { ...t, slug, nombreCompleto: `${item.nombre} ${t.nombre.toLowerCase()}`, cuidados: cuidadosDe(slug) };
+  // "Chica" → "Lavanda chica", pero las medidas quedan como están: "Mate N°46".
+  const variante = /^\p{Lu}\p{Ll}/u.test(t.nombre) ? t.nombre.toLowerCase() : t.nombre;
+  return { ...t, slug, nombreCompleto: `${item.nombre} ${variante}`, cuidados: cuidadosDe(slug) };
 });
 const elegido = variantes[0] ?? {
   slug: item.slug,
@@ -59,17 +66,45 @@ const elegido = variantes[0] ?? {
   precio: item.precio,
   cuidados: cuidadosDe(item.slug),
 };
+
+/** Medidas y planta sugerida de lo que se muestra de entrada (macetas). */
+const elegidoInfo = item.tamanos?.[0] ?? { medidas: item.medidas, ideal: item.ideal };
+
+/** Las miniaturas se generan acá para que el navegador pueda cambiarlas al elegir un color. */
+const opcionesColor = await Promise.all(
+  colores.map(async (c) => ({
+    nombre: c.nombre,
+    slug: aSlug(c.nombre),
+    foto: c.foto && (await getImage({ src: c.foto, width: 176, height: 176 })).src,
+  })),
+);
+const coloresIniciales = item.tamanos?.[0]?.colores;
+/** Con una foto de todos los colores, ninguno arranca elegido: la foto cambia al elegir. */
+const colorInicial = item.vistaGeneral ? undefined : opcionesColor.find((c) => coloresIniciales?.includes(c.nombre) ?? true);
+const pedido = colorInicial
+  ? { slug: `${elegido.slug}-${colorInicial.slug}`, nombre: `${elegido.nombreCompleto} ${colorInicial.nombre.toLowerCase()}` }
+  : { slug: elegido.slug, nombre: elegido.nombreCompleto };
 ---
 
-<div class="flex items-center gap-3 py-4 sm:gap-4" data-fila data-precio-minimo={item.precio}>
+<div
+  class="flex items-center gap-3 py-4 sm:gap-4"
+  data-fila
+  data-precio-minimo={item.precio}
+  data-base-slug={item.slug}
+  data-base-nombre={item.nombre}
+>
   {
     miniatura && (
       <Image
         src={miniatura}
         alt={item.nombre}
+        data-miniatura
         width={176}
         height={176}
-        class="h-14 w-14 shrink-0 rounded-lg border border-oliva/20 object-cover sm:h-20 sm:w-20"
+        class:list={[
+          'h-14 w-14 shrink-0 rounded-lg border border-oliva/20 object-cover sm:h-20 sm:w-20',
+          galeria.length > 0 && 'cursor-zoom-in',
+        ]}
         loading="lazy"
       />
     )
@@ -81,6 +116,13 @@ const elegido = variantes[0] ?? {
     <div class="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-4">
       <h3 class="font-display text-lg font-semibold tracking-wide text-borravino uppercase sm:min-w-0 sm:flex-1 sm:text-xl">
         {item.nombre}
+        {
+          item.etiqueta && (
+            <span class="ml-1.5 inline-block rounded-full bg-oliva px-2.5 py-0.5 align-middle text-[0.65rem] font-medium tracking-[0.14em] text-crema">
+              {item.etiqueta}
+            </span>
+          )
+        }
       </h3>
 
       {/* Precio a la derecha: así los de todas las filas quedan alineados. */}
@@ -98,6 +140,16 @@ const elegido = variantes[0] ?? {
 
     {item.detalle && <p class="mt-1.5 text-balance text-oliva">{item.detalle}</p>}
 
+    {/* Medidas y planta sugerida (macetas): siguen a la variante elegida. */}
+    {
+      (elegidoInfo.medidas || elegidoInfo.ideal) && (
+        <p class="mt-1 text-sm text-oliva/85">
+          <span data-medidas>{elegidoInfo.medidas}</span>
+          <span data-ideal class="block">{elegidoInfo.ideal}</span>
+        </p>
+      )
+    }
+
     {
       variantes.length > 0 && (
         <fieldset class="mt-2.5 flex flex-wrap items-center gap-2">
@@ -114,10 +166,38 @@ const elegido = variantes[0] ?? {
                 data-nombre={v.nombreCompleto}
                 data-precio={v.precio}
                 data-ficha={v.cuidados}
+                data-medidas={v.medidas}
+                data-ideal={v.ideal}
+                data-colores={v.colores?.join('|')}
                 class="peer sr-only"
               />
               <span class="block rounded-full border border-oliva/35 px-3.5 py-1 text-xs font-medium tracking-[0.18em] text-oliva uppercase transition-colors peer-checked:border-borravino peer-checked:bg-borravino peer-checked:text-crema peer-focus-visible:ring-2 peer-focus-visible:ring-borravino/40 hover:border-borravino hover:text-borravino peer-checked:hover:text-crema">
                 {v.nombre}
+              </span>
+            </label>
+          ))}
+        </fieldset>
+      )
+    }
+
+    {
+      opcionesColor.length > 0 && (
+        <fieldset class="mt-2 flex flex-wrap items-center gap-2">
+          <legend class="sr-only">Color de {item.nombre}</legend>
+          <span aria-hidden="true" class="text-sm text-oliva">Color</span>
+          {opcionesColor.map((c) => (
+            <label class="cursor-pointer" hidden={!(coloresIniciales?.includes(c.nombre) ?? true)}>
+              <input
+                type="radio"
+                name={`color-${item.slug}`}
+                value={c.slug}
+                checked={c === colorInicial}
+                data-color={c.nombre}
+                data-foto={c.foto}
+                class="peer sr-only"
+              />
+              <span class="block rounded-full border border-oliva/35 px-3.5 py-1 text-xs font-medium tracking-[0.18em] text-oliva uppercase transition-colors peer-checked:border-oliva peer-checked:bg-oliva peer-checked:text-crema peer-focus-visible:ring-2 peer-focus-visible:ring-oliva/40 hover:border-oliva peer-checked:hover:text-crema">
+                {c.nombre}
               </span>
             </label>
           ))}
@@ -148,10 +228,10 @@ const elegido = variantes[0] ?? {
       <button
         type="button"
         data-agregar
-        data-slug={elegido.slug}
-        data-nombre={elegido.nombreCompleto}
+        data-slug={pedido.slug}
+        data-nombre={pedido.nombre}
         data-precio={elegido.precio}
-        aria-label={`Agregar ${elegido.nombreCompleto} al pedido`}
+        aria-label={`Agregar ${pedido.nombre} al pedido`}
         class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-borravino/40 text-xl leading-none text-borravino transition-colors hover:border-borravino hover:bg-borravino hover:text-crema"
       >
         +
@@ -165,7 +245,9 @@ const elegido = variantes[0] ?? {
    * Al elegir una variante, la fila pasa a mostrar su precio, el enlace de
    * cuidados apunta a su ficha y el botón de agregar pasa a cargarla. "desde"
    * queda solo mientras la elegida es la más barata. Sin JavaScript la fila
-   * muestra y agrega la primera.
+   * muestra y agrega la primera. El color cambia la miniatura y se suma a lo
+   * que se agrega; si la medida elegida no viene en ese color, pasa al primero
+   * que sí tenga.
    */
   const plata = new Intl.NumberFormat('es-AR', {
     style: 'currency',
@@ -187,21 +269,71 @@ const elegido = variantes[0] ?? {
     if (cuidados && radio.dataset.ficha) cuidados.href = radio.dataset.ficha;
 
     const boton = fila.querySelector<HTMLButtonElement>('[data-agregar]');
-    if (boton) {
-      boton.dataset.slug = radio.dataset.slug;
-      boton.dataset.nombre = radio.dataset.nombre;
-      boton.dataset.precio = radio.dataset.precio;
-      boton.setAttribute('aria-label', `Agregar ${radio.dataset.nombre} al pedido`);
+    if (boton) boton.dataset.precio = radio.dataset.precio;
+
+    const medidas = fila.querySelector<HTMLElement>('[data-medidas]');
+    if (medidas) medidas.textContent = radio.dataset.medidas ?? '';
+    const ideal = fila.querySelector<HTMLElement>('[data-ideal]');
+    if (ideal) ideal.textContent = radio.dataset.ideal ?? '';
+
+    filtrarColores(fila, radio.dataset.colores);
+    actualizarPedido(fila);
+  }
+
+  /** Deja a la vista los colores de la medida elegida. */
+  function filtrarColores(fila: HTMLElement, lista: string | undefined) {
+    const permitidos = lista?.split('|');
+    const radios = [...fila.querySelectorAll<HTMLInputElement>('input[data-color]')];
+    for (const radio of radios) {
+      const etiqueta = radio.closest('label');
+      if (etiqueta) etiqueta.hidden = permitidos ? !permitidos.includes(radio.dataset.color!) : false;
     }
+    if (radios.find((r) => r.checked)?.closest('label')?.hidden) {
+      const primero = radios.find((r) => !r.closest('label')?.hidden);
+      if (primero) {
+        primero.checked = true;
+        mostrarColor(primero);
+      }
+    }
+  }
+
+  function mostrarColor(radio: HTMLInputElement) {
+    const imagen = radio.closest('[data-fila]')?.querySelector<HTMLImageElement>('[data-miniatura]');
+    if (imagen && radio.dataset.foto) {
+      imagen.removeAttribute('srcset');
+      imagen.src = radio.dataset.foto;
+    }
+  }
+
+  /** Lo que carga el botón: el producto o su medida, más el color si tiene. */
+  function actualizarPedido(fila: HTMLElement) {
+    const boton = fila.querySelector<HTMLButtonElement>('[data-agregar]');
+    if (!boton) return;
+    const variante = fila.querySelector<HTMLInputElement>('input[data-variante]:checked');
+    const color = fila.querySelector<HTMLInputElement>('input[data-color]:checked');
+    const slug = variante?.dataset.slug ?? fila.dataset.baseSlug;
+    const nombre = variante?.dataset.nombre ?? fila.dataset.baseNombre;
+    boton.dataset.slug = color ? `${slug}-${color.value}` : slug;
+    boton.dataset.nombre = color ? `${nombre} ${color.dataset.color!.toLowerCase()}` : nombre;
+    boton.setAttribute('aria-label', `Agregar ${boton.dataset.nombre} al pedido`);
   }
 
   document.addEventListener('change', (evento) => {
     const radio = evento.target;
-    if (radio instanceof HTMLInputElement && radio.matches('input[data-variante]')) aplicar(radio);
+    if (!(radio instanceof HTMLInputElement)) return;
+    if (radio.matches('input[data-variante]')) aplicar(radio);
+    if (radio.matches('input[data-color]')) {
+      mostrarColor(radio);
+      actualizarPedido(radio.closest<HTMLElement>('[data-fila]')!);
+    }
   });
 
   // Al volver con "atrás", el navegador restaura los radios pero no el texto.
   window.addEventListener('pageshow', () => {
     for (const radio of document.querySelectorAll<HTMLInputElement>('input[data-variante]:checked')) aplicar(radio);
+    for (const radio of document.querySelectorAll<HTMLInputElement>('input[data-color]:checked')) {
+      mostrarColor(radio);
+      actualizarPedido(radio.closest<HTMLElement>('[data-fila]')!);
+    }
   });
 </script>

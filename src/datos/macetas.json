@@ -1,0 +1,136 @@
+{
+  "macetas": [
+    {
+      "nombre": "Andina",
+      "tipo": "Maceta",
+      "detalle": "Redonda, más ancha que alta",
+      "colores": [
+        {
+          "nombre": "Gris claro",
+          "foto": "andina--gris-claro"
+        },
+        {
+          "nombre": "Arena",
+          "foto": "andina--arena"
+        },
+        {
+          "nombre": "Chocolate",
+          "foto": "andina--chocolate"
+        }
+      ],
+      "tamanos": [
+        {
+          "nombre": "N°27",
+          "precio": 40000,
+          "medidas": "23 cm de alto · 7,7 litros",
+          "ideal": "Ideal para: Aromáticas o Estrella federal chica",
+          "colores": [
+            "Arena",
+            "Chocolate",
+            "Gris claro"
+          ]
+        }
+      ],
+      "lista": "Rotomoldeadas rústicas"
+    },
+    {
+      "nombre": "Autorriego con pie",
+      "etiqueta": "Autorriego",
+      "tipo": "Maceta",
+      "detalle": "Con reservorio de agua, medidor de nivel y patas de madera",
+      "precio": 45000,
+      "ideal": "Ideal para: plantas que necesitan tierra siempre húmeda",
+      "lista": "Autorriego"
+    },
+    {
+      "nombre": "Mate",
+      "tipo": "Maceta",
+      "detalle": "Redondeada tipo vasija, boca algo cerrada",
+      "colores": [
+        {
+          "nombre": "Gris claro",
+          "foto": "mate--gris-claro"
+        },
+        {
+          "nombre": "Arena",
+          "foto": "mate--arena"
+        },
+        {
+          "nombre": "Chocolate",
+          "foto": "mate--chocolate"
+        }
+      ],
+      "tamanos": [
+        {
+          "nombre": "N°30",
+          "precio": 40000,
+          "medidas": "30 cm de alto · 14,1 litros",
+          "ideal": "Ideal para: Anturio o Estrella federal",
+          "colores": [
+            "Arena",
+            "Chocolate",
+            "Gris claro"
+          ]
+        }
+      ],
+      "lista": "Rotomoldeadas rústicas"
+    },
+    {
+      "nombre": "Uovo",
+      "etiqueta": "Autorriego",
+      "tipo": "Maceta",
+      "detalle": "Autorriego con reservorio, brillante, liviana, protección UV",
+      "colores": [
+        {
+          "nombre": "Negro",
+          "foto": "uovo--negro"
+        },
+        {
+          "nombre": "Blanco",
+          "foto": "uovo--blanco"
+        },
+        {
+          "nombre": "Beige",
+          "foto": "uovo--beige"
+        }
+      ],
+      "tamanos": [
+        {
+          "nombre": "Chica",
+          "precio": 45000,
+          "medidas": "34 cm de alto",
+          "ideal": "Ideal para: Anturio, Helecho o Stromanthe tricolor",
+          "colores": [
+            "Negro",
+            "Blanco",
+            "Beige"
+          ]
+        },
+        {
+          "nombre": "Mediana",
+          "precio": 60000,
+          "medidas": "42 cm de alto",
+          "ideal": "Ideal para: Hortensia, Helecho o Cala de color",
+          "colores": [
+            "Negro",
+            "Blanco",
+            "Beige"
+          ]
+        },
+        {
+          "nombre": "Grande",
+          "precio": 80000,
+          "medidas": "50 cm de alto",
+          "ideal": "Ideal para: Monstera, Palmera areca o Pandurata",
+          "colores": [
+            "Negro",
+            "Blanco",
+            "Beige"
+          ]
+        }
+      ],
+      "lista": "Autorriego",
+      "vistaGeneral": true
+    }
+  ]
+}
