@@ -107,7 +107,17 @@ const texto = [fotos && (fotos === 1 ? '1 foto' : `${fotos} fotos`), videos && (
   for (const raiz of document.querySelectorAll<HTMLElement>('[data-galeria-producto]')) {
     const dialogo = raiz.querySelector('dialog');
     if (!dialogo) continue;
-    raiz.querySelector('[data-abrir]')?.addEventListener('click', () => dialogo.showModal());
+    const fila = raiz.closest('[data-fila]');
+    const abrir = () => {
+      dialogo.showModal();
+      // Si la fila tiene un color elegido, la galería abre en esa foto.
+      const color = fila?.querySelector<HTMLInputElement>('input[data-color]:checked')?.dataset.color;
+      const foto = [...dialogo.querySelectorAll<HTMLElement>('[data-diapositiva]')].find((d) => d.dataset.titulo === color);
+      if (color && foto) dialogo.querySelector('[data-pista]')?.scrollTo({ left: foto.offsetLeft, behavior: 'instant' });
+    };
+    raiz.querySelector('[data-abrir]')?.addEventListener('click', abrir);
+    // Tocar la miniatura de la fila también amplía.
+    fila?.querySelector('[data-miniatura]')?.addEventListener('click', abrir);
     dialogo.querySelector('[data-cerrar]')?.addEventListener('click', () => dialogo.close());
     // Tocar el fondo (el propio <dialog>, fuera de su contenido) también cierra.
     dialogo.addEventListener('click', (e) => {

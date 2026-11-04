@@ -24,20 +24,22 @@ const FOTOS: Partial<Record<Categoria, ImageMetadata>> = {
 /** Nota al pie de cada categoría, tomada de las tarjetas impresas. */
 const NOTAS: Partial<Record<Categoria, string[]>> = {
   ramos: ['Todos los ramos son de flores de estación, así que la variedad cambia cada semana.'],
+  macetas: ['Las medidas son aproximadas. Consultanos por los colores disponibles de cada modelo.'],
 };
 
 /**
  * Fotos por producto, resueltas en el build. Las deja
  * scripts/importar-fotos.mjs como src/assets/fotos/<categoria>/<slug>.jpg;
- * el producto que no tenga foto simplemente no muestra miniatura.
+ * el producto que no tenga foto simplemente no muestra miniatura. Las macetas
+ * sin fondo vienen en PNG, para conservar la transparencia.
  */
 const FOTOS_PRODUCTO = import.meta.glob<{ default: ImageMetadata }>(
-  '../assets/fotos/*/*.jpg',
+  '../assets/fotos/*/*.{jpg,png}',
   { eager: true },
 );
 
 const fotoDe = (categoria: Categoria, slug: string): ImageMetadata | undefined =>
-  FOTOS_PRODUCTO[`../assets/fotos/${categoria}/${slug}.jpg`]?.default;
+  (FOTOS_PRODUCTO[`../assets/fotos/${categoria}/${slug}.jpg`] ?? FOTOS_PRODUCTO[`../assets/fotos/${categoria}/${slug}.png`])?.default;
 
 /** Ficha de cuidados de un producto o de una variante suya, si la hay. */
 const enlaceCuidados = (slug: string): string | undefined => {
@@ -56,10 +58,21 @@ const ordenar = (clave: Categoria, items: ReturnType<typeof porCategoria>) => {
   return items;
 };
 
+/** Orden de las listas con subtítulo de una categoría (hoy, solo macetas). */
+const ORDEN_LISTAS = ['Rotomoldeadas rústicas', 'Autorriego', 'Otras macetas'];
+
+/** Parte los productos por su lista; sin listas, queda una sola y sin subtítulo. */
+function enListas(items: ReturnType<typeof porCategoria>) {
+  const titulos = [...new Set(items.map((i) => i.lista))].sort(
+    (a, b) => ORDEN_LISTAS.indexOf(a ?? '') - ORDEN_LISTAS.indexOf(b ?? ''),
+  );
+  return titulos.map((titulo) => ({ titulo, items: items.filter((i) => i.lista === titulo) }));
+}
+
 const secciones = CATEGORIAS_CATALOGO.map((categoria) => ({
   ...categoria,
-  items: ordenar(categoria.clave, porCategoria(categoria.clave)),
-  foto: FOTOS[categoria.clave]!,
+  listas: enListas(ordenar(categoria.clave, porCategoria(categoria.clave))),
+  foto: FOTOS[categoria.clave],
   notas: NOTAS[categoria.clave],
 }));
 ---
@@ -106,29 +119,42 @@ const secciones = CATEGORIAS_CATALOGO.map((categoria) => ({
   {
     secciones.map((seccion) => (
       <section id={seccion.clave} data-categoria={seccion.clave} class="mx-auto max-w-5xl scroll-mt-32 px-5 py-12">
-        <figure class="overflow-hidden rounded-xl border border-oliva/25">
-          <Image
-            src={seccion.foto}
-            alt={`${seccion.nombre} de Margarita Nativa`}
-            class="h-52 w-full object-cover sm:h-64"
-            widths={[640, 1024, 1600]}
-            sizes="(min-width: 1024px) 64rem, 100vw"
-          />
-        </figure>
+        {/* Una categoría nueva puede no tener foto de portada todavía (macetas). */}
+        {seccion.foto && (
+          <figure class="mb-10 overflow-hidden rounded-xl border border-oliva/25">
+            <Image
+              src={seccion.foto}
+              alt={`${seccion.nombre} de Margarita Nativa`}
+              class="h-52 w-full object-cover sm:h-64"
+              widths={[640, 1024, 1600]}
+              sizes="(min-width: 1024px) 64rem, 100vw"
+            />
+          </figure>
+        )}
 
-        <TituloSeccion titulo={seccion.nombre} epigrafe={seccion.epigrafe} class="mt-10" />
+        <TituloSeccion titulo={seccion.nombre} epigrafe={seccion.epigrafe} />
 
         <Tarjeta class="mt-10">
-          <div class="divide-y divide-oliva/20">
-            {seccion.items.map((item) => (
-              <FilaPrecio
-                item={item}
-                sufijo={item.sufijo}
-                foto={fotoDe(seccion.clave, item.slug)}
-                enlaceCuidados={enlaceCuidados}
-                galeria={galeriaProducto(seccion.clave, item.slug, `${seccion.nombre.replace(/s$/, '')} ${item.nombre.toLowerCase()} de Margarita Nativa`)}
-                agregable
-              />
+          <div class="space-y-10">
+            {seccion.listas.map((lista) => (
+              <div>
+                {lista.titulo && (
+                  <h3 class="versalitas border-b border-oliva/30 pb-3 text-borravino">{lista.titulo}</h3>
+                )}
+                <div class="divide-y divide-oliva/20">
+                  {lista.items.map((item) => (
+                    <FilaPrecio
+                      item={item}
+                      sufijo={item.sufijo}
+                      foto={fotoDe(seccion.clave, item.slug)}
+                      enlaceCuidados={enlaceCuidados}
+                      colores={item.colores?.map((c) => ({ nombre: c.nombre, foto: c.foto ? fotoDe(seccion.clave, c.foto) : undefined }))}
+                      galeria={galeriaProducto(seccion.clave, item.slug, `${seccion.nombre.replace(/s$/, '')} ${item.nombre.toLowerCase()} de Margarita Nativa`)}
+                      agregable
+                    />
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
 

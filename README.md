@@ -157,6 +157,55 @@ Lo que no debe publicarse (capturas de historias de clientes con su avatar,
 flyers) va en `OMITIR`; el orden de apertura, en `ORDEN`; y un recorte previo
 por archivo, en `RECORTE`.
 
+## Macetas
+
+Salen de la pestaña **Macetas** de la planilla. A diferencia de las otras
+categorías no se transcriben a mano: las genera un script, porque son muchas
+filas.
+
+```bash
+node scripts/importar-macetas.mjs                  # planilla publicada + fotos del Drive
+node scripts/importar-macetas.mjs --csv <archivo>  # otra fuente de filas
+node scripts/importar-macetas.mjs --ejemplo        # datos de prueba: el build de producción falla
+```
+
+Solo van al sitio las filas con **Publicar = Si** y precio de venta. Como en
+Plantas, un modelo con varias medidas es una fila por medida con el mismo
+Nombre y la columna Tamaño cargada. Alto (cm), Diámetro (cm) o Boca (cm),
+Capacidad (L) y Peso (kg) arman la línea de medidas. "Precio compra" y "Nota" son
+internas. El
+script escribe `src/datos/macetas.json`; si una categoría queda sin productos,
+no aparece en el catálogo.
+
+Los modelos que dicen "autorriego" en el Nombre o el Detalle llevan la etiqueta
+**Autorriego** en su fila. La categoría se muestra en listas con subtítulo:
+**Rotomoldeadas rústicas** (los modelos con carpeta en `Macetas/Rotomoldeadas/`),
+**Autorriego** y, si hay, **Otras macetas**.
+
+La columna **Colores** es una lista separada por punto y coma o coma. Al elegir
+un color cambia la miniatura y el color se suma al pedido ("Mate N°30 arena").
+Cada color usa la foto de la carpeta del modelo que se llama igual; si no
+coincide, se aclara en el mapa `FOTO_COLOR` del script. Si una sola foto muestra
+varios colores juntos, `RECORTE_COLOR` dice qué parte es cada uno: la fila arranca
+con la vista general y sin color elegido, y la foto cambia al elegirlo. Las
+rotomoldeadas arrancan en Gris claro (`COLOR_INICIAL`). Si un color no
+viene en una medida, se lo deja afuera de esa fila.
+
+Las fotos van en una carpeta por modelo en cualquier nivel debajo de
+`Macetas/` del Drive (p. ej. `Macetas/Rotomoldeadas/Mate/` o
+`Macetas/Autoriego con pie/`) y quedan en
+`src/assets/fotos/macetas/<slug>.png` o `.jpg`. La miniatura es la foto de
+`PRINCIPAL`, la llamada `portada`, la del primer color o la más reciente. El fondo
+blanco de las fotos del proveedor se vuelve transparente y queda en PNG; las de
+`PRINCIPAL` se recortan y quedan en JPG. Toda maceta con foto se puede ver
+ampliada desde "Ver foto" o tocando la miniatura: la galería lleva una foto por
+color, con su nombre, o todas las de la carpeta si el modelo no tiene colores.
+Queda en `src/assets/galeria/macetas/<slug>/` y `importar-galeria.mjs` la conserva.
+Las carpetas que no se llaman igual que el modelo van en el mapa `ALIAS`.
+
+Después de correr el script hay que reiniciar `npm run dev`: el servidor no
+siempre toma el JSON nuevo.
+
 ## Pedido por WhatsApp
 
 El carrito ([`src/components/Carrito.astro`](src/components/Carrito.astro)) arma

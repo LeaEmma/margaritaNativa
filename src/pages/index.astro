@@ -6,11 +6,13 @@ import TituloSeccion from '../components/TituloSeccion.astro';
 import Boton from '../components/Boton.astro';
 import Ornamento from '../components/Ornamento.astro';
 import Icono from '../components/Icono.astro';
+import CarruselEmpresas from '../components/CarruselEmpresas.astro';
 import CarruselResenas from '../components/CarruselResenas.astro';
 import Carrusel from '../components/Carrusel.astro';
 
 import { SUSCRIPCION, EXHIBIDOR, CUIDADOS, precio } from '../datos/catalogo';
 import { SITIO, enlaceContacto } from '../datos/sitio';
+import { EMPRESAS } from '../datos/empresas';
 import { RESENAS, RESUMEN_GOOGLE } from '../datos/resenas';
 import { galeria } from '../datos/galeria';
 
@@ -24,8 +26,8 @@ import liriosArreglo from '../assets/fotos/lirios-arreglo.jpg';
 /*
  * Orden de secciones pensado para que no haya dos fondos oscuros seguidos:
  * hero (borravino) · cómo funciona (papel claro) · suscripción (tinta) ·
- * eventos (papel) · preguntas (papel claro) · opiniones (papel) ·
- * contacto (borravino).
+ * empresas (papel claro) · eventos (papel) · preguntas (papel claro) ·
+ * opiniones (papel) · contacto (borravino).
  */
 
 const PASOS = [
@@ -299,6 +301,16 @@ const PREGUNTAS = [
           }
         </ul>
       </div>
+    </div>
+  </section>
+
+  {/* ------------------------------------------------------------ Empresas */}
+  <section id="empresas" class="scroll-mt-32 bg-papel-claro py-20">
+    <div class="mx-auto max-w-5xl px-5">
+      <TituloSeccion titulo="Confiaron en nosotros" epigrafe="Empresas y comercios" />
+    </div>
+    <div class="mx-auto mt-12 max-w-6xl">
+      <CarruselEmpresas empresas={EMPRESAS} />
     </div>
   </section>
 
