@@ -17,7 +17,11 @@
  *     de un bloque de la home.
  *
  *       <origen>/Suscripción/<fotos y videos>     → exhibidor
- *       <origen>/Eventos/<fotos y videos>         → eventos (cuando haya)
+ *       <origen>/Eventos/<categoría>/<fotos y videos> → eventos
+ *
+ *   Una sección puede tener subcarpetas por categoría ("Ramos de novia",
+ *   "Centros de mesa"): el nombre de la carpeta queda como leyenda de cada
+ *   pieza y las categorías se muestran en el orden de `subcarpetas`.
  *
  * Los archivos sueltos de Ramos/ no se publican: hay que moverlos a la
  * carpeta del tipo de ramo que corresponda. El script los lista para que no
@@ -39,6 +43,7 @@ import { promisify } from 'node:util';
 import { createHash } from 'node:crypto';
 import sharp from 'sharp';
 import ffmpeg from 'ffmpeg-static';
+import heicConvert from 'heic-convert';
 import { leerHoja, aSlug, nombreComercial, ORIGEN_DRIVE } from './planilla.mjs';
 
 const ORIGEN = process.argv[2] ?? process.env.FOTOS_ORIGEN ?? ORIGEN_DRIVE;
@@ -56,10 +61,24 @@ const PRODUCTOS = {
 /** Galerías por producto que deja scripts/importar-macetas.mjs: acá se conservan. */
 const AJENAS = ['macetas'];
 
-/** Bloques de la home con las fotos sueltas de una carpeta. */
+/**
+ * Calidad de salida. Las galerías de producto usan la normal; una sección
+ * puede pedir más (Eventos se ve ampliada a pantalla completa).
+ */
+const CALIDAD_NORMAL = { lado: LADO_MAXIMO, jpeg: 82, ladoVideo: LADO_VIDEO, crf: 26 };
+const CALIDAD_ALTA = { lado: 2048, jpeg: 86, ladoVideo: 1920, crf: 22 };
+
+/**
+ * Bloques de la home con las fotos sueltas de una carpeta. `subcarpetas`
+ * fija qué categorías se leen y en qué orden; las que no figuran van al final.
+ */
 const SECCIONES = {
   suscripcion: { carpeta: 'Suscripción' },
-  eventos: { carpeta: 'Eventos' },
+  eventos: {
+    carpeta: 'Eventos',
+    subcarpetas: ['Ambientación', 'Centros de mesa', 'Ramos de novia'],
+    calidad: CALIDAD_ALTA,
+  },
 };
 
 /** Archivos que no van a ninguna galería: capturas con interfaz encima, flyers. */
@@ -76,7 +95,25 @@ const OMITIR = new Set([
  */
 const ORDEN = {
   suscripcion: ['IMG-20261005-WA0034(1).jpg', 'IMG-20260921-WA0064.jpg', 'IMG-20260921-WA0061.jpg'],
+  // Eventos se ordena dentro de cada categoría; el video de la rosa roja va después del IMG_1662.
+  eventos: [
+    'Copia de IMG_1666.HEIC',
+    'Copia de IMG_1671.HEIC',
+    'Copia de IMG_1662.MOV',
+    'Copia de WhatsApp Video 2026-11-10 at 14.12.29 (1).mp4',
+    'Copia de WhatsApp Video 2026-11-10 at 14.12.27.mp4',
+  ],
 };
+
+/**
+ * Piezas retocadas a mano después de importarlas: no se vuelven a convertir
+ * mientras la copia exista, para no perder el retoque. Para rehacer una,
+ * borrar su copia en src/assets/galeria y public/video y retocarla de nuevo.
+ */
+const RETOCADAS = new Set([
+  'Copia de IMG_1760.MOV', // caras de los novios e invitados difuminadas (OpenCV + YuNet)
+  'Copia de WhatsApp Image 2026-11-10 at 14.12.28 (1).jpeg', // tatuaje del antebrazo borrado
+]);
 
 /**
  * Recorte previo de una foto, en fracciones del ancho y el alto (0 a 1), para
@@ -85,7 +122,8 @@ const ORDEN = {
  */
 const RECORTE = {};
 
-const esImagen = (f) => /\.(jpe?g|png|webp)$/i.test(f);
+const esImagen = (f) => /\.(jpe?g|png|webp|heic)$/i.test(f);
+const esHeic = (f) => /\.heic$/i.test(f);
 const esVideo = (f) => /\.(mp4|mov|m4v)$/i.test(f);
 const ejecutar = promisify(execFile);
 
@@ -112,7 +150,7 @@ function productoDeCarpeta(nombre, productos) {
  * archivo subido dos veces con otro nombre ("foto (1).jpg") se toma una sola
  * vez: se comparan por contenido.
  */
-async function piezasDe(dir) {
+async function piezasDe(dir, titulo) {
   if (!existsSync(dir)) return [];
   const piezas = [];
   const vistos = new Map();
@@ -126,7 +164,7 @@ async function piezasDe(dir) {
       continue;
     }
     vistos.set(huella, entrada.name);
-    piezas.push({ archivo: entrada.name, ruta, mtime: (await fs.stat(ruta)).mtimeMs });
+    piezas.push({ archivo: entrada.name, ruta, titulo, mtime: (await fs.stat(ruta)).mtimeMs });
   }
   return piezas;
 }
@@ -140,8 +178,12 @@ function ordenar(clave, piezas) {
   return [...piezas].sort((a, b) => posicion(a) - posicion(b) || b.mtime - a.mtime);
 }
 
-async function convertirFoto(pieza, salida) {
-  const { data, info } = await sharp(pieza.ruta).rotate().toBuffer({ resolveWithObject: true });
+async function convertirFoto(pieza, salida, calidad) {
+  // sharp no trae decodificador de HEIC (las fotos del iPhone): se pasan antes a JPEG.
+  const entrada = esHeic(pieza.archivo)
+    ? Buffer.from(await heicConvert({ buffer: await fs.readFile(pieza.ruta), format: 'JPEG', quality: 0.95 }))
+    : pieza.ruta;
+  const { data, info } = await sharp(entrada).rotate().toBuffer({ resolveWithObject: true });
   let imagen = sharp(data);
   const recorte = RECORTE[pieza.archivo];
   if (recorte) {
@@ -153,24 +195,26 @@ async function convertirFoto(pieza, salida) {
     });
   }
   const resultado = await imagen
-    .resize(LADO_MAXIMO, LADO_MAXIMO, { fit: 'inside', withoutEnlargement: true })
-    .jpeg({ quality: 82, mozjpeg: true })
+    .resize(calidad.lado, calidad.lado, { fit: 'inside', withoutEnlargement: true })
+    .jpeg({ quality: calidad.jpeg, mozjpeg: true })
     .toFile(salida);
   return { ancho: resultado.width, alto: resultado.height, kb: Math.round(resultado.size / 1024) };
 }
 
-async function convertirVideo(pieza, salidaVideo, salidaPoster) {
+async function convertirVideo(pieza, salidaVideo, salidaPoster, calidad) {
   const existente = existsSync(salidaVideo) ? (await fs.stat(salidaVideo)).mtimeMs : 0;
   let convertido = false;
   if (existente < pieza.mtime) {
     // ffmpeg aplica solo la rotación del celular; iw/ih ya vienen rotados.
-    const escala = `scale='if(gt(iw,ih),${LADO_VIDEO},-2)':'if(gt(iw,ih),-2,${LADO_VIDEO})'`;
+    // Nunca se agranda: un video más chico que el lado pedido queda como está.
+    const lado = calidad.ladoVideo;
+    const escala = `scale='if(gt(iw,ih),min(${lado},iw),-2)':'if(gt(iw,ih),-2,min(${lado},ih))'`;
     await ejecutar(ffmpeg, [
       '-y', '-hide_banner', '-loglevel', 'error',
       '-i', pieza.ruta,
       '-vf', `${escala},fps=30`,
       '-c:v', 'libx264', '-profile:v', 'main', '-pix_fmt', 'yuv420p',
-      '-crf', '26', '-preset', 'slow', '-movflags', '+faststart',
+      '-crf', String(calidad.crf), '-preset', 'slow', '-movflags', '+faststart',
       '-an',
       salidaVideo,
     ]);
@@ -178,10 +222,16 @@ async function convertirVideo(pieza, salidaVideo, salidaPoster) {
   }
   const cuadro = `${salidaPoster}.cuadro.png`;
   await ejecutar(ffmpeg, ['-y', '-hide_banner', '-loglevel', 'error', '-ss', '1', '-i', salidaVideo, '-frames:v', '1', cuadro]);
-  const resultado = await sharp(cuadro).jpeg({ quality: 82, mozjpeg: true }).toFile(salidaPoster);
+  const resultado = await sharp(cuadro).jpeg({ quality: calidad.jpeg, mozjpeg: true }).toFile(salidaPoster);
   await fs.unlink(cuadro);
   const kb = Math.round((await fs.stat(salidaVideo)).size / 1024);
   return { ancho: resultado.width, alto: resultado.height, kb, convertido };
+}
+
+/** Ancho y alto de una imagen ya producida (las retocadas, que no se reconvierten). */
+async function dimensiones(archivo) {
+  const { width, height } = await sharp(archivo).metadata();
+  return { ancho: width, alto: height };
 }
 
 /** Borra de un directorio (archivos y subcarpetas) todo lo que no se produjo en esta corrida. */
@@ -199,24 +249,33 @@ async function limpiar(dir, producidos) {
  * `rutaVideos` son relativas a los destinos; devuelve la lista para el
  * manifiesto y deja los directorios limpios de lo que no se produjo.
  */
-async function importarGaleria(clave, dirOrigen, rutaFotos, rutaVideos) {
+async function importarGaleria(clave, fuentes, rutaFotos, rutaVideos, calidad = CALIDAD_NORMAL) {
   const dirFotos = path.join(DESTINO_FOTOS, rutaFotos);
   const dirVideos = path.join(DESTINO_VIDEOS, rutaVideos);
   await fs.mkdir(dirFotos, { recursive: true });
   await fs.mkdir(dirVideos, { recursive: true });
 
-  const piezas = ordenar(clave, await piezasDe(dirOrigen));
+  // `fuentes`: una carpeta, o varias con su leyenda ({ dir, titulo }), en orden.
+  const listaFuentes = typeof fuentes === 'string' ? [{ dir: fuentes }] : fuentes;
+  const piezas = [];
+  for (const { dir, titulo } of listaFuentes) piezas.push(...ordenar(clave, await piezasDe(dir, titulo)));
   const fotosProducidas = new Set();
   const videosProducidos = new Set();
   const lista = [];
 
   for (const pieza of piezas) {
-    const slug = aSlug(path.parse(pieza.archivo).name) || 'pieza';
+    const base = aSlug(path.parse(pieza.archivo).name.replace(/^copia de /i, '')) || 'pieza';
+    const slug = pieza.titulo ? `${aSlug(pieza.titulo)}-${base}` : base;
     try {
       if (esVideo(pieza.archivo)) {
         const nombreVideo = `${slug}.mp4`;
         const nombrePoster = `${slug}.poster.jpg`;
-        const r = await convertirVideo(pieza, path.join(dirVideos, nombreVideo), path.join(dirFotos, nombrePoster));
+        const salidaVideo = path.join(dirVideos, nombreVideo);
+        const salidaPoster = path.join(dirFotos, nombrePoster);
+        const r =
+          RETOCADAS.has(pieza.archivo) && existsSync(salidaVideo) && existsSync(salidaPoster)
+            ? { ...(await dimensiones(salidaPoster)), kb: Math.round((await fs.stat(salidaVideo)).size / 1024), convertido: false }
+            : await convertirVideo(pieza, salidaVideo, salidaPoster, calidad);
         videosProducidos.add(nombreVideo);
         fotosProducidas.add(nombrePoster);
         lista.push({
@@ -225,13 +284,24 @@ async function importarGaleria(clave, dirOrigen, rutaFotos, rutaVideos) {
           video: `/video/${rutaVideos}/${nombreVideo}`,
           ancho: r.ancho,
           alto: r.alto,
+          ...(pieza.titulo && { titulo: pieza.titulo }),
         });
         console.log(`  ▶ ${pieza.archivo.padEnd(36)} ${r.ancho}×${r.alto} ${String(r.kb).padStart(6)} KB${r.convertido ? '' : '  (ya convertido)'}`);
       } else {
         const nombreFoto = `${slug}.jpg`;
-        const r = await convertirFoto(pieza, path.join(dirFotos, nombreFoto));
+        const salidaFoto = path.join(dirFotos, nombreFoto);
+        const r =
+          RETOCADAS.has(pieza.archivo) && existsSync(salidaFoto)
+            ? { ...(await dimensiones(salidaFoto)), kb: Math.round((await fs.stat(salidaFoto)).size / 1024) }
+            : await convertirFoto(pieza, salidaFoto, calidad);
         fotosProducidas.add(nombreFoto);
-        lista.push({ tipo: 'foto', archivo: `${rutaFotos}/${nombreFoto}`, ancho: r.ancho, alto: r.alto });
+        lista.push({
+          tipo: 'foto',
+          archivo: `${rutaFotos}/${nombreFoto}`,
+          ancho: r.ancho,
+          alto: r.alto,
+          ...(pieza.titulo && { titulo: pieza.titulo }),
+        });
         console.log(`  ✓ ${pieza.archivo.padEnd(36)} ${r.ancho}×${r.alto} ${String(r.kb).padStart(6)} KB`);
       }
     } catch (error) {
@@ -303,7 +373,21 @@ for (const [categoria, config] of Object.entries(PRODUCTOS)) {
 
 for (const [seccion, config] of Object.entries(SECCIONES)) {
   console.log(`\n━━━ ${seccion} ━━━`);
-  manifiesto.secciones[seccion] = await importarGaleria(seccion, path.join(ORIGEN, config.carpeta), seccion, seccion);
+  const dir = path.join(ORIGEN, config.carpeta);
+  let fuentes = dir;
+  if (config.subcarpetas) {
+    const existentes = existsSync(dir)
+      ? (await fs.readdir(dir, { withFileTypes: true })).filter((e) => e.isDirectory()).map((e) => e.name)
+      : [];
+    const posicion = (n) => {
+      const i = config.subcarpetas.findIndex((s) => aSlug(s) === aSlug(n));
+      return i < 0 ? Infinity : i;
+    };
+    existentes.sort((a, b) => posicion(a) - posicion(b) || a.localeCompare(b));
+    // Primero lo suelto (sin leyenda), después cada categoría.
+    fuentes = [{ dir }, ...existentes.map((n) => ({ dir: path.join(dir, n), titulo: n }))];
+  }
+  manifiesto.secciones[seccion] = await importarGaleria(seccion, fuentes, seccion, seccion, config.calidad);
 }
 
 // Galerías que dejaron de existir en la configuración: fuera.

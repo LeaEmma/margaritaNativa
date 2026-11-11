@@ -1,0 +1,196 @@
+---
+import Carrusel from './Carrusel.astro';
+import type { Diapositiva } from '../datos/galeria';
+
+/**
+ * Galería de la sección Eventos: un carrusel de tarjetas grandes con fotos y
+ * videos de eventos reales, con la categoría de cada pieza (la subcarpeta del
+ * Drive) como leyenda. Arriba, un acceso por categoría lleva el carrusel a la
+ * primera pieza de esa categoría. Tocar una tarjeta la abre a pantalla
+ * completa, en un <dialog> con el mismo material entero y sin recortar, y
+ * desde ahí se recorre todo.
+ */
+interface Props {
+  diapositivas: Diapositiva[];
+}
+
+const { diapositivas } = Astro.props;
+
+/** Categorías en el orden en que aparecen, con el índice de su primera pieza. */
+const categorias = diapositivas.reduce<{ nombre: string; desde: number; cantidad: number }[]>((lista, d, i) => {
+  if (!d.titulo) return lista;
+  const existente = lista.find((c) => c.nombre === d.titulo);
+  if (existente) existente.cantidad++;
+  else lista.push({ nombre: d.titulo, desde: i, cantidad: 1 });
+  return lista;
+}, []);
+---
+
+{
+  diapositivas.length > 0 && (
+    <div data-galeria-eventos>
+      {categorias.length > 1 && (
+        <ul
+          class="flex gap-2 overflow-x-auto px-5 [scrollbar-width:none] sm:flex-wrap sm:justify-center sm:gap-2.5"
+          aria-label="Ir a una categoría"
+        >
+          {categorias.map((c) => (
+            <li class="shrink-0">
+              <button
+                type="button"
+                data-ir-a={c.desde}
+                class="versalitas rounded-full border border-borravino/40 px-3.5 py-2 text-[0.7rem] whitespace-nowrap text-borravino sm:px-4 sm:text-xs transition-colors hover:border-borravino hover:bg-borravino hover:text-crema"
+              >
+                {c.nombre}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <Carrusel
+        diapositivas={diapositivas}
+        ancho="tarjeta"
+        anchoTarjeta="w-[72vw] sm:w-72 lg:w-80"
+        marco="aspect-[3/4] shadow-lg shadow-tinta/10"
+        etiqueta="Fotos y videos de eventos"
+        sizes="(min-width: 1024px) 20rem, (min-width: 640px) 18rem, 72vw"
+        widths={[400, 640, 960]}
+        intervalo={4}
+        ampliable
+        class="mt-8"
+      />
+
+      <dialog
+        class="visor m-auto h-dvh max-h-none w-screen max-w-none bg-transparent p-0 text-crema"
+        aria-label="Fotos y videos de eventos, ampliados"
+      >
+        <div class="mx-auto flex h-full max-w-5xl flex-col px-3 py-3 sm:px-6 sm:py-5">
+          <div class="flex items-center justify-between gap-4 pb-3">
+            <p class="versalitas text-sm text-crema" data-leyenda aria-live="polite"></p>
+            <button
+              type="button"
+              data-cerrar
+              class="flex h-11 w-11 items-center justify-center rounded-full border border-crema/40 text-crema transition-colors hover:bg-crema/10"
+              aria-label="Cerrar"
+            >
+              <svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                <path d="m6 6 12 12M18 6 6 18" />
+              </svg>
+            </button>
+          </div>
+          <Carrusel
+            diapositivas={diapositivas.map((d) => ({ ...d, titulo: undefined }))}
+            marco="h-[calc(100dvh-8.5rem)] sm:h-[calc(100dvh-10rem)]"
+            ajuste="contener"
+            etiqueta="Fotos y videos de eventos, ampliados"
+            claro
+            limpio
+            cargaDiferida
+            sizes="(min-width: 1100px) 64rem, 100vw"
+            widths={[640, 1024, 1600, 2048]}
+            intervalo={0}
+          />
+        </div>
+      </dialog>
+
+      {/* Leyendas para el visor: el carrusel ampliado no las muestra sobre la foto. */}
+      <script type="application/json" data-leyendas set:html={JSON.stringify(diapositivas.map((d) => d.titulo ?? ''))} />
+    </div>
+  )
+}
+
+<style is:global>
+  body:has(.visor[open]) {
+    overflow: hidden;
+  }
+</style>
+
+<style>
+  .visor {
+    position: fixed;
+    inset: 0;
+  }
+
+  .visor::backdrop {
+    background-color: rgb(40 30 18 / 0.96);
+  }
+
+  .visor[open] {
+    animation: aparecer 0.22s ease-out;
+  }
+
+  @keyframes aparecer {
+    from {
+      opacity: 0;
+      transform: scale(0.985);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .visor[open] {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  for (const raiz of document.querySelectorAll<HTMLElement>('[data-galeria-eventos]')) {
+    const tarjetas = raiz.querySelector<HTMLElement>('[data-carrusel]')!;
+    const pistaTarjetas = tarjetas.querySelector<HTMLElement>('[data-pista]')!;
+    const dialogo = raiz.querySelector('dialog')!;
+    const pistaVisor = dialogo.querySelector<HTMLElement>('[data-pista]')!;
+    const leyenda = dialogo.querySelector<HTMLElement>('[data-leyenda]')!;
+    const leyendas: string[] = JSON.parse(raiz.querySelector('[data-leyendas]')?.textContent ?? '[]');
+    const total = leyendas.length;
+
+    const enTarjetas = (i: number) => pistaTarjetas.querySelectorAll<HTMLElement>('[data-diapositiva]')[i];
+    const enVisor = () => [...pistaVisor.querySelectorAll<HTMLElement>('[data-diapositiva]')];
+
+    const rotular = () => {
+      const i = Math.round(pistaVisor.scrollLeft / Math.max(1, pistaVisor.clientWidth));
+      const nombre = leyendas[i];
+      leyenda.textContent = `${nombre ? `${nombre} · ` : ''}${i + 1} de ${total}`;
+    };
+    pistaVisor.addEventListener('scroll', rotular, { passive: true });
+
+    const abrir = (i: number) => {
+      dialogo.showModal();
+      const destino = enVisor()[i];
+      if (destino) pistaVisor.scrollTo({ left: destino.offsetLeft, behavior: 'instant' });
+      rotular();
+      tarjetas.querySelectorAll('video').forEach((v) => v.pause());
+    };
+
+    tarjetas.addEventListener('click', (e) => {
+      const boton = (e.target as HTMLElement).closest<HTMLElement>('[data-ampliar]');
+      if (boton) abrir(Number(boton.dataset.ampliar));
+    });
+
+    // Al cerrar, el carrusel de tarjetas queda en la pieza que se estaba viendo.
+    dialogo.addEventListener('close', () => {
+      dialogo.querySelectorAll('video').forEach((v) => v.pause());
+      const i = Math.round(pistaVisor.scrollLeft / Math.max(1, pistaVisor.clientWidth));
+      const tarjeta = enTarjetas(i);
+      if (tarjeta) {
+        const margen = parseFloat(getComputedStyle(pistaTarjetas).paddingLeft) || 0;
+        pistaTarjetas.scrollTo({ left: tarjeta.offsetLeft - margen, behavior: 'instant' });
+      }
+    });
+    dialogo.querySelector('[data-cerrar]')?.addEventListener('click', () => dialogo.close());
+    dialogo.addEventListener('click', (e) => {
+      if (e.target === dialogo) dialogo.close();
+    });
+
+    // Los accesos por categoría llevan el carrusel a la primera pieza de cada una.
+    const reducido = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    for (const boton of raiz.querySelectorAll<HTMLElement>('[data-ir-a]')) {
+      boton.addEventListener('click', () => {
+        const tarjeta = enTarjetas(Number(boton.dataset.irA));
+        if (!tarjeta) return;
+        const margen = parseFloat(getComputedStyle(pistaTarjetas).paddingLeft) || 0;
+        pistaTarjetas.scrollTo({ left: tarjeta.offsetLeft - margen, behavior: reducido ? 'auto' : 'smooth' });
+      });
+    }
+  }
+</script>
