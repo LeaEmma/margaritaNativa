@@ -31,6 +31,14 @@ interface Props {
   limpio?: boolean;
   /** Ninguna foto carga hasta que se la necesita (galerías que empiezan cerradas). */
   cargaDiferida?: boolean;
+  /** Ancho de cada tarjeta (solo con `ancho="tarjeta"`). */
+  anchoTarjeta?: string;
+  /**
+   * Cada diapositiva lleva un botón encima para ampliarla. El carrusel solo
+   * lo dibuja: quien lo usa escucha el clic en `[data-ampliar]`, que trae el
+   * índice de la pieza.
+   */
+  ampliable?: boolean;
   class?: string;
 }
 
@@ -46,6 +54,8 @@ const {
   ajuste = 'cubrir',
   limpio = false,
   cargaDiferida = false,
+  anchoTarjeta = 'w-56 sm:w-64',
+  ampliable = false,
   class: clase = '',
 } = Astro.props;
 
@@ -90,7 +100,7 @@ const flecha = [
         >
           {diapositivas.map((d, i) => (
             <li
-              class:list={['shrink-0', ancho === 'completo' ? 'w-full snap-center' : 'w-56 snap-start sm:w-64']}
+              class:list={['shrink-0', ancho === 'completo' ? 'w-full snap-center' : ['snap-start', anchoTarjeta]]}
               aria-label={`${i + 1} de ${total}`}
               data-diapositiva
               data-titulo={d.titulo}
@@ -125,8 +135,28 @@ const flecha = [
                     class={encaje}
                   />
                 )}
+                {ampliable && (
+                  <button
+                    type="button"
+                    class="ampliar group absolute inset-0 flex cursor-zoom-in items-start justify-end p-3"
+                    data-ampliar={i}
+                    aria-label={`Ampliar ${d.tipo === 'video' ? 'video' : 'foto'}${d.titulo ? ` de ${d.titulo.toLowerCase()}` : ''}, ${i + 1} de ${total}`}
+                  >
+                    <span class="flex h-9 w-9 items-center justify-center rounded-full bg-tinta/55 text-crema opacity-90 backdrop-blur-sm transition group-hover:scale-110 group-hover:bg-tinta/75 group-hover:opacity-100">
+                      {d.tipo === 'video' ? (
+                        <svg viewBox="0 0 24 24" class="ml-0.5 h-4 w-4" fill="currentColor" aria-hidden="true">
+                          <path d="M8 5.5v13l10.5-6.5z" />
+                        </svg>
+                      ) : (
+                        <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                          <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
+                        </svg>
+                      )}
+                    </span>
+                  </button>
+                )}
                 {d.titulo && (
-                  <figcaption class="versalitas absolute bottom-3 left-3 rounded-full bg-tinta/70 px-3 py-1 text-xs text-crema">
+                  <figcaption class="versalitas pointer-events-none absolute bottom-3 left-3 rounded-full bg-tinta/70 px-3 py-1 text-xs text-crema">
                     {d.titulo}
                   </figcaption>
                 )}
