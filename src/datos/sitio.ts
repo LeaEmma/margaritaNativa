@@ -45,6 +45,7 @@ export const NAVEGACION = [
   { texto: 'Inicio', href: '/', pagina: '/' },
   { texto: 'Catálogo', href: '/catalogo', pagina: '/catalogo' },
   { texto: 'Suscripción', href: '/#suscripcion' },
+  { texto: 'Tus fechas', href: '/recordatorios', pagina: '/recordatorios' },
   { texto: 'Cuidados', href: '/cuidados', pagina: '/cuidados' },
   { texto: 'Eventos', href: '/#eventos' },
   { texto: 'Contacto', href: '/#contacto' },
