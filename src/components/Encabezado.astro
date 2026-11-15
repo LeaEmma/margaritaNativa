@@ -52,7 +52,7 @@ const hayPedido = Boolean(SITIO.whatsapp);
                 href={enlace.href}
                 aria-current={esActiva(enlace) ? 'page' : undefined}
                 class:list={[
-                  'versalitas block py-4 transition-colors',
+                  'versalitas block py-4 whitespace-nowrap transition-colors',
                   esActiva(enlace)
                     ? 'text-borravino underline underline-offset-4'
                     : 'text-oliva hover:text-borravino',
@@ -124,7 +124,7 @@ const hayPedido = Boolean(SITIO.whatsapp);
     boton.querySelector('[data-icono-cerrar]')?.classList.toggle('hidden', !abierto);
   }
 
-  boton?.addEventListener('click', () => abrir(menu?.hidden ?? false));
+  boton?.addEventListener('click', () => abrir(menu?.hidden === true));
 
   // Los enlaces con ancla ("/#eventos") no cambian de página: hay que cerrar a mano.
   menu?.addEventListener('click', (evento) => {

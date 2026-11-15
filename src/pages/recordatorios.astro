@@ -1,0 +1,404 @@
+---
+import Layout from '../layouts/Layout.astro';
+import TituloSeccion from '../components/TituloSeccion.astro';
+import Boton from '../components/Boton.astro';
+import Icono from '../components/Icono.astro';
+
+import { SITIO, enlaceContacto } from '../datos/sitio';
+import { RECORDATORIOS, OCASIONES, MESES } from '../datos/recordatorios';
+
+const PASOS = [
+  { n: '01', titulo: 'Agendá', texto: 'Dejanos las fechas especiales que quieras recordar.' },
+  {
+    n: '02',
+    titulo: 'Te avisamos',
+    texto: `${RECORDATORIOS.diasDeAviso} días antes te enviamos un recordatorio por WhatsApp para que puedas organizar tu regalo.`,
+  },
+  {
+    n: '03',
+    titulo: 'Elegí tu ramo',
+    texto: 'Elegí el ramo que más te guste y prepará tu sorpresa.',
+  },
+  { n: '04', titulo: 'Lo enviamos', texto: 'Coordinamos la entrega para que las flores lleguen a esa persona especial.' },
+];
+
+const campo =
+  'w-full rounded-lg border border-oliva/35 bg-papel-claro px-4 py-3 text-borravino placeholder:text-oliva/70 focus:border-borravino focus:outline-none';
+const rotulo = 'mb-1.5 block text-sm font-medium text-oliva';
+---
+
+<Layout
+  titulo={RECORDATORIOS.nombre}
+  descripcion="Agendá tus fechas importantes y esos días que no queres olvidar. Te avisamos 10 días antes para que puedas preparar una sorpresa."
+  mensajeWhatsApp="¡Hola! Tengo una consulta sobre los recordatorios de fechas."
+>
+  <section class="mx-auto max-w-5xl px-5 pt-16 pb-20">
+    <TituloSeccion titulo={RECORDATORIOS.nombre} epigrafe="Hay fechas que merecen flores, nosotros te ayudamos a recordarlas." />
+
+    <div class="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+      {
+        PASOS.map((paso) => (
+          <div class="text-center">
+            <p class="font-display text-5xl leading-none font-semibold text-borravino/50">{paso.n}</p>
+            <h3 class="font-display mt-4 text-xl font-semibold tracking-wide text-borravino uppercase">
+              {paso.titulo}
+            </h3>
+            <p class="mt-2 text-balance text-oliva">{paso.texto}</p>
+          </div>
+        ))
+      }
+    </div>
+
+    {/* Beneficios: el segundo se enciende cuando se llega a la tercera fecha. */}
+    <div class="mx-auto mt-14 grid max-w-3xl gap-4 sm:grid-cols-2">
+      <div class="rounded-xl bg-borravino p-6 text-center text-crema">
+        <p class="epigrafe text-crema/80">Por anotarte</p>
+        <p class="font-display mt-2 text-2xl font-semibold">Envío gratis</p>
+        <p class="mt-1 text-crema">dentro de CABA, en los ramos de tus fechas</p>
+      </div>
+      <div
+        id="beneficio-descuento"
+        class="rounded-xl border border-borravino/40 p-6 text-center text-borravino transition-colors data-activo:bg-borravino data-activo:text-crema"
+      >
+        <p class="versalitas font-semibold">Con tres fechas o más</p>
+        <p class="font-display mt-2 text-2xl font-semibold">{RECORDATORIOS.descuento} % de descuento</p>
+        <p class="mt-1">en el primer ramo que nos encargues</p>
+      </div>
+    </div>
+
+    {/* Sin JavaScript el formulario no puede armar el mensaje: queda el botón. */}
+    <div id="sin-formulario" class="mt-12 text-center">
+      <Boton href={enlaceContacto('¡Hola! Quiero agendar mis fechas especiales.')} class="gap-2.5">
+        <Icono nombre="whatsapp" class="h-5 w-5" />
+        Agendar por WhatsApp
+      </Boton>
+    </div>
+
+    <form
+      id="form-fechas"
+      hidden
+      novalidate
+      data-whatsapp={SITIO.whatsapp}
+      data-destino={RECORDATORIOS.destino}
+      class="mx-auto mt-12 max-w-3xl rounded-2xl border border-oliva/25 p-6 sm:p-9"
+    >
+      <div class="grid gap-5 sm:grid-cols-2">
+        <div>
+          <label for="rec-nombre" class={rotulo}>Tu nombre</label>
+          <input id="rec-nombre" name="nombre" type="text" required maxlength="60" autocomplete="given-name" class={campo} />
+        </div>
+        <div>
+          <label for="rec-telefono" class={rotulo}>Tu WhatsApp</label>
+          <input
+            id="rec-telefono"
+            name="telefono"
+            type="tel"
+            required
+            maxlength="20"
+            inputmode="numeric"
+            autocomplete="tel-national"
+            placeholder="1123456789"
+            aria-describedby="rec-telefono-ayuda"
+            class={campo}
+          />
+          <p id="rec-telefono-ayuda" class="mt-1.5 text-sm text-oliva">
+            Con código de área, sin 0 y sin 15. Son 10 números.
+          </p>
+        </div>
+      </div>
+
+      {/* Trampa para robots: una persona no la ve ni la completa. */}
+      <div class="hidden" aria-hidden="true">
+        <label for="rec-sitio">No completar</label>
+        <input id="rec-sitio" name="sitio" type="text" tabindex="-1" autocomplete="off" />
+      </div>
+
+      <h3 class="font-display mt-9 text-xl font-semibold tracking-wide text-borravino uppercase">Tus fechas</h3>
+
+      <ol id="fechas" class="mt-5 space-y-4"></ol>
+
+      <button
+        id="agregar-fecha"
+        type="button"
+        class="versalitas mt-5 inline-flex cursor-pointer items-center justify-center rounded-full border border-borravino/40 px-6 py-3 text-borravino transition-colors hover:border-borravino hover:bg-borravino/5"
+      >
+        + Agregar otra fecha
+      </button>
+
+      {/* Al pie de la lista: cambia a medida que se suman fechas. */}
+      <p id="contador" class="mt-4 text-oliva" aria-live="polite"></p>
+
+      <label class="mt-9 flex cursor-pointer items-start gap-3 text-oliva">
+        <input id="rec-acepto" name="acepto" type="checkbox" required class="mt-1.5 h-5 w-5 shrink-0 accent-borravino" />
+        <span>
+          Acepto que {SITIO.nombre} me escriba por WhatsApp para recordarme estas fechas.
+          Puedo darme de baja cuando quiera respondiendo BAJA.
+        </span>
+      </label>
+
+      <p id="rec-error" hidden role="alert" class="mt-5 rounded-lg bg-borravino/10 px-4 py-3 text-borravino"></p>
+
+      <a
+        id="rec-alternativa"
+        hidden
+        target="_blank"
+        rel="noopener noreferrer"
+        class="mt-3 inline-block text-borravino underline underline-offset-4"
+      >
+        Enviar mis fechas por WhatsApp
+      </a>
+
+      <div class="mt-8 text-center">
+        <button
+          type="submit"
+          class="versalitas inline-flex cursor-pointer items-center justify-center rounded-full bg-borravino px-7 py-3.5 text-crema transition-colors hover:bg-borravino-medio disabled:cursor-wait disabled:opacity-60"
+        >
+          Agendar tus fechas
+        </button>
+      </div>
+    </form>
+
+    {/* Reemplaza al formulario cuando la planilla confirma que guardó el alta. */}
+    <div
+      id="rec-listo"
+      hidden
+      tabindex="-1"
+      class="mx-auto mt-12 max-w-3xl rounded-2xl border border-oliva/25 p-6 text-center sm:p-9"
+    >
+      <h3 class="font-display text-2xl font-semibold text-borravino">¡Listo! Ya agendamos tus fechas</h3>
+      <p class="mx-auto mt-3 max-w-xl text-balance text-oliva">
+        Te vamos a escribir {RECORDATORIOS.diasDeAviso} días antes de cada una. Para que el aviso te llegue
+        bien, mandanos un mensaje ahora y agendá nuestro número.
+      </p>
+      <a
+        id="rec-avisar"
+        href={enlaceContacto('¡Hola! Acabo de agendar mis fechas especiales.')}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="versalitas mt-7 inline-flex items-center justify-center gap-2.5 rounded-full bg-borravino px-7 py-3.5 text-crema transition-colors hover:bg-borravino-medio"
+      >
+        <Icono nombre="whatsapp" class="h-5 w-5" />
+        Avisar por WhatsApp
+      </a>
+    </div>
+
+    <p class="mx-auto mt-8 max-w-2xl text-center text-sm text-balance text-oliva">
+      Usamos estos datos solo para avisarte de tus fechas. No los compartimos con nadie
+      y los borramos cuando nos lo pidas.
+    </p>
+  </section>
+
+  {/* Molde de cada fecha; el script lo clona y numera. */}
+  <template id="molde-fecha">
+    <li class="rounded-xl border border-oliva/25 bg-papel-claro p-4 sm:p-5">
+      <div class="flex items-center justify-between gap-3">
+        <p class="versalitas text-oliva" data-titulo></p>
+        <button
+          type="button"
+          data-quitar
+          class="cursor-pointer text-sm text-borravino underline underline-offset-4 hover:text-borravino-medio"
+        >
+          Quitar
+        </button>
+      </div>
+      <div class="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-[5.5rem_1fr_1fr_1fr]">
+        <label class="block">
+          <span class={rotulo}>Día</span>
+          <select data-campo="dia" required class={campo}>
+            <option value="">–</option>
+            {Array.from({ length: 31 }, (_, i) => <option value={i + 1}>{i + 1}</option>)}
+          </select>
+        </label>
+        <label class="block">
+          <span class={rotulo}>Mes</span>
+          <select data-campo="mes" required class={campo}>
+            <option value="">–</option>
+            {MESES.map((mes, i) => <option value={i + 1}>{mes.nombre}</option>)}
+          </select>
+        </label>
+        <label class="col-span-2 block sm:col-span-1">
+          <span class={rotulo}>Ocasión</span>
+          <select data-campo="ocasion" required class={campo}>
+            {OCASIONES.map((ocasion) => <option value={ocasion}>{ocasion}</option>)}
+          </select>
+        </label>
+        <label class="col-span-2 block sm:col-span-1">
+          <span class={rotulo}>¿De quién?</span>
+          <input data-campo="para" type="text" required maxlength="40" placeholder="Mamá, Sofi…" class={campo} />
+        </label>
+      </div>
+    </li>
+  </template>
+</Layout>
+
+<script>
+  import { RECORDATORIOS, MESES } from '../datos/recordatorios';
+
+  const form = document.querySelector<HTMLFormElement>('#form-fechas');
+  const lista = document.querySelector<HTMLOListElement>('#fechas');
+  const molde = document.querySelector<HTMLTemplateElement>('#molde-fecha');
+  const agregar = document.querySelector<HTMLButtonElement>('#agregar-fecha');
+  const contador = document.querySelector<HTMLElement>('#contador');
+  const beneficio = document.querySelector<HTMLElement>('#beneficio-descuento');
+  const aviso = document.querySelector<HTMLElement>('#rec-error');
+
+  if (form && lista && molde && agregar) {
+    document.querySelector<HTMLElement>('#sin-formulario')?.setAttribute('hidden', '');
+    form.hidden = false;
+
+    const filas = () => [...lista.children] as HTMLElement[];
+    const valor = (fila: HTMLElement, nombre: string) =>
+      fila.querySelector<HTMLInputElement | HTMLSelectElement>(`[data-campo="${nombre}"]`)?.value.trim() ?? '';
+
+    /** Numera las fechas y actualiza el contador, el botón y el beneficio. */
+    const actualizar = () => {
+      const cantidad = filas().length;
+      filas().forEach((fila, i) => {
+        fila.querySelector('[data-titulo]')!.textContent = `Fecha ${i + 1}`;
+        fila.querySelector<HTMLElement>('[data-quitar]')!.hidden = cantidad === 1;
+      });
+      agregar.hidden = cantidad >= RECORDATORIOS.maximo;
+
+      const conDescuento = cantidad >= RECORDATORIOS.fechasParaDescuento;
+      beneficio?.toggleAttribute('data-activo', conDescuento);
+      if (contador) {
+        const faltan = RECORDATORIOS.fechasParaDescuento - cantidad;
+        contador.textContent = conDescuento
+          ? `Ya tenés el ${RECORDATORIOS.descuento} % de descuento en tu primer ramo, además del envío gratis.`
+          : `Sumá ${faltan} ${faltan === 1 ? 'fecha' : 'fechas'} más y tenés ${RECORDATORIOS.descuento} % de descuento en tu primer ramo.`;
+      }
+    };
+
+    const sumarFila = (enfocar = false) => {
+      lista.append(molde.content.cloneNode(true));
+      actualizar();
+      if (enfocar) lista.lastElementChild?.querySelector<HTMLElement>('[data-campo="dia"]')?.focus();
+    };
+
+    agregar.addEventListener('click', () => sumarFila(true));
+    lista.addEventListener('click', (evento) => {
+      const boton = (evento.target as HTMLElement).closest('[data-quitar]');
+      if (!boton) return;
+      boton.closest('li')?.remove();
+      actualizar();
+    });
+
+    const error = (texto: string, foco?: HTMLElement | null) => {
+      if (aviso) {
+        aviso.textContent = texto;
+        aviso.hidden = false;
+      }
+      foco?.focus();
+    };
+
+    form.addEventListener('submit', (evento) => {
+      evento.preventDefault();
+      if (aviso) aviso.hidden = true;
+
+      const datos = new FormData(form);
+      const nombre = String(datos.get('nombre') ?? '').trim();
+      // Celular argentino: código de área + número, 10 dígitos, sin 0 ni 15.
+      // Espacios, guiones y el +54 9 de adelante se quitan solos; el 0 y el 15
+      // no, porque el largo del código de área varía y habría que adivinar.
+      const telefono = String(datos.get('telefono') ?? '')
+        .replace(/\D/g, '')
+        .replace(/^549(?=\d{10}$)/, '')
+        .replace(/^54(?=\d{10}$)/, '');
+
+      if (!nombre) return error('Decinos tu nombre.', form.querySelector<HTMLElement>('#rec-nombre'));
+      // Los códigos de área empiezan con 11, 2 o 3: un 15 adelante es el prefijo viejo.
+      if (!/^(11\d{8}|[23]\d{9})$/.test(telefono))
+        return error(
+          'Escribí tu WhatsApp con código de área, sin 0 y sin 15: son 10 números, por ejemplo 1123456789.',
+          form.querySelector<HTMLElement>('#rec-telefono'),
+        );
+
+      const fechas = [];
+      for (const [i, fila] of filas().entries()) {
+        const dia = Number(valor(fila, 'dia'));
+        const mes = Number(valor(fila, 'mes'));
+        const para = valor(fila, 'para');
+        const campoDia = fila.querySelector<HTMLElement>('[data-campo="dia"]');
+        if (!dia || !mes) return error(`Elegí el día y el mes de la fecha ${i + 1}.`, campoDia);
+        if (dia > MESES[mes - 1].dias)
+          return error(`La fecha ${i + 1} no existe: ${MESES[mes - 1].nombre} no tiene ${dia} días.`, campoDia);
+        if (!para)
+          return error(`Contanos de quién es la fecha ${i + 1}.`, fila.querySelector<HTMLElement>('[data-campo="para"]'));
+        fechas.push({ dia, mes, ocasion: valor(fila, 'ocasion'), para });
+      }
+
+      if (!datos.get('acepto'))
+        return error('Para agendarte necesitamos que aceptes recibir los avisos.', form.querySelector<HTMLElement>('#rec-acepto'));
+
+      const mensaje = [
+        `¡Hola! Quiero agendar mis fechas especiales.`,
+        ``,
+        `Nombre: ${nombre}`,
+        `WhatsApp: ${telefono}`,
+        ``,
+        ...fechas.map((f, i) => `${i + 1}. ${f.dia} de ${MESES[f.mes - 1].nombre} · ${f.ocasion} · ${f.para}`),
+        ``,
+        `Acepto recibir los recordatorios por WhatsApp.`,
+      ].join('\n');
+      const porWhatsApp = `https://wa.me/${form.dataset.whatsapp}?text=${encodeURIComponent(mensaje)}`;
+
+      // Sin planilla conectada, el alta sale por WhatsApp con las fechas escritas.
+      const destino = form.dataset.destino;
+      if (!destino) {
+        window.open(porWhatsApp, '_blank', 'noopener');
+        return;
+      }
+
+      const enviar = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+      if (enviar) {
+        enviar.disabled = true;
+        enviar.textContent = 'Guardando…';
+      }
+
+      // text/plain evita la consulta previa (preflight), que Apps Script no
+      // responde. La trampa y el tiempo de carga viajan para que el script
+      // descarte a los robots; la respuesta nunca trae datos de la planilla.
+      fetch(destino, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({
+          nombre,
+          telefono,
+          fechas,
+          acepto: true,
+          sitio: String(datos.get('sitio') ?? ''),
+          demora: Date.now() - inicio,
+        }),
+      })
+        .then((respuesta) => respuesta.json())
+        .then((resultado: { ok?: boolean; motivo?: string }) => {
+          if (!resultado.ok) throw new Error(resultado.motivo ?? 'error');
+          form.hidden = true;
+          const listo = document.querySelector<HTMLElement>('#rec-listo');
+          if (listo) {
+            listo.hidden = false;
+            listo.focus();
+          }
+        })
+        .catch((fallo: Error) => {
+          if (enviar) {
+            enviar.disabled = false;
+            enviar.textContent = 'Agendar tus fechas';
+          }
+          const alternativa = document.querySelector<HTMLAnchorElement>('#rec-alternativa');
+          if (alternativa) {
+            alternativa.href = porWhatsApp;
+            alternativa.hidden = false;
+          }
+          error(
+            fallo.message === 'limite'
+              ? 'Ya recibimos varias altas con este número. Si necesitás sumar más fechas, escribinos por WhatsApp.'
+              : 'No pudimos guardar tus fechas. Probá de nuevo en un momento o mandánoslas por WhatsApp.',
+          );
+        });
+    });
+
+    const inicio = Date.now();
+    sumarFila();
+  }
+</script>
