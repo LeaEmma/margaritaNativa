@@ -133,7 +133,7 @@ async function productosDe(hoja) {
   return filas
     .map((f) => {
       const nombre = (f.Categoria ?? f.Nombre ?? '').trim();
-      return { nombre, slug: aSlug(nombreComercial(nombre)), precio: Number(f['Precio venta'] ?? f.Precio) };
+      return { nombre, slug: aSlug(nombreComercial(nombre)), precio: Number(f['Precio venta Web'] ?? f['Precio venta'] ?? f.Precio) };
     })
     .filter((p) => p.nombre);
 }

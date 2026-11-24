@@ -3,8 +3,7 @@ import { Image } from 'astro:assets';
 
 import Layout from '../layouts/Layout.astro';
 import TituloSeccion from '../components/TituloSeccion.astro';
-import FilaPrecio from '../components/FilaPrecio.astro';
-import Tarjeta from '../components/Tarjeta.astro';
+import TarjetaProducto from '../components/TarjetaProducto.astro';
 import Boton from '../components/Boton.astro';
 import Icono from '../components/Icono.astro';
 
@@ -134,43 +133,42 @@ const secciones = CATEGORIAS_CATALOGO.map((categoria) => ({
 
         <TituloSeccion titulo={seccion.nombre} epigrafe={seccion.epigrafe} />
 
-        <Tarjeta class="mt-10">
-          <div class="space-y-10">
-            {seccion.listas.map((lista) => (
-              <div>
-                {lista.titulo && (
-                  <h3 class="versalitas border-b border-oliva/30 pb-3 text-borravino">{lista.titulo}</h3>
-                )}
-                <div class="divide-y divide-oliva/20">
-                  {lista.items.map((item) => (
-                    <FilaPrecio
-                      item={item}
-                      sufijo={item.sufijo}
-                      foto={fotoDe(seccion.clave, item.slug)}
-                      enlaceCuidados={enlaceCuidados}
-                      colores={item.colores?.map((c) => ({ nombre: c.nombre, foto: c.foto ? fotoDe(seccion.clave, c.foto) : undefined }))}
-                      galeria={galeriaProducto(seccion.clave, item.slug, `${seccion.nombre.replace(/s$/, '')} ${item.nombre.toLowerCase()} de Margarita Nativa`)}
-                      agregable
-                    />
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
+        {/* Grilla de tarjetas, con el mismo diseño que el presupuesto mayorista. */}
+        <div class="mt-10 space-y-10">
+          {seccion.listas.map((lista) => (
+            <div>
+              {lista.titulo && (
+                <h3 class="versalitas mb-5 border-b border-oliva/30 pb-3 text-borravino">{lista.titulo}</h3>
+              )}
+              <ul class="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
+                {lista.items.map((item) => (
+                  <TarjetaProducto
+                    item={item}
+                    sufijo={item.sufijo}
+                    foto={fotoDe(seccion.clave, item.slug)}
+                    enlaceCuidados={enlaceCuidados}
+                    colores={item.colores?.map((c) => ({ nombre: c.nombre, foto: c.foto ? fotoDe(seccion.clave, c.foto) : undefined }))}
+                    galeria={galeriaProducto(seccion.clave, item.slug, `${seccion.nombre.replace(/s$/, '')} ${item.nombre.toLowerCase()} de Margarita Nativa`)}
+                    agregable
+                  />
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
 
-          {seccion.notas && (
-            <ul class="mt-6 space-y-2 border-t border-oliva/20 pt-5">
-              {seccion.notas.map((nota) => (
-                <li class="flex gap-3 text-sm text-oliva">
-                  <svg viewBox="0 0 10 14" class="mt-1.5 h-2.5 w-1.5 shrink-0 fill-oliva/50" aria-hidden="true">
-                    <path d="M5 0 9.5 7 5 14 .5 7Z" />
-                  </svg>
-                  <span>{nota}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </Tarjeta>
+        {seccion.notas && (
+          <ul class="mt-6 space-y-2">
+            {seccion.notas.map((nota) => (
+              <li class="flex justify-center gap-3 text-center text-sm text-oliva">
+                <svg viewBox="0 0 10 14" class="mt-1.5 h-2.5 w-1.5 shrink-0 fill-oliva/50" aria-hidden="true">
+                  <path d="M5 0 9.5 7 5 14 .5 7Z" />
+                </svg>
+                <span>{nota}</span>
+              </li>
+            ))}
+          </ul>
+        )}
 
         <div class="mt-8 text-center">
           <Boton

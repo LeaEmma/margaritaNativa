@@ -1,0 +1,194 @@
+{
+  "actualizado": "2026-11-22",
+  "secciones": [
+    {
+      "titulo": "Plantas",
+      "items": [
+        {
+          "nombre": "Lavanda",
+          "slug": "lavanda",
+          "tamano": "Chica",
+          "precio": 10000,
+          "foto": "lavanda"
+        },
+        {
+          "nombre": "Jazmín chino",
+          "slug": "jazmin-chino",
+          "precio": 8000,
+          "foto": "jazmin-chino"
+        },
+        {
+          "nombre": "Santa Rita",
+          "slug": "santa-rita",
+          "precio": 8000,
+          "foto": "santa-rita"
+        },
+        {
+          "nombre": "Pino",
+          "slug": "pino",
+          "precio": 12000,
+          "foto": "pino"
+        },
+        {
+          "nombre": "Palo de agua",
+          "slug": "palo-de-agua",
+          "precio": 14000,
+          "foto": "palo-de-agua"
+        },
+        {
+          "nombre": "Monstera / Costilla de Adán",
+          "slug": "monstera-costilla-de-adan",
+          "precio": 15000,
+          "foto": "monstera-costilla-de-adan"
+        },
+        {
+          "nombre": "Lilium",
+          "slug": "lilium",
+          "precio": 15000,
+          "foto": "lilium"
+        },
+        {
+          "nombre": "Orquídea",
+          "slug": "orquidea",
+          "precio": 39000,
+          "foto": "orquidea"
+        },
+        {
+          "nombre": "Pandurata",
+          "slug": "pandurata",
+          "precio": 39000,
+          "foto": "pandurata"
+        },
+        {
+          "nombre": "Palmera areca",
+          "slug": "palmera-areca",
+          "tamano": "3 litros",
+          "precio": 24000,
+          "foto": "palmera-areca"
+        },
+        {
+          "nombre": "Stromanthe tricolor",
+          "slug": "stromanthe-tricolor",
+          "precio": 24000,
+          "foto": "stromanthe-tricolor"
+        },
+        {
+          "nombre": "Hortensia",
+          "slug": "hortensia",
+          "precio": 39000,
+          "foto": "hortensia"
+        },
+        {
+          "nombre": "Helecho",
+          "slug": "helecho",
+          "precio": 32000,
+          "foto": "helecho"
+        },
+        {
+          "nombre": "Platycerium",
+          "slug": "platycerium",
+          "detalle": "Cuernos de alce",
+          "precio": 24000,
+          "foto": "platycerium"
+        },
+        {
+          "nombre": "Estrella federal",
+          "slug": "estrella-federal",
+          "precio": 18000,
+          "foto": "estrella-federal"
+        },
+        {
+          "nombre": "Aromáticas",
+          "slug": "aromaticas",
+          "precio": 2000,
+          "variedades": [
+            "Albahaca",
+            "Romero",
+            "Menta"
+          ],
+          "foto": "aromaticas"
+        },
+        {
+          "nombre": "Petunias",
+          "slug": "petunias",
+          "precio": 2000,
+          "foto": "petunias"
+        },
+        {
+          "nombre": "Rafis",
+          "slug": "rafis",
+          "precio": 32000,
+          "foto": "rafis"
+        },
+        {
+          "nombre": "Monstera de agujeros",
+          "slug": "monstera-de-agujeros",
+          "precio": 65000,
+          "foto": "monstera-de-agujeros"
+        },
+        {
+          "nombre": "Cheflera",
+          "slug": "cheflera",
+          "precio": 10000,
+          "foto": "cheflera"
+        },
+        {
+          "nombre": "Gomero",
+          "slug": "gomero",
+          "precio": 35000,
+          "foto": "gomero"
+        },
+        {
+          "nombre": "Jazmín del Cabo",
+          "slug": "jazmin-del-cabo",
+          "precio": 39000,
+          "foto": "jazmin-del-cabo"
+        },
+        {
+          "nombre": "Bromelia",
+          "slug": "bromelia",
+          "precio": 32000,
+          "foto": "bromelia"
+        }
+      ]
+    },
+    {
+      "titulo": "Cajones",
+      "nota": "Mínimo 10 unidades",
+      "items": [
+        {
+          "nombre": "Hypoestes",
+          "slug": "hypoestes",
+          "precio": 3000,
+          "foto": "hypoestes"
+        },
+        {
+          "nombre": "Pilea depressa",
+          "slug": "pilea-depressa",
+          "precio": 3000,
+          "foto": "pilea-depressa"
+        },
+        {
+          "nombre": "Suculentas",
+          "slug": "suculentas",
+          "precio": 1200,
+          "cajon": {
+            "precio": 28000,
+            "unidades": 28
+          },
+          "foto": "suculentas"
+        },
+        {
+          "nombre": "Cactus",
+          "slug": "cactus",
+          "precio": 1500,
+          "cajon": {
+            "precio": 32000,
+            "unidades": 24
+          },
+          "foto": "cactus"
+        }
+      ]
+    }
+  ]
+}
