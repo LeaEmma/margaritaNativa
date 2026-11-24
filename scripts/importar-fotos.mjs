@@ -106,7 +106,7 @@ const CATEGORIAS = ['Plantas', 'Ramos'];
 async function productosDe(categoria) {
   const filas = await leerHoja(categoria);
   return filas
-    .map((f) => ({ nombre: (f.Nombre ?? f.Categoria ?? '').trim(), precio: Number(f['Precio venta'] ?? f.Precio) }))
+    .map((f) => ({ nombre: (f.Nombre ?? f.Categoria ?? '').trim(), precio: Number(f['Precio venta Web'] ?? f['Precio venta'] ?? f.Precio) }))
     .filter((p) => p.nombre);
 }
 

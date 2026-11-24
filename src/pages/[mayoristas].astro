@@ -1,0 +1,203 @@
+---
+/**
+ * Presupuesto mayorista para viveros y comercios. Lo que se comparte es el PDF
+ * (public/presupuesto-mayorista.pdf): esta página existe solo para imprimirlo
+ * (scripts/generar-presupuesto.mjs), así que los dos coinciden.
+ *
+ * Solo existe con `npm run dev`: es una ruta dinámica cuyo getStaticPaths no
+ * devuelve nada en el build, así que no se publica.
+ *
+ * Los datos salen de src/datos/mayoristas.json, que arma
+ * scripts/importar-mayoristas.mjs con la columna "Precio venta mayorista".
+ */
+export function getStaticPaths() {
+  return import.meta.env.DEV ? [{ params: { mayoristas: 'mayoristas' } }] : [];
+}
+
+import '../styles/global.css';
+import { Image } from 'astro:assets';
+import sello from '../assets/sello-margarita-nativa.png';
+import Icono from '../components/Icono.astro';
+import { SITIO, enlaceContacto } from '../datos/sitio';
+import { precio } from '../datos/catalogo';
+import datos from '../datos/mayoristas.json';
+
+interface ItemMayorista {
+  nombre: string;
+  slug: string;
+  detalle?: string;
+  precio: number;
+  tamano?: string;
+  variedades?: string[];
+  tamanos?: { nombre: string; precio: number }[];
+  cajon?: { precio: number; unidades: number };
+  foto?: string;
+}
+
+const secciones = datos.secciones as { titulo: string; nota?: string; items: ItemMayorista[] }[];
+
+const FOTOS = import.meta.glob<{ default: ImageMetadata }>('../assets/fotos/mayoristas/*.jpg', { eager: true });
+const fotoDe = (slug?: string) => (slug ? FOTOS[`../assets/fotos/mayoristas/${slug}.jpg`]?.default : undefined);
+
+const actualizado = new Date(`${datos.actualizado}T12:00:00`).toLocaleDateString('es-AR', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+});
+
+// 5491139379048 → 11 3937-9048
+const telefono = SITIO.whatsapp.replace(/^549(\d{2})(\d{4})(\d{4})$/, '$1 $2-$3');
+// En el PDF los enlaces van al sitio publicado, nunca a localhost.
+const sitio = new URL('https://margaritanativa.com.ar');
+const dominio = sitio.hostname;
+const pedido = enlaceContacto('¡Hola! Quiero hacer un pedido mayorista.');
+const titulo = `Presupuesto mayorista — ${SITIO.nombre}`;
+---
+
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>{titulo}</title>
+    <meta name="description" content={`Lista de precios mayoristas de plantas. Actualizada al ${actualizado}.`} />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" />
+    <meta name="theme-color" content="#500000" />
+    <meta property="og:title" content={titulo} />
+    <meta property="og:description" content={`Lista de precios mayoristas de plantas. Actualizada al ${actualizado}.`} />
+    <meta property="og:image" content={new URL('/og-margarita-nativa.jpg', Astro.site ?? 'https://margaritanativa.com.ar')} />
+  </head>
+
+  <body class="antialiased">
+    <main class="presupuesto mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-12">
+      <header class="rounded-2xl bg-oliva px-6 py-7 text-center text-crema sm:py-9">
+        <Image src={sello} alt="" width={160} height={160} format="png" class="mx-auto h-16 w-16 sm:h-20 sm:w-20" />
+        <h1 class="font-display mt-3 text-3xl font-semibold text-crema sm:text-4xl">Presupuesto mayorista</h1>
+        <p class="versalitas mt-2 text-crema/85">{SITIO.nombre}</p>
+        <p class="mt-3 text-sm text-crema/80">Precios actualizados al {actualizado}</p>
+      </header>
+
+      {
+        secciones.map((seccion) => (
+          <section class="seccion mt-10">
+            <h2 class="font-display border-b border-oliva/30 pb-2 text-2xl font-semibold text-borravino">
+              {seccion.titulo}
+            </h2>
+
+            <ul class="grilla mt-5 grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
+              {seccion.items.map((item) => {
+                const foto = fotoDe(item.foto);
+                return (
+                  <li class="tarjeta flex flex-col overflow-hidden rounded-xl bg-crema shadow-sm ring-1 ring-oliva/25">
+                    {foto ? (
+                      // En JPG y no WebP: el navegador mete los JPG tal cual en
+                      // el PDF, y los WebP los descomprime (el PDF pasaba los 15 MB).
+                      <Image src={foto} alt={item.nombre} width={600} format="jpg" quality={78} class="aspect-[3/2] w-full object-cover" />
+                    ) : (
+                      <div class="aspect-[3/2] w-full bg-oliva/10" />
+                    )}
+                    <div class="flex flex-1 flex-col p-3 sm:p-4">
+                      <h3 class="text-base leading-tight font-semibold text-tinta sm:text-lg">
+                        {item.nombre}
+                        {item.tamano && <span class="font-normal text-oliva"> · {item.tamano}</span>}
+                      </h3>
+                      {item.detalle && <p class="mt-0.5 text-sm text-oliva">{item.detalle}</p>}
+                      {item.variedades && <p class="mt-0.5 text-sm text-oliva">{item.variedades.join(' · ')}</p>}
+
+                      {item.tamanos ? (
+                        <ul class="mt-2 space-y-0.5">
+                          {item.tamanos.map((t) => (
+                            <li class="flex justify-between gap-2">
+                              <span class="text-oliva">{t.nombre}</span>
+                              <span class="font-semibold text-borravino">{precio(t.precio)}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p class="mt-auto pt-2 text-xl font-semibold text-borravino sm:text-2xl">
+                          {precio(item.precio)}
+                          {(item.variedades || seccion.nota) && <span class="text-sm font-normal text-oliva"> c/u</span>}
+                        </p>
+                      )}
+
+                      {item.cajon && (
+                        <p class="mt-2 rounded-lg bg-oliva/10 px-2.5 py-1.5 text-sm leading-snug text-tinta">
+                          <span class="versalitas text-xs font-semibold text-oliva">Cajón × {item.cajon.unidades}</span>
+                          <br />
+                          <span class="font-semibold text-borravino">{precio(item.cajon.precio)}</span>
+                        </p>
+                      )}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          </section>
+        ))
+      }
+
+      <footer class="pie mt-10 overflow-hidden rounded-2xl text-center">
+        <p class="versalitas bg-oliva px-4 py-3 font-semibold text-crema">Se abona contra entrega</p>
+        <div class="flex flex-wrap justify-center gap-x-6 gap-y-2 bg-oliva/10 px-4 py-4 text-sm text-tinta">
+          <a href={sitio.href} class="inline-flex items-center gap-1.5 hover:text-borravino">{dominio}</a>
+          <a href={SITIO.instagram} class="inline-flex items-center gap-1.5 hover:text-borravino">
+            <Icono nombre="instagram" class="h-4 w-4" />
+            {SITIO.instagramUsuario}
+          </a>
+          <a href={pedido} class="inline-flex items-center gap-1.5 hover:text-borravino">
+            <Icono nombre="whatsapp" class="h-4 w-4" />
+            {telefono}
+          </a>
+        </div>
+      </footer>
+    </main>
+  </body>
+</html>
+
+<style>
+  /* El PDF es esta misma página impresa en A4: tres columnas, sin botones y
+     sin que una tarjeta quede partida entre dos hojas. */
+  @page {
+    size: A4;
+    margin: 9mm;
+    /* El crema llega hasta el borde de la hoja, también en el margen. */
+    background: #fff5c3;
+  }
+  @media print {
+    :global(html) {
+      font-size: 12px;
+    }
+    .tarjeta :global(img),
+    .tarjeta > div:first-child {
+      aspect-ratio: 16 / 10;
+    }
+    :global(body) {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .presupuesto {
+      max-width: none;
+      padding: 0;
+    }
+    .no-imprimir {
+      display: none;
+    }
+    .seccion {
+      margin-top: 1.25rem;
+      break-before: auto;
+    }
+    .grilla {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.6rem;
+    }
+    .tarjeta,
+    .pie,
+    h2 {
+      break-inside: avoid;
+    }
+    .tarjeta {
+      box-shadow: none;
+    }
+  }
+</style>

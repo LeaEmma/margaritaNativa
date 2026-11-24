@@ -2,8 +2,9 @@
  * Catálogo de Margarita Nativa.
  *
  * Los precios están transcritos de las planillas publicadas de Google (ver
- * README). En Plantas se toma la columna "Precio venta"; "Precio compra" es
- * una referencia interna del dueño y no va al sitio. Al actualizar precios,
+ * README). En Plantas se toma la columna "Precio venta Web"; "Precio compra" es
+ * una referencia interna del dueño y no va al sitio. Los precios mayoristas
+ * van aparte, en mayoristas.json (scripts/importar-mayoristas.mjs). Al actualizar precios,
  * actualizar también las tarjetas impresas de
  * `_resources/Margarita Nativa/Productos/` para que no se desfasen.
  */
@@ -137,6 +138,11 @@ export const PLANTAS: Item[] = [
   { nombre: 'Gomero', precio: 55000 },
   { nombre: 'Jazmín del Cabo', precio: 60000 },
   { nombre: 'Bromelia', precio: 40000 },
+  // Las de la sección "Cajones" de la planilla, al precio por unidad.
+  { nombre: 'Hypoestes', precio: 3500 },
+  { nombre: 'Pilea depressa', precio: 3500 },
+  { nombre: 'Suculentas', precio: 2000 },
+  { nombre: 'Cactus', precio: 2500 },
 ];
 
 /**

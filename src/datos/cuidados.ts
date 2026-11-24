@@ -301,6 +301,42 @@ export const CUIDADOS: Record<string, Cuidado> = {
     ubicacion: 'Interior luminoso, lejos de estufas. Le gusta la humedad.',
     dato: 'Después de florecer, la planta madre se seca despacio: es normal. Al pie salen hijuelos que la reemplazan y vuelven a florecer.',
   },
+  hypoestes: {
+    nombre: 'Hypoestes',
+    productos: ['hypoestes'],
+    resumen: 'La planta salpicada: hojas verdes con manchas rosas, rojas o blancas. Chiquita y llena de color. Para alegrar un escritorio o armar un centro de mesa distinto.',
+    luz: 'Mucha luz indirecta. Con poca luz pierde las manchas y se pone verde.',
+    riego: 'Tierra apenas húmeda, sin encharcar. No la dejes secar del todo.',
+    ubicacion: 'Interior luminoso, lejos del sol fuerte del mediodía y de las estufas.',
+    dato: 'Si le falta agua se desmaya de golpe, pero se recupera en horas al regarla. Cortale las puntas de vez en cuando para que crezca tupida y no se estire.',
+  },
+  'pilea-depressa': {
+    nombre: 'Pilea depressa',
+    productos: ['pilea-depressa'],
+    resumen: 'Cubresuelos de hojitas redondas verde lima que cae como una cascada. Crece rápido y llena cualquier maceta. Ideal para colgar, para terrarios y para quien recién empieza con las plantas.',
+    luz: 'Luz indirecta abundante. El sol directo le quema las hojas.',
+    riego: 'Frecuente: la tierra siempre un poco húmeda. Más seguido en verano.',
+    ubicacion: 'Interior o balcón con sombra. Queda muy bien colgada o en el borde de una maceta grande.',
+    dato: 'Si las hojas se arrugan o se ponen finitas, le faltó agua. Pero no la dejes con el plato lleno: las raíces se pudren.',
+  },
+  suculentas: {
+    nombre: 'Suculentas',
+    productos: ['suculentas'],
+    resumen: 'Rosetas carnosas de formas y colores distintos que guardan agua en las hojas. Casi no piden nada. Un detalle perfecto para souvenirs y para regalar a quien viaja mucho.',
+    luz: 'Mucha luz, con algo de sol suave por la mañana.',
+    riego: 'Poco y a fondo: regá recién cuando la tierra esté seca del todo. En invierno, casi nada.',
+    ubicacion: 'Ventana luminosa o balcón, en maceta con agujero de drenaje.',
+    dato: 'Se mueren por exceso de agua, no por falta. Si se estiran y pierden la forma de roseta, les falta luz.',
+  },
+  cactus: {
+    nombre: 'Cactus',
+    productos: ['cactus'],
+    resumen: 'Resistentes, de formas curiosas, y algunos florecen. La planta más fácil de mantener. Para escritorios, souvenirs y para quien dice que se le mueren todas las plantas.',
+    luz: 'Pleno sol o la ventana más luminosa de la casa.',
+    riego: 'Muy poco: cada dos o tres semanas en verano y casi nada en invierno.',
+    ubicacion: 'Exterior al sol o interior junto a una ventana, en maceta con buen drenaje.',
+    dato: 'El descanso sin riego del invierno es lo que los hace florecer. Si los pasás al sol fuerte, acostumbralos de a poco para que no se quemen.',
+  },
 };
 
 /** Ficha de cuidados que cubre a un producto del catálogo, si existe. */
