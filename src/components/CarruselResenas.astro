@@ -9,6 +9,10 @@ import type { Resena } from '../datos/resenas';
  * al principio al llegar al final; se frena mientras el mouse, el dedo o el
  * foco del teclado están encima, y con "reducir movimiento" no avanza sola.
  * Las flechas funcionan siempre.
+ *
+ * Se renderizan todas las opiniones, pero en cada visita el script sortea
+ * `MOSTRAR` y saca el resto: 2 o 3 salen de las más largas (las que tienen
+ * `data-larga`) y las demás al azar. Sin JavaScript quedan las primeras.
  */
 interface Props {
   resenas: Resena[];
@@ -16,19 +20,31 @@ interface Props {
 
 const { resenas } = Astro.props;
 
+/** Cuántas se ven por visita y cuántas cuentan como "largas". */
+const MOSTRAR = 6;
+const LARGAS = 6;
+
+const largas = new Set(
+  [...resenas].sort((a, b) => b.cita.length - a.cita.length).slice(0, LARGAS),
+);
+
 const flecha =
   'flex h-11 w-11 items-center justify-center rounded-full border border-borravino/30 text-borravino transition-colors hover:border-borravino hover:bg-borravino/5';
 ---
 
-<div class="carrusel-resenas" data-carrusel-resenas>
+<div class="carrusel-resenas" data-carrusel-resenas data-mostrar={MOSTRAR}>
   <ul
     class="pista flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth scroll-px-5 px-5 pb-2 sm:scroll-px-0 sm:px-0"
     aria-label="Opiniones de clientes"
     tabindex="0"
   >
     {
-      resenas.map((resena) => (
-        <li class="flex w-[85%] shrink-0 snap-start sm:w-[calc((100%-1.25rem)/2)] lg:w-[calc((100%-2.5rem)/3)]">
+      resenas.map((resena, i) => (
+        <li
+          hidden={i >= MOSTRAR}
+          data-larga={largas.has(resena) ? '' : undefined}
+          class="flex w-[85%] shrink-0 snap-start sm:w-[calc((100%-1.25rem)/2)] lg:w-[calc((100%-2.5rem)/3)]"
+        >
           <figure class="flex w-full flex-col rounded-2xl border border-oliva/25 bg-papel p-7 shadow-sm shadow-borravino/5">
             <div class="flex gap-0.5 text-borravino" role="img" aria-label="5 estrellas">
               {[1, 2, 3, 4, 5].map(() => (
@@ -82,8 +98,37 @@ const flecha =
   const INTERVALO = 6000;
   const sinMovimiento = window.matchMedia('(prefers-reduced-motion: reduce)');
 
+  /** Mezcla Fisher-Yates sobre una copia. */
+  const mezclar = <T,>(lista: T[]): T[] => {
+    const copia = [...lista];
+    for (let i = copia.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copia[i], copia[j]] = [copia[j], copia[i]];
+    }
+    return copia;
+  };
+
+  /** Deja en la pista `cantidad` tarjetas sorteadas: 2 o 3 largas y el resto
+   *  al azar, en orden mezclado. Las que no salen se quitan del DOM. */
+  const sortear = (pista: HTMLElement, cantidad: number) => {
+    const todas = Array.from(pista.children) as HTMLElement[];
+    if (todas.length <= cantidad) return;
+    const largas = mezclar(todas.filter((t) => t.hasAttribute('data-larga')));
+    const fijas = largas.slice(0, Math.min(largas.length, 2 + Math.floor(Math.random() * 2)));
+    const resto = mezclar(todas.filter((t) => !fijas.includes(t)));
+    const elegidas = mezclar([...fijas, ...resto.slice(0, cantidad - fijas.length)]);
+    todas.forEach((t) => t.remove());
+    elegidas.forEach((t) => {
+      t.hidden = false;
+      pista.append(t);
+    });
+    // Al recargar, el navegador puede restaurar el desplazamiento anterior.
+    pista.scrollLeft = 0;
+  };
+
   document.querySelectorAll<HTMLElement>('[data-carrusel-resenas]').forEach((carrusel) => {
     const pista = carrusel.querySelector<HTMLElement>('.pista')!;
+    sortear(pista, Number(carrusel.dataset.mostrar) || 6);
     const tarjetas = Array.from(pista.children) as HTMLElement[];
 
     // Distancia de una tarjeta más el espacio entre tarjetas.
