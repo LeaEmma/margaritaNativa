@@ -407,7 +407,17 @@ const PREGUNTAS = [
         </a>
       </div>
       <div class="mt-12">
-        <CarruselResenas resenas={RESENAS} />
+        <CarruselResenas resenas={RESENAS.filter((resena) => !resena.oculta)} />
+      </div>
+      <div class="mt-8 flex justify-center px-5 sm:px-0">
+        <Boton href={SITIO.perfilGoogle} variante="contorno" class="flex-wrap gap-x-2.5 gap-y-1 text-center">
+          <span>Ver todas las reseñas</span>
+          <span class="flex items-center gap-1.5">
+            en Google
+            <Icono nombre="estrella" class="h-4 w-4 fill-current" />
+            {RESUMEN_GOOGLE.promedio}
+          </span>
+        </Boton>
       </div>
     </div>
   </section>
